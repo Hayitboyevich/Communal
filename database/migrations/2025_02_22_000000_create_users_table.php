@@ -14,10 +14,16 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('login')->unique();
+            $table->string('middle_name')->nullable();
+            $table->string('surname')->nullable();
+            $table->foreignId('region_id')->nullable()->constrained('regions');
+            $table->foreignId('district_id')->nullable()->constrained('districts');
+            $table->string('pin')->nullable()->unique();
+            $table->string('phone')->nullable();
+            $table->string('image')->nullable();
             $table->string('password');
-            $table->rememberToken();
+            $table->timestamp('last_login_at')->nullable();
             $table->timestamps();
         });
 
