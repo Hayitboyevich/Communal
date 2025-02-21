@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('login')->unique();
             $table->string('middle_name')->nullable();
             $table->string('surname')->nullable();
-            $table->foreignId('region_id')->nullable()->constrained('regions');
-            $table->foreignId('district_id')->nullable()->constrained('districts');
+            $table->foreignId('region_id')->nullable()->index()->constrained('regions')->nullOnDelete();
+            $table->foreignId('district_id')->nullable()->index()->constrained('districts')->nullOnDelete();
             $table->string('pin')->nullable()->unique();
             $table->string('phone')->nullable();
             $table->string('image')->nullable();

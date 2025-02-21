@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             RegionSeeder::class,
             UserSeeder::class,
+            ProtocolStatusSeeder::class,
         ]);
 
 
