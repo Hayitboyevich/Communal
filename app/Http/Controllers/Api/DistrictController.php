@@ -2,16 +2,22 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\District;
+use App\Constants\ErrorMessage;
+use App\Http\Controllers\BaseController;
+use App\Http\Resources\DistrictResource;
 use App\Models\Region;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
-class DistrictController extends Controller
+class DistrictController extends BaseController
 {
-    public function list()
+    public function list(): JsonResponse
     {
-        $region = Region::query()->find(request('region_id'));
-        return District::query()->where('region_id', $region->id)->get();
+        try {
+            $region = Region::query()->findOrFail(request('region_id'));
+            return $this->sendSuccess(DistrictResource::collection($region->districts), 'District list');
+
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
     }
 }

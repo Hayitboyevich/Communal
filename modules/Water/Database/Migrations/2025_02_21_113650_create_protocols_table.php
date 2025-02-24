@@ -29,7 +29,7 @@ return new class extends Migration
             $table->date('birth_date')->nullable()->comment('tugilgan kuni');
             $table->string('functionary_name')->nullable()->comment('mansabdor shaxs');
             $table->string('phone')->nullable()->comment('tel nomer');
-            $table->string('self-government_name')->nullable()->comment('fuqaroni ozini ozi boshqarish organi');
+            $table->string('self_government_name')->nullable()->comment('fuqaroni ozini ozi boshqarish organi');
             $table->string('inspector_name')->nullable()->comment('fuqaroni ozini ozi boshqarish organi');
             $table->string('participant_name')->nullable()->comment('boshqa ishtirok etuvchi');
             //3-qadam

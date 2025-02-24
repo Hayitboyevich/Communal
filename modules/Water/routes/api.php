@@ -1,5 +1,28 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Water\Http\Controllers\ProtocolController;
+use Modules\Water\Http\Controllers\ProtocolStatusController;
+use Modules\Water\Http\Controllers\ProtocolTypeController;
 
-Route::get('abs', fn() => 'Salom')->middleware('auth:api');
+Route::group(['middleware' => ['auth:api']], function () {
+
+    Route::controller(ProtocolController::class)->prefix('protocol')->group(function () {
+        Route::get('/{id?}', 'index');
+        Route::post('/create/first', 'createFirst');
+        Route::post('/create/second', 'createSecond');
+        Route::post('/create/third', 'createThird');
+    });
+
+    Route::controller(ProtocolStatusController::class)->prefix('protocol-status')->group(function () {
+        Route::get('/{id?}', 'index');
+    });
+
+    Route::controller(ProtocolTypeController::class)->prefix('protocol-type')->group(function () {
+        Route::get('/{id?}', 'index');
+    });
+
+
+
+
+});

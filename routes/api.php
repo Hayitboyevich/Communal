@@ -13,7 +13,6 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/auth', 'auth');
 });
 
-Route::get('region', [RegionController::class, 'index'])->middleware(['auth:api']);
 
 Route::group(['middleware' => ['auth:api']], function () {
 

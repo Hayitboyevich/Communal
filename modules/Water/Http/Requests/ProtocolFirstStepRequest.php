@@ -1,0 +1,28 @@
+<?php
+
+namespace Modules\Water\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class ProtocolFirstStepRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'protocol_type_id' => 'required|integer|exists:protocol_types,id',
+            'protocol_status_id' => 'required|integer|exists:protocol_statuses,id',
+            'region_id' => 'required|integer|exists:regions,id',
+            'district_id' => 'required|integer|exists:districts,id',
+            'address' => 'required|string',
+            'description' => 'required|string',
+            'lat' => 'required|numeric',
+            'long' => 'required|numeric',
+            'images' => 'required|array',
+        ];
+    }
+}

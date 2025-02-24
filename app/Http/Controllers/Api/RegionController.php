@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Constants\ErrorMessage;
+use App\Http\Controllers\BaseController;
+use App\Http\Resources\RegionResource;
 use App\Models\Region;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
-class RegionController extends Controller
+class RegionController extends BaseController
 {
-    public function index($id = null)
+    public function index($id = null): JsonResponse
     {
-       if ($id) {
-           return Region::query()->find($id);
-       }else{
-           return Region::all();
-       }
+        try {
+            $regions = $id ? Region::query()->findOrFail($id) : Region::all();
+            $resource = $id ? RegionResource::make($regions) : RegionResource::collection($regions);
+
+            return $this->sendSuccess($resource, 'Region');
+        } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
     }
+
 }
