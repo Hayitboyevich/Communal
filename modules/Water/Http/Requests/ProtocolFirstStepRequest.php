@@ -3,6 +3,7 @@
 namespace Modules\Water\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Modules\Water\Enums\ProtocolStatusEnum;
 
 class ProtocolFirstStepRequest extends FormRequest
 {
@@ -24,5 +25,12 @@ class ProtocolFirstStepRequest extends FormRequest
             'long' => 'required|numeric',
             'images' => 'required|array',
         ];
+    }
+
+    public function prepareForValidation()
+    {
+        $this->merge([
+            'protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT->value
+        ]);
     }
 }

@@ -15,6 +15,7 @@ class ProtocolSecondStepRequest extends FormRequest
     public function rules(): array
     {
         return [
+//            'id' => 'required|integer|exists:protocols,id',
             'user_type' => 'required|integer|between:1,2',
             'inn' => 'required|string',
             'enterprise_name' => 'required|string',
@@ -25,6 +26,7 @@ class ProtocolSecondStepRequest extends FormRequest
             'self_government_name' => 'required|string',
             'inspector_name' => 'required|string',
             'participant_name' => 'required|string',
+            'file' => 'required|file',
         ];
     }
 }

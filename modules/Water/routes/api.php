@@ -10,8 +10,8 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::controller(ProtocolController::class)->prefix('protocol')->group(function () {
         Route::get('/{id?}', 'index');
         Route::post('/create/first', 'createFirst');
-        Route::post('/create/second', 'createSecond');
-        Route::post('/create/third', 'createThird');
+        Route::post('/create/second/{id}', 'createSecond');
+        Route::post('/create/third/{id}', 'createThird');
     });
 
     Route::controller(ProtocolStatusController::class)->prefix('protocol-status')->group(function () {
