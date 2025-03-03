@@ -15,7 +15,7 @@ class ProtocolService
 
     public function getAll()
     {
-        return $this->repository->all()->get();
+        return $this->repository->all();
     }
 
     public function findById(?int $id)
@@ -23,38 +23,26 @@ class ProtocolService
         return $this->repository->findById($id);
     }
 
-    public function createFirst(?array $data)
+    public function create(?array $data)
     {
-        return  $this->repository->createFirst($data);
+        return  $this->repository->create($data);
     }
 
-    public function createSecond(?int $id, ?array $data)
+    public function update(?int $id, ?array $data)
     {
-        return $this->repository->createSecond($id, $data);
+        return $this->repository->update($id, $data);
     }
 
-    public function createThird(?int $id, ?array $data)
-    {
-        return $this->repository->createThird($id, $data);
-    }
 
     public function saveImages(Protocol $protocol, ?array $images)
     {
-        foreach ($images as $image) {
-            $path = $this->fileService->uploadImage($image, 'protocol/images');
-            $protocol->images()->create([
-                'url' => $path
-            ]);
-        }
+        $paths = array_map(fn($image) => $this->fileService->uploadImage($image, 'protocol/images'), $images);
+        $protocol->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
     }
 
     public function saveFiles(Protocol $protocol, ?array $files)
     {
-        foreach ($files as $file) {
-            $path = $this->fileService->uploadImage($file, 'protocol/files');
-            $protocol->documents()->create([
-                'url' => $path
-            ]);
-        }
+        $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'protocol/files'), $files);
+        $protocol->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
     }
 }

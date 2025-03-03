@@ -14,27 +14,18 @@ class ProtocolRepository implements ProtocolRepositoryInterface
 
     public function findById(?int $id)
     {
-        try {
-            return Protocol::query()->findOrFail($id);
-        }catch (\Exception $exception){
-            throw $exception;
-        }
+        return Protocol::query()->findOrFail($id);
     }
 
-    public function createFirst(?array $data)
+    public function create(?array $data)
     {
-        $protocol = Protocol::query()->create($data);
+        return  Protocol::query()->create($data);
+    }
 
+    public function update(?int $id, ?array $data)
+    {
+        $protocol = Protocol::query()->findOrFail($id);
+        $protocol->update($data);
         return $protocol;
-    }
-
-    public function createSecond(?int $id, ?array $data)
-    {
-
-    }
-
-    public function createThird(?int $id, ?array $data)
-    {
-
     }
 }

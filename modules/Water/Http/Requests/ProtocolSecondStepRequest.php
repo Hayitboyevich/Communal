@@ -3,6 +3,7 @@
 namespace Modules\Water\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Modules\Water\Enums\ProtocolStatusEnum;
 
 class ProtocolSecondStepRequest extends FormRequest
 {
@@ -15,7 +16,6 @@ class ProtocolSecondStepRequest extends FormRequest
     public function rules(): array
     {
         return [
-//            'id' => 'required|integer|exists:protocols,id',
             'user_type' => 'required|integer|between:1,2',
             'inn' => 'required|string',
             'enterprise_name' => 'required|string',
@@ -26,7 +26,17 @@ class ProtocolSecondStepRequest extends FormRequest
             'self_government_name' => 'required|string',
             'inspector_name' => 'required|string',
             'participant_name' => 'required|string',
-            'file' => 'required|file',
+            'files' => 'required|array',
+            'protocol_status_id' => 'required|integer',
         ];
+    }
+
+    public function prepareForValidation()
+    {
+        $this->merge([
+            'protocol_status_id' => $this->protocol_status_id == ProtocolStatusEnum::NOT_DEFECT->value
+                ? ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value
+                : ProtocolStatusEnum::FORMING->value
+        ]);
     }
 }

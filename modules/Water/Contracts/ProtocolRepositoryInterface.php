@@ -8,9 +8,8 @@ interface ProtocolRepositoryInterface
 
     public function findById(?int $id);
 
-    public function createFirst(?array $data);
+    public function create(?array $data);
 
-    public function createSecond(?int $id, ?array $data);
+    public function update(?int $id, ?array $data);
 
-    public function createThird(?int $id, ?array $data);
 }

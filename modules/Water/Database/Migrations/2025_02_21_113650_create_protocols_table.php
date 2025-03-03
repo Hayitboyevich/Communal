@@ -37,7 +37,7 @@ return new class extends Migration
             $table->text('comment')->nullable();
             $table->dateTime('deadline')->nullable();
             $table->boolean('is_finished')->default(false);
-            $table->jsonb('images')->nullable();
+            $table->jsonb('image_files')->nullable();
             $table->timestamps();
         });
     }

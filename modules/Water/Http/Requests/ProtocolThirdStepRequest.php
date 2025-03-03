@@ -3,6 +3,7 @@
 namespace Modules\Water\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Modules\Water\Enums\ProtocolStatusEnum;
 
 class ProtocolThirdStepRequest extends FormRequest
 {
@@ -17,14 +18,17 @@ class ProtocolThirdStepRequest extends FormRequest
             'defect_information' => 'required|string',
             'comment' => 'required|string',
             'deadline' => 'required|date',
-            'images' => 'required|array',
+            'image_files' => 'required|array',
+            'is_finished' => 'required|boolean',
         ];
     }
 
     public function prepareForValidation()
     {
         $this->merge([
-            'is_finished' => true
+            'is_finished' => true,
+            'image_files' => $this->images,
+            'protocol_status_id' => ProtocolStatusEnum::CONFIRM_RESULT->value
         ]);
     }
 }

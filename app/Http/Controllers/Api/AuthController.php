@@ -2,31 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Http\Controllers\BaseController;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
-class AuthController extends Controller
+class AuthController extends BaseController
 {
-    public function auth(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'login' => 'required',
-            'password' => 'required|string|min:6',
-        ]);
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-
-        $user = User::query()->create($validator->validated());
-        $token = $user->createToken('UserToken')->accessToken;
-        return response()->json([$user, 'token' => $token], 201);
-    }
-
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         $credentials = $request->only('login', 'password');
         if (Auth::attempt($credentials)) {
@@ -38,8 +21,7 @@ class AuthController extends Controller
             $meta['phone'] = $user->phone;
             $meta['token'] = $token;
 
-
-            return response()->json($meta, 201);
+            return $this->sendSuccess($meta, 'User logged in successfully.');
         }else{
             return response()->json(['error' => 'Unauthorized'], 401);
         }

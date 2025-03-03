@@ -15,30 +15,47 @@ class ProtocolStatusSeeder extends Seeder
     {
         ProtocolStatus::create([
             'name' => 'Natija kiritishda',
+            'description' => 'Natija kiritishda',
         ]);
 
         ProtocolStatus::create([
             'name' => 'Kamchilik aniqlanmadi',
+            'description' => 'Kamchilik aniqlanmadi',
         ]);
 
         ProtocolStatus::create([
             'name' => 'Ko\'rsatma shakllantirish',
+            'description' => 'Ko\'rsatma shakllantirish',
         ]);
 
         ProtocolStatus::create([
             'name' => 'Ko\'rsatma shakllantirildi',
+            'description' => 'Ko\'rsatma shakllantirildi',
         ]);
 
         ProtocolStatus::create([
             'name' => 'Ma\'muriy qilindi',
+            'description' => 'Ma\'muriy qilindi',
         ]);
 
         ProtocolStatus::create([
             'name' => 'Ko\'rsatma bajarildi',
+            'description' => 'Ko\'rsatma bajarildi',
         ]);
 
         ProtocolStatus::create([
             'name' => 'HMQOga yuborildi',
+            'description' => 'HMQOga yuborildi',
+        ]);
+
+        ProtocolStatus::create([
+            'name' => 'Korsatmani tasdiqlash',
+            'description' => 'Korsatmani tasdiqlash',
+        ]);
+
+        ProtocolStatus::create([
+            'name' => 'Kamchilik tasdiqlash',
+            'description' => 'Kamchilik aniqlanmadini tasdiqlash',
         ]);
     }
 }
