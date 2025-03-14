@@ -28,7 +28,6 @@ if (!function_exists('getInfo')) {
         try {
             $client = new Client();
 
-
             $url = $param ? $baseUrl.'='.$param : $baseUrl;
 
             $resClient = $client->post($url,
