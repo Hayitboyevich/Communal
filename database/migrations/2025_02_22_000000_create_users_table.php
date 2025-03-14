@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('district_id')->nullable()->index()->constrained('districts')->nullOnDelete();
             $table->string('pin')->nullable()->unique();
             $table->string('phone')->nullable();
+            $table->date('birth_date')->nullable();
             $table->string('image')->nullable();
             $table->string('password');
             $table->timestamp('last_login_at')->nullable();

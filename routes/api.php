@@ -4,7 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DistrictController;
 use App\Http\Controllers\Api\RegionController;
 use App\Http\Controllers\Api\UserController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\RoleController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -24,6 +24,11 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::controller(RegionController::class)->prefix('region')->group(function () {
         Route::get('/{id?}', 'index');
     });
+
+    Route::controller(RoleController::class)->prefix('role')->group(function () {
+        Route::get('/{id?}', 'index');
+    });
+
 
     Route::controller(DistrictController::class)->prefix('district')->group(function () {
         Route::get('/', 'list');

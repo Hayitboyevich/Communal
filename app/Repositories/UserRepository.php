@@ -9,7 +9,7 @@ class UserRepository implements UserRepositoryInterface
 {
     public function all()
     {
-
+        return User::query();
     }
 
     public function create(?array $data)
@@ -23,7 +23,7 @@ class UserRepository implements UserRepositoryInterface
 
     public function find($id)
     {
-
+        $user = User::query()->find($id);
     }
 
     public function update($id, array $data){

@@ -24,6 +24,8 @@ class UserCreateRequest extends FormRequest
             'district_id' => 'required|integer|exists:districts,id',
             'login' => 'required|string|max:255|unique:users',
             'password' => 'required|string',
+            'birth_date' => 'required|date',
+            'role_id' => 'required|integer|exists:roles,id',
             'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
@@ -34,5 +36,7 @@ class UserCreateRequest extends FormRequest
             'login' => $this->passport,
             'password' => $this->pin
         ]);
+
+        $this->request->remove('passport');
     }
 }

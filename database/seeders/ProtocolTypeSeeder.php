@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Imports\ProtocolTypeImport;
 use Illuminate\Database\Seeder;
+use Maatwebsite\Excel\Facades\Excel;
 use Modules\Water\Models\ProtocolType;
 
 class ProtocolTypeSeeder extends Seeder
@@ -13,9 +14,8 @@ class ProtocolTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        ProtocolType::create([
-            'name' => 'Bilmadm',
-            'description' => 'Bilmadm',
-        ]);
+        ProtocolType::query()->truncate();
+        $types = storage_path() . "/excel/protocol-type.xlsx";
+        Excel::import(new ProtocolTypeImport(), $types);
     }
 }
