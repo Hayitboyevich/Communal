@@ -1,5 +1,6 @@
 <?php
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
 
 if (!function_exists('pagination')) {
     function pagination(object $model)
@@ -22,24 +23,32 @@ if (!function_exists('pagination')) {
     }
 }
 
-if (!function_exists('getInfo')) {
-    function getInfo(?string $baseUrl, ?string $param = null)
+if (!function_exists('postData')) {
+    function postData(?string $baseUrl, ?array $data = null)
     {
         try {
-            $client = new Client();
-            $url = $param ? $baseUrl.'='.$param : $baseUrl;
+            $response = Http::withHeaders([
+                'client-id' => config('water.card.clientId'),
+                'client-secret' => config('water.card.clientSecret'),
+                'Content-Type' => 'application/json',
+            ])->timeout(10)
+            ->post($baseUrl, $data);
 
-            $resClient = $client->post($url,
-                [
-                    'headers' => [
-                        'client-id' => config('water.card.clientId'),
-                        'client-secret' => config('water.card.clientSecret'),
-                     ]
-                ]);
-            $response = json_decode($resClient->getBody(), true);
-            return $response['result'];
+            if ($response->successful()) {
+                return $response->json() ?? null;
+            } else {
+                return null;
+            }
         }catch (Exception $e){
             return null;
         }
+    }
+}
+
+if (!function_exists('getData'))
+{
+    function getData(string $baseUrl, ?string $param = null)
+    {
+
     }
 }

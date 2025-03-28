@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'oneId' => [
+        'id' => env('ONE_ID_CLIENT_ID'),
+        'secret' => env('ONE_ID_CLIENT_SECRET'),
+        'redirect' => env('ONE_ID_URL'),
+    ],
+
 ];

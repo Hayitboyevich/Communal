@@ -2,6 +2,8 @@
 
 namespace Modules\Water\Contracts;
 
+use Modules\Water\Http\Requests\CardRequest;
+
 interface CardRepositoryInterface
 {
     public function getInfo();
@@ -9,4 +11,6 @@ interface CardRepositoryInterface
     public function register();
 
     public function verify();
+
+    public function create(CardRequest $request);
 }

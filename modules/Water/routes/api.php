@@ -5,6 +5,10 @@ use Modules\Water\Http\Controllers\ProtocolController;
 use Modules\Water\Http\Controllers\ProtocolStatusController;
 use Modules\Water\Http\Controllers\ProtocolTypeController;
 use Modules\Water\Http\Controllers\CardController;
+use App\Http\Controllers\Api\AuthController;
+
+
+
 
 Route::group(['middleware' => ['auth:api']], function () {
 
@@ -27,6 +31,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/{id?}', 'index');
         Route::post('/register', 'register');
         Route::post('/verify', 'verify');
+        Route::post('/create', 'create');
         Route::get('/phone', 'cardByPhone');
         Route::get('/info', 'info');
     });

@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::controller(AuthController::class)->group(function () {
-    Route::post('/login', 'login');
-//    Route::post('/auth', 'auth');
+    Route::post('login', 'login');
+    Route::post('auth', 'auth');
+    Route::post('check-user', 'checkUser');
 });
 
 
