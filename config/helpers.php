@@ -49,6 +49,6 @@ if (!function_exists('getData'))
 {
     function getData(string $baseUrl, ?string $param = null)
     {
-
+        return 'kalish';
     }
 }
