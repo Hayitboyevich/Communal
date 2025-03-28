@@ -73,7 +73,6 @@ class AuthController extends BaseController
             $roleId = request('role_id');
             $role = Role::query()->find($roleId);
             $token = $user->createToken('App', ['role_id' => $roleId])->accessToken;
-
             $success['token'] = $token;
             $success['id'] = $user->id;
             $success['full_name'] = $user->name;
