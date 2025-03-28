@@ -11,6 +11,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -60,7 +61,25 @@ class AuthController extends BaseController
         }
     }
 
-    public function login(): JsonResponse
+    public function login(Request $request): JsonResponse
+    {
+        $credentials = $request->only('login', 'password');
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            $token = $user->createToken('UserToken')->accessToken;
+            $meta['name'] = $user->name;
+            $meta['surname'] = $user->surname;
+            $meta['middle_name'] = $user->middle_name;
+            $meta['phone'] = $user->phone;
+            $meta['token'] = $token;
+
+            return $this->sendSuccess($meta, 'User logged in successfully.');
+        }else{
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    }
+
+    public function auth(): JsonResponse
     {
         $encodedData = request('token');
         $decodedData = base64_decode($encodedData);
