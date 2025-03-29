@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends BaseController
 {
@@ -66,7 +67,7 @@ class AuthController extends BaseController
         $credentials = $request->only('login', 'password');
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            $token = $user->createToken('UserToken')->accessToken;
+            $token = JWTAuth::claims(['role_id' => $request->role_id])->fromUser($user);
             $meta['name'] = $user->name;
             $meta['surname'] = $user->surname;
             $meta['middle_name'] = $user->middle_name;
@@ -91,7 +92,7 @@ class AuthController extends BaseController
             $user = Auth::user();
             $roleId = request('role_id');
             $role = Role::query()->find($roleId);
-            $token = $user->createToken('App', ['role_id' => $roleId])->accessToken;
+            $token = JWTAuth::claims(['role_id' => \request('role_id')])->fromUser($user);
             $success['token'] = $token;
             $success['id'] = $user->id;
             $success['full_name'] = $user->name;

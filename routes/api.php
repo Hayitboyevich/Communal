@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\RegionController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ProfileController;
 
 
 Route::controller(AuthController::class)->group(function () {
@@ -21,6 +22,10 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::controller(UserController::class)->prefix('user')->group(function () {
         Route::get('/', 'index');
         Route::post('/create', 'create');
+    });
+
+    Route::controller(ProfileController::class)->prefix('profile')->group(function () {
+        Route::get('/', 'index');
     });
 
     Route::controller(RegionController::class)->prefix('region')->group(function () {

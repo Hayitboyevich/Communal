@@ -4,9 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BaseController extends Controller
 {
+    protected $user;
+    protected  $roleId;
+    public function __construct()
+    {
+        $this->user = Auth::guard('api')->user();
+        if ($this->user)  $this->roleId = $this->user->getRoleFromToken();
+    }
+
     public function sendSuccess($result, $message, $meta = []): JsonResponse
     {
         $response = [

@@ -6,11 +6,11 @@ use Modules\Water\Http\Requests\CardRequest;
 
 interface CardRepositoryInterface
 {
-    public function getInfo();
 
-    public function register();
+    public function findById($id);
+    public function all($userId);
 
-    public function verify();
+    public function changeCard($id, $userId);
 
     public function create(CardRequest $request);
 }

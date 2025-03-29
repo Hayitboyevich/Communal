@@ -11,7 +11,30 @@ use Modules\Water\Services\CardService;
 
 class CardController extends BaseController
 {
-    public function __construct(protected CardService $service){}
+    public function __construct(protected CardService $service){
+        parent::__construct();
+    }
+
+    public function index($id = null): JsonResponse
+    {
+        try {
+            $cards = $id
+                ? $this->service->findById($id)
+                : $this->service->getAll($this->user)->paginate(request('per_page', 15));
+
+            $resource = $id
+                ? CardResource::make($cards)
+                : CardResource::collection($cards);
+
+            return $this->sendSuccess(
+                $resource,
+                $id ? 'Card retrieved successfully.' : 'Cards retrieved successfully.',
+                $id ? null : pagination($cards)
+            );
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
 
     public function register(): JsonResponse
     {
@@ -34,19 +57,20 @@ class CardController extends BaseController
         }
     }
 
-    public function cardByPhone(): JsonResponse
+    public function create(CardRequest $request): JsonResponse
     {
         try {
-
+            $data = $this->service->create($request);
+            return $this->sendSuccess(CardResource::make($data), 'Ok');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
-    public function create(CardRequest $request): JsonResponse
+    public function change(): JsonResponse
     {
         try {
-            $data = $this->service->create($request);
+            $data = $this->service->change(request('card_id'), $this->user);
             return $this->sendSuccess(CardResource::make($data), 'Ok');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());

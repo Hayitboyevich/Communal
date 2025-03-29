@@ -17,7 +17,9 @@ class ProtocolController extends BaseController
 
     public function __construct(
         protected ProtocolService $service
-    ){}
+    ){
+        parent::__construct();
+    }
 
     public function index($id = null): JsonResponse
     {

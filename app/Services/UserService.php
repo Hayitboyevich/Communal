@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\UserRepositoryInterface;
+use App\Http\Requests\UserCreateRequest;
 use Illuminate\Support\Facades\DB;
 
 class UserService
@@ -27,16 +28,13 @@ class UserService
         return $this->repository->find($id);
     }
 
-    public function create(array $data)
+    public function create(UserCreateRequest $request)
     {
         DB::beginTransaction();
         try {
-            $roleId = $data['role_id'];
-            unset($data['role_id']);
 
-            $user = $this->repository->create($data);
-
-            $user->roles()->attach($roleId);
+            $user = $this->repository->create($request->except(['role_id', 'image']));
+            $user->roles()->attach($user->id, ['role_id' => $request->role_id]);
 
             if (!empty($data['image'])) {
                 $path = $this->fileService->uploadImage($data['image'], 'user/images');

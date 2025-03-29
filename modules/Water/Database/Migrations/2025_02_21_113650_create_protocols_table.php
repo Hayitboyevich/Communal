@@ -38,6 +38,10 @@ return new class extends Migration
             $table->dateTime('deadline')->nullable();
             $table->boolean('is_finished')->default(false);
             $table->jsonb('image_files')->nullable();
+            // qoshimcha
+            $table->integer('role_id')->nullable()->index()->comment('kim tomodidan yaratilganligi role');
+            $table->bigInteger('user_id')->nullable()->index()->comment('kim tomodidan yaratilganligi user');
+            $table->tinyInteger('type')->nullable()->comment('qaysi platformada yaratilgani 1 suv, 2 ogoh fuqaro');
             $table->timestamps();
         });
     }

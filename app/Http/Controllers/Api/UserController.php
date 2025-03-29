@@ -14,7 +14,9 @@ use Illuminate\Http\JsonResponse;
 class UserController extends BaseController
 {
 
-    public function __construct(protected UserService  $service){}
+    public function __construct(protected UserService  $service){
+        parent::__construct();
+    }
     public function index($id = null): JsonResponse
     {
         try {
@@ -39,7 +41,7 @@ class UserController extends BaseController
     public function create(UserCreateRequest $request): JsonResponse
     {
         try {
-            $user = $this->service->create($request->all());
+            $user = $this->service->create($request);
             return $this->sendSuccess(new UserResource($user), 'User created successfully.');
 
         }catch (\Exception $exception){

@@ -32,8 +32,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/register', 'register');
         Route::post('/verify', 'verify');
         Route::post('/create', 'create');
-        Route::get('/phone', 'cardByPhone');
-        Route::get('/info', 'info');
+        Route::post('/change', 'change');
     });
 
 });

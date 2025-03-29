@@ -35,4 +35,19 @@ class CardService
             throw $exception;
         }
     }
+
+    public function findById($id)
+    {
+        return $this->repository->findById($id);
+    }
+
+    public function getAll($user)
+    {
+       return $this->repository->all($user->id);
+    }
+
+    public function change($id, $user)
+    {
+        return $this->repository->changeCard($id, $user->id);
+    }
 }
