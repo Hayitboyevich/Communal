@@ -22,6 +22,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::controller(UserController::class)->prefix('user')->group(function () {
         Route::get('/', 'index');
         Route::post('/create', 'create');
+        Route::post('/info', 'info');
     });
 
     Route::controller(ProfileController::class)->prefix('profile')->group(function () {

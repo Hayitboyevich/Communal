@@ -41,4 +41,10 @@ return [
         'redirect' => env('ONE_ID_URL'),
     ],
 
+    "passport" => [
+        "url" => 'https://api.shaffofqurilish.uz/api/v1/get-egov-token',
+        "login" => env('BANK_USERNAME', 'dev@gasn'),
+        "password" => env('BANK_PASSWORD', 'EkN`9?@{3v0j'),
+    ],
+
 ];

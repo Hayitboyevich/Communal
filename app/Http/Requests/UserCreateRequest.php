@@ -37,6 +37,5 @@ class UserCreateRequest extends FormRequest
             'password' => $this->pin
         ]);
 
-        $this->request->remove('passport');
     }
 }

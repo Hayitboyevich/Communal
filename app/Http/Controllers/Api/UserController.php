@@ -48,4 +48,16 @@ class UserController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
+    public function info(): JsonResponse
+    {
+        try {
+            $data = $this->service->getInfo(request('pin'), request('birth_date'));
+
+            return $this->sendSuccess($data, 'Passport Information Get Successfully');
+
+        } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
 }
