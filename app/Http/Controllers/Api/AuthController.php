@@ -73,6 +73,7 @@ class AuthController extends BaseController
             $meta['middle_name'] = $user->middle_name;
             $meta['phone'] = $user->phone;
             $meta['token'] = $token;
+            $meta['role'] = RoleResource::make(Role::query()->find($request->role_id));
 
             return $this->sendSuccess($meta, 'User logged in successfully.');
         }else{
