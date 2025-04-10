@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('protocols', function (Blueprint $table) {
             $table->id();
+            $table->tinyInteger('step')->nullable();
             $table->foreignId('protocol_type_id')->nullable()->index()->constrained('protocol_types')->nullOnDelete();
             $table->foreignId('protocol_status_id')->nullable()->index()->constrained('protocol_statuses')->nullOnDelete();
             $table->foreignId('region_id')->nullable()->index()->constrained('regions')->nullOnDelete();

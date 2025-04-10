@@ -20,6 +20,7 @@ class ProtocolThirdStepRequest extends FormRequest
             'deadline' => 'required|date',
             'image_files' => 'required|array',
             'is_finished' => 'required|boolean',
+            'step' => 'required|integer',
         ];
     }
 
@@ -28,7 +29,8 @@ class ProtocolThirdStepRequest extends FormRequest
         $this->merge([
             'is_finished' => true,
             'image_files' => $this->images,
-            'protocol_status_id' => ProtocolStatusEnum::CONFIRM_RESULT->value
+            'protocol_status_id' => ProtocolStatusEnum::CONFIRM_RESULT->value,
+            'step' => 3
         ]);
     }
 }

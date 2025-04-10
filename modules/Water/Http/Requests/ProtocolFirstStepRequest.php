@@ -23,6 +23,7 @@ class ProtocolFirstStepRequest extends FormRequest
             'description' => 'required|string',
             'lat' => 'required|numeric',
             'long' => 'required|numeric',
+            'step' => 'required|integer',
             'images' => 'required|array',
         ];
     }
@@ -30,7 +31,8 @@ class ProtocolFirstStepRequest extends FormRequest
     public function prepareForValidation()
     {
         $this->merge([
-            'protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT->value
+            'protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT->value,
+            'step' => 1
         ]);
     }
 }

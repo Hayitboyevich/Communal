@@ -28,6 +28,7 @@ class ProtocolSecondStepRequest extends FormRequest
             'participant_name' => 'required|string',
             'files' => 'required|array',
             'protocol_status_id' => 'required|integer',
+            'step' => 'required|integer',
         ];
     }
 
@@ -36,7 +37,8 @@ class ProtocolSecondStepRequest extends FormRequest
         $this->merge([
             'protocol_status_id' => $this->protocol_status_id == ProtocolStatusEnum::NOT_DEFECT->value
                 ? ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value
-                : ProtocolStatusEnum::FORMING->value
+                : ProtocolStatusEnum::FORMING->value,
+            'step' => 2
         ]);
     }
 }
