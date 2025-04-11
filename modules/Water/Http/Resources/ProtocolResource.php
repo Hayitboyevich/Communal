@@ -12,11 +12,6 @@ use Illuminate\Support\Facades\Storage;
 
 class ProtocolResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
@@ -26,6 +21,18 @@ class ProtocolResource extends JsonResource
             'protocol_type' => $this->protocol_type_id ? ProtocolTypeResource::make($this->type) : null,
             'status' => $this->protocol_status_id ? ProtocolStatusResource::make($this->status) : null,
             'address' => $this->address,
+            'user' => $this->user ? [
+                'id' => $this->user_id,
+                'name' => $this->user->full_name ?? '',
+            ] : null,
+            'inspector' => $this->inspector ? [
+                'id' => $this->inspector_id,
+                'name' => $this->inspector->full_name ?? '',
+            ] : null,
+            'role' => $this->role ? [
+                'id' => $this->role_id,
+                'name' => $this->role->name ?? '',
+            ] : null,
             'lat' => $this->lat,
             'long' => $this->long,
             'images' => $this->images ?  ImageResource::collection($this->images) : null,

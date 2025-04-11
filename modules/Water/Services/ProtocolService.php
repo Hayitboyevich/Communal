@@ -13,9 +13,9 @@ class ProtocolService
         protected FileService $fileService
     ){}
 
-    public function getAll()
+    public function getAll($user, $roleId)
     {
-        return $this->repository->all();
+        return $this->repository->all($user, $roleId);
     }
 
     public function findById(?int $id)

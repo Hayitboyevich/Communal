@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('passport')->nullable();
-            $table->string('birth_date')->nullable();
             $table->string('login')->unique();
             $table->string('middle_name')->nullable();
             $table->string('surname')->nullable();

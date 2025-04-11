@@ -13,4 +13,5 @@ enum ProtocolStatusEnum: int
     case HMQO = 7; // HMQOga yuborildi
     case CONFIRM_RESULT = 8; // Korsatmani tasdiqlash
     case CONFIRM_NOT_DEFECT = 9; // Kamchilik aniqlanmadini tasdiqlash
+    case NEW = 10; // Yangi
 }

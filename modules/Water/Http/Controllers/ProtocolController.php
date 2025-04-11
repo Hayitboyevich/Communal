@@ -26,7 +26,7 @@ class ProtocolController extends BaseController
         try {
             $protocols = $id
                 ? $this->service->findById($id)
-                : $this->service->getAll()->paginate(request('per_page', 15));
+                : $this->service->getAll($this->user, $this->roleId)->paginate(request('per_page', 15));
 
             $resource = $id
                 ? ProtocolResource::make($protocols)

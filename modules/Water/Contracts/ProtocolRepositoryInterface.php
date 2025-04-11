@@ -4,7 +4,7 @@ namespace Modules\Water\Contracts;
 
 interface ProtocolRepositoryInterface
 {
-    public function all();
+    public function all($user, $roleId);
 
     public function findById(?int $id);
 
