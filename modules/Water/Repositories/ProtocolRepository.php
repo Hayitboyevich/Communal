@@ -22,6 +22,29 @@ class ProtocolRepository implements ProtocolRepositoryInterface
         }
     }
 
+    public function filter($query, $filters)
+    {
+       return $query
+           ->when(isset($filters['status']), function ($query) use ($filters) {
+               $query->whereIn('protocol_status_id', $filters['status']);
+           })
+           ->when(isset($filters['protocol_number']), function ($query) use ($filters) {
+               $query->where('protocol_number', $filters['protocol_number']);
+           })
+           ->when(isset($filters['region_id']), function ($query) use ($filters) {
+               $query->where('region_id', $filters['region_id']);
+           })
+           ->when(isset($filters['district_id']), function ($query) use ($filters) {
+               $query->where('district_id', $filters['district_id']);
+           })
+           ->when(isset($filters['protocol_type']), function ($query) use ($filters) {
+               $query->where('protocol_type_id', $filters['protocol_type']);
+           });
+
+    }
+
+
+
     public function findById(?int $id)
     {
         return Protocol::query()->findOrFail($id);
@@ -34,8 +57,16 @@ class ProtocolRepository implements ProtocolRepositoryInterface
 
     public function update(?int $id, ?array $data)
     {
-        $protocol = Protocol::query()->findOrFail($id);
+        $protocol = $this->findById($id);
         $protocol->update($data);
         return $protocol;
     }
+
+    public function attach($data, $user, $roleId)
+    {
+        $protocol = $this->findById($data['id']);
+        $protocol->update(['inspector_id' => $data['inspector_id']]);
+        return $protocol;
+    }
+
 }

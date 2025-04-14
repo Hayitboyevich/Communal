@@ -13,9 +13,10 @@ class ProtocolService
         protected FileService $fileService
     ){}
 
-    public function getAll($user, $roleId)
+    public function getAll($user, $roleId, $filters = [])
     {
-        return $this->repository->all($user, $roleId);
+        $query = $this->repository->all($user, $roleId);
+        return $this->repository->filter($query, $filters);
     }
 
     public function findById(?int $id)
@@ -31,6 +32,11 @@ class ProtocolService
     public function update(?int $id, ?array $data)
     {
         return $this->repository->update($id, $data);
+    }
+
+    public function attach(?array $data, $user, ?int $roleId)
+    {
+        return $this->repository->attach($data, $user, $roleId);
     }
 
 

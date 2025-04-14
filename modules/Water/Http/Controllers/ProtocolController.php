@@ -6,6 +6,7 @@ use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 use Modules\Water\Http\Requests\ProtocolFirstStepRequest;
 use Modules\Water\Http\Requests\ProtocolSecondStepRequest;
 use Modules\Water\Http\Requests\ProtocolThirdStepRequest;
@@ -24,9 +25,10 @@ class ProtocolController extends BaseController
     public function index($id = null): JsonResponse
     {
         try {
+            $filters = request()->only(['status', 'protocol_number', 'district_id', 'region_id', 'protocol_type']);
             $protocols = $id
                 ? $this->service->findById($id)
-                : $this->service->getAll($this->user, $this->roleId)->paginate(request('per_page', 15));
+                : $this->service->getAll($this->user, $this->roleId, $filters)->paginate(request('per_page', 15));
 
             $resource = $id
                 ? ProtocolResource::make($protocols)
@@ -39,6 +41,16 @@ class ProtocolController extends BaseController
             );
 
         } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
+        }
+    }
+
+    public function attach(Request $request): JsonResponse
+    {
+        try {
+           $protocol = $this->service->attach($request->all(), $this->user, $this->roleId);
+           return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol attached successfully.');
+        }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }

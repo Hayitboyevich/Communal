@@ -15,5 +15,15 @@ class RoleSeeder extends Seeder
             'name' => 'admin',
             'description' => 'admin'
         ]);
+
+        Role::query()->create([
+            'name' => 'inspektor',
+            'description' => 'inspektor'
+        ]);
+
+        Role::query()->create([
+            'name' => 'suv inspektor',
+            'description' => 'suv inspektor'
+        ]);
     }
 }

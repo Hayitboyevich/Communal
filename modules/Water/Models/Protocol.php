@@ -51,7 +51,7 @@ class Protocol extends Model
         return $this->belongsTo(ProtocolStatus::class, 'protocol_status_id');
     }
 
-    public function type(): BelongsTo
+    public function protocolType(): BelongsTo
     {
         return $this->belongsTo(ProtocolType::class, 'protocol_type_id');
     }

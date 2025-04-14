@@ -18,7 +18,7 @@ class ProtocolResource extends JsonResource
             'id' => $this->id,
             'region' => $this->region_id ? RegionResource::make($this->region) : null,
             'district' => $this->district_id ? DistrictResource::make($this->district) : null,
-            'protocol_type' => $this->protocol_type_id ? ProtocolTypeResource::make($this->type) : null,
+            'protocol_type' => $this->protocol_type_id ? ProtocolTypeResource::make($this->protocolType) : null,
             'status' => $this->protocol_status_id ? ProtocolStatusResource::make($this->status) : null,
             'address' => $this->address,
             'user' => $this->user ? [
@@ -49,7 +49,9 @@ class ProtocolResource extends JsonResource
             'deadline' => $this->deadline,
             'is_finished' => $this->is_finished,
             'files' =>  DocumentResource::collection($this->documents),
-            'created_at' => $this->created_at
+            'created_at' => $this->created_at,
+            'step' => $this->step,
+            'type' => $this->type
         ];
     }
 }
