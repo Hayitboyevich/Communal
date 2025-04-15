@@ -23,6 +23,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/', 'index');
         Route::post('/create', 'create');
         Route::post('/info', 'info');
+        Route::post('/inspector', 'inspector');
     });
 
     Route::controller(ProfileController::class)->prefix('profile')->group(function () {

@@ -17,18 +17,20 @@ class ProtocolSecondStepRequest extends FormRequest
     {
         return [
             'user_type' => 'required|integer|between:1,2',
-            'inn' => 'required|string',
-            'enterprise_name' => 'required|string',
-            'pin' => 'required|string',
-            'birth_date' => 'required|date',
-            'functionary_name' => 'required|string',
-            'phone' => 'required|string',
-            'self_government_name' => 'required|string',
-            'inspector_name' => 'required|string',
-            'participant_name' => 'required|string',
-            'files' => 'required|array',
-            'protocol_status_id' => 'required|integer',
+            'inn' => 'sometimes',
+            'enterprise_name' => 'sometimes',
+            'pin' => 'sometimes',
+            'birth_date' => 'sometimes',
+            'functionary_name' => 'sometimes',
+            'phone' => 'sometimes',
+            'self_government_name' => 'sometimes',
+            'inspector_name' => 'sometimes',
+            'participant_name' => 'sometimes',
+            'files' => 'sometimes',
+            'protocol_status_id' => 'sometimes',
             'step' => 'required|integer',
+            'additional_files' => 'sometimes',
+            'additional_comment' => 'sometimes'
         ];
     }
 

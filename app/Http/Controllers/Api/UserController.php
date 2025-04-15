@@ -60,4 +60,9 @@ class UserController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
+    public function inspector()
+    {
+        
+    }
 }
