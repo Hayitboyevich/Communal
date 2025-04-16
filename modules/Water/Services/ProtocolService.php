@@ -51,4 +51,10 @@ class ProtocolService
         $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'protocol/files'), $files);
         $protocol->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
     }
+    public function uploadFiles(Protocol $protocol, ?array $files)
+    {
+        $paths = array_map(fn($file) => $this->fileService->uploadFile($file, 'protocol/files'), $files);
+        $protocol->additional_files = json_encode(array_map(fn($path) => ['url' => $path], $paths));
+    }
+
 }
