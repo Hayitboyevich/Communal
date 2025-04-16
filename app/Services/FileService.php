@@ -9,4 +9,9 @@ class FileService
         return $file->store($path, 'public');
     }
 
+    public function uploadFile($file, $path)
+    {
+        return $file->store($path, 'public');
+    }
+
 }
