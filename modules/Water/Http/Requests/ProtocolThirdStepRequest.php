@@ -28,7 +28,6 @@ class ProtocolThirdStepRequest extends FormRequest
     {
         $this->merge([
             'is_finished' => true,
-            'image_files' => $this->images,
             'protocol_status_id' => ProtocolStatusEnum::CONFIRM_RESULT->value,
             'step' => 3
         ]);

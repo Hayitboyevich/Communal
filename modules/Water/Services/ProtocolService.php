@@ -54,11 +54,11 @@ class ProtocolService
         }
 
     }
-    public function uploadFiles(Protocol $protocol, ?array $files)
+    public function uploadFiles(Protocol $protocol, string $column, ?array $files)
     {
         if (!empty($files)) {
             $paths = array_map(fn($file) => $this->fileService->uploadFile($file, 'protocol/files'), $files);
-            $protocol->additional_files = json_encode(array_map(fn($path) => ['url' => $path], $paths));
+            $protocol->$column = json_encode(array_map(fn($path) => ['url' => $path], $paths));
             $protocol->save();
         }
 

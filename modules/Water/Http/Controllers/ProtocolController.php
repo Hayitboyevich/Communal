@@ -76,7 +76,7 @@ class ProtocolController extends BaseController
         try {
             $protocol = $this->service->update($id, $request->except('files', 'additional_files'));
             $this->service->saveFiles($protocol, $request['files']);
-            $this->service->uploadFiles($protocol, $request['additional_files']);
+            $this->service->uploadFiles($protocol, 'additional_files', $request['additional_files']);
             DB::commit();
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol created successfully.');
         }catch (\Exception $exception){
@@ -87,10 +87,14 @@ class ProtocolController extends BaseController
 
     public function createThird(?int $id, ProtocolThirdStepRequest $request): JsonResponse
     {
+        DB::beginTransaction();
         try {
             $protocol = $this->service->update($id, $request->validated());
+            $this->service->uploadFiles($protocol, 'image_files', $request['additional_files']);
+            DB::commit();
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol created successfully.');
         }catch (\Exception $exception){
+            DB::rollBack();
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }

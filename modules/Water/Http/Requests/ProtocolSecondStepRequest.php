@@ -16,7 +16,7 @@ class ProtocolSecondStepRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_type' => 'required_if:protocol_status_id,3|integer',
+            'user_type' => 'sometimes',
             'inn' => 'sometimes',
             'enterprise_name' => 'sometimes',
             'pin' => 'sometimes',
@@ -45,4 +45,6 @@ class ProtocolSecondStepRequest extends FormRequest
             'step' => 2
         ]);
     }
+
+
 }
