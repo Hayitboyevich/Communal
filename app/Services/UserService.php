@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\UserRepositoryInterface;
 use App\Http\Requests\UserCreateRequest;
+use App\Models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Support\Facades\DB;
@@ -88,6 +89,21 @@ class UserService
         } catch (\Exception $ex) {
             throw new \Exception($ex->getMessage());
         }
+    }
+
+    public function getInspectors($filters)
+    {
+        $query = $this->repository->all()->whereHas('inspectors');
+        return  $query
+            ->when(isset($filters['region_id']), function ($query) use ($filters) {
+                $query->where('region_id', $filters['region_id']);
+            })
+            ->when(isset($filters['full_name']), function ($query) use ($filters) {
+                $query->searchByFullName($filters['full_name']);
+            })
+            ->when(isset($filters['phone']), function ($query) use ($filters) {
+                $query->where('phone', $filters['phone']);
+            });
     }
 
 }

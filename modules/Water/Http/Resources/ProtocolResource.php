@@ -40,6 +40,7 @@ class ProtocolResource extends JsonResource
             'inn' => $this->inn,
             'enterprise_name' => $this->enterprise_name,
             'pin' => $this->pin,
+            'additional_comment' => $this->additional_comment,
             'birth_date' => $this->birth_date,
             'self_government_name' => $this->self_government_name,
             'inspector_name' => $this->inspector_name,

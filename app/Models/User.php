@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserRoleEnum;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -51,6 +52,16 @@ class User extends Authenticatable implements JWTSubject
         return Attribute::get(fn () => "{$this->surname} {$this->name} {$this->middle_name}");
     }
 
+    public function scopeSearchByFullName($query, $searchTerm)
+    {
+        $searchTerm = strtolower($searchTerm);
+        return $query->where(function ($query) use ($searchTerm) {
+            $query->whereRaw('LOWER(name) LIKE ?', ['%' . $searchTerm . '%'])
+                ->orWhereRaw('LOWER(middle_name) LIKE ?', ['%' . $searchTerm . '%'])
+                ->orWhereRaw('LOWER(surname) LIKE ?', ['%' . $searchTerm . '%']);
+        });
+    }
+
     public function region(): BelongsTo
     {
         return $this->belongsTo(Region::class);
@@ -64,5 +75,10 @@ class User extends Authenticatable implements JWTSubject
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
+    }
+
+    public function inspectors(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id')->where('roles.id', UserRoleEnum::INSPECTOR->value);
     }
 }

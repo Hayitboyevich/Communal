@@ -61,8 +61,16 @@ class UserController extends BaseController
         }
     }
 
-    public function inspector()
+    public function inspector($id = null): JsonResponse
     {
-        
+        try {
+            $filters = request()->only(['region_id', 'full_name', 'phone', 'pin']);
+
+            $users = $this->service->getInspectors($filters)->get();
+
+           return $this->sendSuccess(UserResource::collection($users), 'Inspectors retrieved successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
     }
 }
