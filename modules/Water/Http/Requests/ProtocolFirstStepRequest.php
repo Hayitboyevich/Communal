@@ -37,7 +37,7 @@ class ProtocolFirstStepRequest extends FormRequest
     public function prepareForValidation()
     {
         $this->merge([
-            'protocol_status_id' => $this->role_id == UserRoleEnum::INSPECTOR->value ? ProtocolStatusEnum::ENTER_RESULT->value : ProtocolStatusEnum::NEW->value,
+            'protocol_status_id' => in_array($this->role_id, [UserRoleEnum::INSPECTOR->value, UserRoleEnum::WATER_INSPECTOR->value]) ? ProtocolStatusEnum::ENTER_RESULT->value : ProtocolStatusEnum::NEW->value,
             'inspector_id' => $this->role_id == UserRoleEnum::INSPECTOR->value ? Auth::id() : null,
             'step' => 1,
         ]);

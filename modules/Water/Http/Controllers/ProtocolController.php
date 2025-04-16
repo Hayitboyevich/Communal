@@ -25,7 +25,7 @@ class ProtocolController extends BaseController
     public function index($id = null): JsonResponse
     {
         try {
-            $filters = request()->only(['status', 'protocol_number', 'district_id', 'region_id', 'protocol_type']);
+            $filters = request()->only(['status', 'protocol_number', 'district_id', 'region_id', 'protocol_type', 'type', 'attach']);
             $protocols = $id
                 ? $this->service->findById($id)
                 : $this->service->getAll($this->user, $this->roleId, $filters)->paginate(request('per_page', 15));

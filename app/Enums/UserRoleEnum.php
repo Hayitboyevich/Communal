@@ -7,4 +7,5 @@ enum UserRoleEnum: int
     case ADMIN = 1;
     case INSPECTOR = 2;
     case WATER_INSPECTOR = 3;
+    case MANAGER = 4;
 }

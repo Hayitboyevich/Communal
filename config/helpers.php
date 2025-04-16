@@ -30,7 +30,7 @@ if (!function_exists('postData')) {
             $response = Http::withHeaders([
                 'client-id' => config('water.card.clientId'),
                 'client-secret' => config('water.card.clientSecret'),
-                'Content-Type' => 'application/json',
+                'Content-TypeList' => 'application/json',
             ])->timeout(10)
             ->post($baseUrl, $data);
 

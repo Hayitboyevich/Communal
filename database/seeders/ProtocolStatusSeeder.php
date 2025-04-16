@@ -39,7 +39,7 @@ class ProtocolStatusSeeder extends Seeder
         ]);
 
         ProtocolStatus::create([
-            'name' => 'Ko\'rsatma bajarildi',
+            'name' => 'Ko\'rsatma  bajarildi',
             'description' => 'Ko\'rsatma bajarildi',
         ]);
 
@@ -56,6 +56,16 @@ class ProtocolStatusSeeder extends Seeder
         ProtocolStatus::create([
             'name' => 'Kamchilik tasdiqlash',
             'description' => 'Kamchilik aniqlanmadini tasdiqlash',
+        ]);
+
+        ProtocolStatus::create([
+            'name' => 'Yangi',
+            'description' => 'yangi',
+        ]);
+
+        ProtocolStatus::create([
+            'name' => 'Kamchilik aniqlanmadi',
+            'description' => 'Kamchilik aniqlanmadi',
         ]);
     }
 }
