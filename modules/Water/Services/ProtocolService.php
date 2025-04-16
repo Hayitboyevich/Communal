@@ -59,6 +59,7 @@ class ProtocolService
         if (!empty($files)) {
             $paths = array_map(fn($file) => $this->fileService->uploadFile($file, 'protocol/files'), $files);
             $protocol->additional_files = json_encode(array_map(fn($path) => ['url' => $path], $paths));
+            $protocol->save();
         }
 
     }

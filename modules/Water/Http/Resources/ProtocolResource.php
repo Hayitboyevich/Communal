@@ -50,6 +50,7 @@ class ProtocolResource extends JsonResource
             'deadline' => $this->deadline,
             'is_finished' => $this->is_finished,
             'files' =>  DocumentResource::collection($this->documents),
+            'additional_files' =>  json_decode($this->additional_files),
             'created_at' => $this->created_at,
             'step' => $this->step,
             'type' => $this->type

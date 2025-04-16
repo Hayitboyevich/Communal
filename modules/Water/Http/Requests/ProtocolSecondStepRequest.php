@@ -30,7 +30,8 @@ class ProtocolSecondStepRequest extends FormRequest
             'protocol_status_id' => 'sometimes',
             'step' => 'required|integer',
             'additional_files' => 'sometimes',
-            'additional_comment' => 'sometimes'
+            'additional_comment' => 'sometimes',
+            'is_finished' => 'sometimes',
         ];
     }
 
@@ -40,6 +41,7 @@ class ProtocolSecondStepRequest extends FormRequest
             'protocol_status_id' => $this->protocol_status_id == ProtocolStatusEnum::NOT_DEFECT->value
                 ? ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value
                 : ProtocolStatusEnum::FORMING->value,
+            'is_finished' => $this->protocol_status_id == ProtocolStatusEnum::NOT_DEFECT->value ? true : false,
             'step' => 2
         ]);
     }
