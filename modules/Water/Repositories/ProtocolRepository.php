@@ -26,7 +26,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
     {
        return $query
            ->when(isset($filters['status']), function ($query) use ($filters) {
-               $query->whereIn('protocol_status_id', $filters['status']);
+               $query->where('protocol_status_id', $filters['status']);
            })
            ->when(isset($filters['protocol_number']), function ($query) use ($filters) {
                $query->where('protocol_number', $filters['protocol_number']);
