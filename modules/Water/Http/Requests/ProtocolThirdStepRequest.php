@@ -28,7 +28,7 @@ class ProtocolThirdStepRequest extends FormRequest
     {
         $this->merge([
             'is_finished' => true,
-            'protocol_status_id' => ProtocolStatusEnum::FORMED,
+            'protocol_status_id' => ProtocolStatusEnum::FORMED->value,
             'step' => 3
         ]);
     }

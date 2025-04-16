@@ -50,14 +50,14 @@ class ProtocolResource extends JsonResource
             'deadline' => $this->deadline,
             'is_finished' => $this->is_finished,
             'files' =>  DocumentResource::collection($this->documents),
-            'additional_files' => collect(json_decode($this->additional_files))->map(function ($file) {
+            'additional_files' => collect(json_decode($this->additional_files, true))->map(function ($file) {
                 return [
-                    'url' => url('storage/'.$file),
+                    'url' => url('storage/'.$file['url']),
                 ];
             }),
-            'image_files' =>  collect(json_decode($this->image_files))->map(function ($file) {
+            'image_files' => collect(json_decode($this->image_files, true))->map(function ($file) {
                 return [
-                    'url' => url('storage/'.$file),
+                    'url' => url('storage/' . $file['url']),
                 ];
             }),
             'created_at' => $this->created_at,
