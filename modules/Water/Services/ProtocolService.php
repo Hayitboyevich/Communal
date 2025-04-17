@@ -41,7 +41,7 @@ class ProtocolService
         return $this->repository->attach($data, $user, $roleId);
     }
 
-    public function count($user, $roleId, $filters = [])
+    public function count($user, $roleId, $filters = []): array
     {
         $query = $this->repository->all($user, $roleId);
         if ($filters['category'] == CategoryType::MONITORING){
