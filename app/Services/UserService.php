@@ -38,7 +38,10 @@ class UserService
         try {
 
             $user = $this->repository->create($request->except(['role_id', 'image']));
-            $user->roles()->attach($user->id, ['role_id' => $request->role_id]);
+            
+            foreach ($request->role_id as $role) {
+                $user->roles()->attach($user->id, ['role_id' => $role]);
+            }
 
             if (!empty($data['image'])) {
                 $path = $this->fileService->uploadImage($data['image'], 'user/images');
