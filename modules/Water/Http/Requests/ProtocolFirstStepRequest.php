@@ -5,6 +5,8 @@ namespace Modules\Water\Http\Requests;
 use App\Enums\UserRoleEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Modules\Water\Const\CategoryType;
+use Modules\Water\Const\Step;
 use Modules\Water\Enums\ProtocolStatusEnum;
 
 class ProtocolFirstStepRequest extends FormRequest
@@ -39,7 +41,8 @@ class ProtocolFirstStepRequest extends FormRequest
         $this->merge([
             'protocol_status_id' => in_array($this->role_id, [UserRoleEnum::INSPECTOR->value, UserRoleEnum::WATER_INSPECTOR->value]) ? ProtocolStatusEnum::ENTER_RESULT->value : ProtocolStatusEnum::NEW->value,
             'inspector_id' => $this->role_id == UserRoleEnum::INSPECTOR->value ? Auth::id() : null,
-            'step' => 1,
+            'step' => Step::ONE,
+            'category' => CategoryType::MONITORING
         ]);
     }
 }
