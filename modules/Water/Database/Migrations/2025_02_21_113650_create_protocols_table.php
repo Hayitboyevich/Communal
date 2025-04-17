@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('inspector_name')->nullable()->comment('fuqaroni ozini ozi boshqarish organi');
             $table->string('participant_name')->nullable()->comment('boshqa ishtirok etuvchi');
             $table->jsonb('additional_files')->nullable()->comment('Kamchilik aniqlanmadi file');
-            $table->jsonb('additional_comment')->nullable()->comment('Kamchilik aniqlanmadi comment');
+            $table->text('additional_comment')->nullable()->comment('Kamchilik aniqlanmadi comment');
             //3-qadam
             $table->text('defect_information')->nullable();
             $table->text('comment')->nullable();

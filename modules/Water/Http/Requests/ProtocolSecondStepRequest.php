@@ -38,10 +38,6 @@ class ProtocolSecondStepRequest extends FormRequest
     public function prepareForValidation()
     {
         $this->merge([
-            'protocol_status_id' => $this->protocol_status_id == ProtocolStatusEnum::NOT_DEFECT->value
-                ? ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value
-                : ProtocolStatusEnum::FORMING->value,
-            'is_finished' => $this->protocol_status_id == ProtocolStatusEnum::NOT_DEFECT->value ? true : false,
             'step' => 2
         ]);
     }

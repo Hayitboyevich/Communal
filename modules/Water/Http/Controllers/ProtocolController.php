@@ -74,7 +74,7 @@ class ProtocolController extends BaseController
     {
         DB::beginTransaction();
         try {
-            $protocol = $this->service->update($id, $request->except('files', 'additional_files'));
+            $protocol = $this->service->update($this->user, $this->roleId,$id, $request->except('files', 'additional_files'));
             $this->service->saveFiles($protocol, $request['files']);
             $this->service->uploadFiles($protocol, 'additional_files', $request['additional_files']);
             DB::commit();
@@ -100,15 +100,6 @@ class ProtocolController extends BaseController
         }
     }
 
-    public function sendDefect(): JsonResponse
-    {
-        try {
-            $protocol = $this->service->sendDefect($this->user, $this->roleId, request('id'));
-            return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol send defect successfully.');
-        }catch (\Exception $exception){
-            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
-        }
-    }
 
     public function confirmDefect(): JsonResponse
     {

@@ -3,6 +3,7 @@
 namespace Modules\Water\Services;
 
 use App\Constants\ErrorMessage;
+use App\Enums\UserRoleEnum;
 use App\Services\FileService;
 use Modules\Water\Const\CategoryType;
 use Modules\Water\Contracts\ProtocolRepositoryInterface;
@@ -33,17 +34,21 @@ class ProtocolService
         return  $this->repository->create($data);
     }
 
-    public function update(?int $id, ?array $data)
+    public function update($user, $roleId,?int $id, ?array $data)
     {
+        if ($roleId == UserRoleEnum::INSPECTOR->value && $data['protocol_status_id'] == ProtocolStatusEnum::NOT_DEFECT->value)
+        {
+            $data['protocol_status_id'] = ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value;
+        }
+        if ($roleId == UserRoleEnum::WATER_INSPECTOR->value && $data['protocol_status_id'] == ProtocolStatusEnum::NOT_DEFECT->value)
+        {
+            $data['protocol_status_id'] = ProtocolStatusEnum::NOT_DEFECT->value;
+            $data['is_finished'] = true;
+        }
+
         return $this->repository->update($id, $data);
     }
 
-    public function sendDefect($user, $roleId, $id)
-    {
-        $protocol = $this->repository->sendDefect($user, $roleId, $id);
-        if (!$protocol) throw new NotFoundHttpException(ErrorMessage::ERROR_1);
-        return $protocol;
-    }
 
     public function confirmDefect($user, $roleId, $id)
     {
