@@ -25,7 +25,7 @@ class ProtocolController extends BaseController
     public function index($id = null): JsonResponse
     {
         try {
-            $filters = request()->only(['status', 'protocol_number', 'district_id', 'region_id', 'protocol_type', 'type', 'attach']);
+            $filters = request()->only(['status', 'protocol_number', 'district_id', 'region_id', 'protocol_type', 'type', 'attach', 'category']);
             $protocols = $id
                 ? $this->service->findById($id)
                 : $this->service->getAll($this->user, $this->roleId, $filters)->paginate(request('per_page', 15));
@@ -100,10 +100,10 @@ class ProtocolController extends BaseController
         }
     }
 
-    public function count()
+    public function count(): JsonResponse
     {
         try {
-            $filters = \request()->only(['status', 'protocol_type']);
+            $filters = \request()->only(['status', 'category']);
             $data = $this->service->count($this->user, $this->roleId, $filters);
             return $this->sendSuccess($data, 'Count of protocols retrieved successfully.');
         }catch (\Exception $exception){
