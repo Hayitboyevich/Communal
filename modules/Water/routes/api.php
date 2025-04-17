@@ -9,12 +9,13 @@ use App\Http\Controllers\Api\AuthController;
 
 
 
-
 Route::group(['middleware' => ['auth:api']], function () {
 
     Route::controller(ProtocolController::class)->prefix('protocol')->group(function () {
         Route::get('/{id?}', 'index');
         Route::post('/attach', 'attach');
+        Route::post('/count', 'count');
+        Route::post('/reject', 'reject');
         Route::post('/create/first', 'createFirst');
         Route::post('/create/second/{id}', 'createSecond');
         Route::post('/create/third/{id}', 'createThird');

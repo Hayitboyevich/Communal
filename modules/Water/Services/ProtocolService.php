@@ -39,6 +39,16 @@ class ProtocolService
         return $this->repository->attach($data, $user, $roleId);
     }
 
+    public function count($user, $roleId, $filters = [])
+    {
+
+    }
+
+    public function reject($user, $roleId, $id)
+    {
+        return $this->repository->reject($user, $roleId, $id);
+    }
+
 
     public function saveImages(Protocol $protocol, ?array $images)
     {

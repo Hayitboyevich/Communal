@@ -18,4 +18,6 @@ interface ProtocolRepositoryInterface
 
     public function filter($query, $filters);
 
+    public function reject($user, $roleId, $id);
+
 }

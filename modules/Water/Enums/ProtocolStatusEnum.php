@@ -14,4 +14,5 @@ enum ProtocolStatusEnum: int
     case CONFIRM_RESULT = 8; // Korsatmani tasdiqlash
     case CONFIRM_NOT_DEFECT = 9; // Kamchilik aniqlanmadini tasdiqlash
     case NEW = 10; // Yangi
+    case REJECTED = 11; // Rad qilingan
 }

@@ -99,4 +99,27 @@ class ProtocolController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
+    public function count()
+    {
+        try {
+            $filters = \request()->only(['status', 'protocol_type']);
+            $data = $this->service->count($this->user, $this->roleId, $filters);
+            return $this->sendSuccess($data, 'Count of protocols retrieved successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+
+    }
+
+    public function reject(): JsonResponse
+    {
+        try {
+         $id = request('id');
+         $protocol = $this->service->reject($this->user, $this->roleId, $id);
+         return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol rejected successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
 }

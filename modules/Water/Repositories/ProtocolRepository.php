@@ -92,4 +92,13 @@ class ProtocolRepository implements ProtocolRepositoryInterface
         return $protocol;
     }
 
+    public function reject($user, $roleId, $id)
+    {
+        try {
+           return $this->findById($id)->update(['protocol_status_id' => ProtocolStatusEnum::REJECTED]);
+        }catch (\Exception $exception){
+            throw $exception;
+        }
+    }
+
 }

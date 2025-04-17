@@ -63,9 +63,10 @@ class ProtocolStatusSeeder extends Seeder
             'description' => 'yangi',
         ]);
 
+
         ProtocolStatus::create([
-            'name' => 'Kamchilik aniqlanmadi',
-            'description' => 'Kamchilik aniqlanmadi',
+            'name' => 'Rad qilingan',
+            'description' => 'Rad qilingan',
         ]);
     }
 }
