@@ -2,11 +2,13 @@
 
 namespace Modules\Water\Services;
 
+use App\Constants\ErrorMessage;
 use App\Services\FileService;
 use Modules\Water\Const\CategoryType;
 use Modules\Water\Contracts\ProtocolRepositoryInterface;
 use Modules\Water\Enums\ProtocolStatusEnum;
 use Modules\Water\Models\Protocol;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProtocolService
 {
@@ -36,6 +38,23 @@ class ProtocolService
         return $this->repository->update($id, $data);
     }
 
+    public function sendDefect($user, $roleId, $id)
+    {
+        $protocol = $this->repository->sendDefect($user, $roleId, $id);
+        if (!$protocol) throw new NotFoundHttpException(ErrorMessage::ERROR_1);
+        return $protocol;
+    }
+
+    public function confirmDefect($user, $roleId, $id)
+    {
+       return  $this->repository->confirmDefect($user, $roleId, $id);
+    }
+
+    public function rejectDefect($user, $roleId, $id)
+    {
+        return  $this->repository->rejectDefect($user, $roleId, $id);
+    }
+
     public function attach(?array $data, $user, ?int $roleId)
     {
         return $this->repository->attach($data, $user, $roleId);
@@ -48,15 +67,18 @@ class ProtocolService
             return [
                 'all' => $query->clone()->where('category', CategoryType::MONITORING)->count(),
                 'enter_result' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::ENTER_RESULT->value)->count(),
+                'confirm_not_defect' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value)->count(),
                 'forming' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::ENTER_RESULT->value)->count(),
-                'formed' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::FORMED->value)->count(),
                 'not_defect' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::NOT_DEFECT->value)->count(),
             ];
         }elseif($filters['category'] == CategoryType::REGULATION){
             return [
                 'all' => $query->clone()->where('category', CategoryType::REGULATION)->count(),
+                'formed' => $query->clone()->where('category', CategoryType::REGULATION)->where('protocol_status_id', ProtocolStatusEnum::FORMED->value)->count(),
                 'administrative' => $query->clone()->where('category', CategoryType::REGULATION)->where('protocol_status_id', ProtocolStatusEnum::ADMINISTRATIVE->value)->count(),
                 'hmqo' => $query->clone()->where('category', CategoryType::REGULATION)->where('protocol_status_id', ProtocolStatusEnum::HMQO->value)->count(),
+                'confirm_result' => $query->clone()->where('category', CategoryType::REGULATION)->where('protocol_status_id', ProtocolStatusEnum::CONFIRM_RESULT->value)->count(),
+                'confirmed' => $query->clone()->where('category', CategoryType::REGULATION)->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED->value)->count(),
             ];
         }
         else{

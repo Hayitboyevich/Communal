@@ -15,9 +15,12 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/attach', 'attach');
         Route::get('/count', 'count');
         Route::post('/reject', 'reject');
+        Route::post('/send/defect', 'sendDefect');
         Route::post('/create/first', 'createFirst');
         Route::post('/create/second/{id}', 'createSecond');
         Route::post('/create/third/{id}', 'createThird');
+        Route::post('/confirm/defect', 'confirmDefect');
+        Route::post('/reject/defect', 'rejectDefect');
         Route::get('/{id?}', 'index');
     });
 

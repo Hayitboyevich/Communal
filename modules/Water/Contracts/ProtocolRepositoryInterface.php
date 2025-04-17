@@ -19,5 +19,9 @@ interface ProtocolRepositoryInterface
     public function filter($query, $filters);
 
     public function reject($user, $roleId, $id);
+    public function sendDefect($user, $roleId, $id);
+
+    public function confirmDefect($user, $roleId, $id);
+    public function rejectDefect($user, $roleId, $id);
 
 }

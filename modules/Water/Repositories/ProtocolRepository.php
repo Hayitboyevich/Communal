@@ -95,11 +95,44 @@ class ProtocolRepository implements ProtocolRepositoryInterface
         return $protocol;
     }
 
+    public function sendDefect($user, $roleId, $id)
+    {
+        try {
+            if ($roleId == UserRoleEnum::WATER_INSPECTOR->value) {
+                return  $this->findById($id)->update(['protocol_status_id' => ProtocolStatusEnum::NOT_DEFECT, 'is_finished' => true]);
+            }if ($roleId == UserRoleEnum::INSPECTOR->value) {
+                return  $this->findById($id)->update(['protocol_status_id' => ProtocolStatusEnum::CONFIRM_NOT_DEFECT]);
+            }
+            return null;
+        }catch (\Exception $exception) {
+            throw $exception;
+        }
+    }
+
     public function reject($user, $roleId, $id)
     {
         try {
            return $this->findById($id)->update(['protocol_status_id' => ProtocolStatusEnum::REJECTED]);
         }catch (\Exception $exception){
+            throw $exception;
+        }
+    }
+
+    public function confirmDefect($user, $roleId, $id)
+    {
+        try {
+            return $this->findById($id)->update(['protocol_status_id' => ProtocolStatusEnum::NOT_DEFECT, 'is_finished' => true]);
+
+        }  catch (\Exception $exception){
+            throw $exception;
+        }
+    }
+
+    public function rejectDefect($user, $roleId, $id)
+    {
+        try {
+            return $this->findById($id)->update(['protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT]);
+        }  catch (\Exception $exception){
             throw $exception;
         }
     }

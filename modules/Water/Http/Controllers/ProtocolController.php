@@ -100,6 +100,36 @@ class ProtocolController extends BaseController
         }
     }
 
+    public function sendDefect(): JsonResponse
+    {
+        try {
+            $protocol = $this->service->sendDefect($this->user, $this->roleId, request('id'));
+            return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol send defect successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function confirmDefect(): JsonResponse
+    {
+        try {
+            $protocol = $this->service->confirmDefect($this->user, $this->roleId, request('id'));
+            return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol confirmed successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+    public function rejectDefect(): JsonResponse
+    {
+        try {
+            $protocol = $this->service->rejectDefect($this->user, $this->roleId, request('id'));
+            return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol rejected successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+
+    }
+
     public function count(): JsonResponse
     {
         try {
@@ -115,8 +145,7 @@ class ProtocolController extends BaseController
     public function reject(): JsonResponse
     {
         try {
-         $id = request('id');
-         $protocol = $this->service->reject($this->user, $this->roleId, $id);
+         $protocol = $this->service->reject($this->user, $this->roleId, request('id'));
          return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol rejected successfully.');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
