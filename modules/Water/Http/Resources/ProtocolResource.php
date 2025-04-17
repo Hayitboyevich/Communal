@@ -21,6 +21,7 @@ class ProtocolResource extends JsonResource
             'protocol_type' => $this->protocol_type_id ? ProtocolTypeResource::make($this->protocolType) : null,
             'status' => $this->protocol_status_id ? ProtocolStatusResource::make($this->status) : null,
             'address' => $this->address,
+            'description' => $this->description,
             'user' => $this->user ? [
                 'id' => $this->user_id,
                 'name' => $this->user->full_name ?? '',
@@ -36,6 +37,8 @@ class ProtocolResource extends JsonResource
             'lat' => $this->lat,
             'long' => $this->long,
             'images' => $this->images ?  ImageResource::collection($this->images) : null,
+            'functionary_name' => $this->functionary_name,
+            'phone' => $this->phone,
             'user_type' => $this->user_type,
             'inn' => $this->inn,
             'enterprise_name' => $this->enterprise_name,

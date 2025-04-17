@@ -10,6 +10,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Http;
 
 class UserController extends BaseController
 {
@@ -56,6 +57,22 @@ class UserController extends BaseController
 
             return $this->sendSuccess($data, 'Passport Information Get Successfully');
 
+        } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function organization(): JsonResponse
+    {
+        try {
+            $cadNumber = request('stir');
+            $response = Http::withBasicAuth('orgapi-v1', '*@org-apiv_*ali')
+                ->get('https://api-sert.mc.uz/api/orginfoapi/' . $cadNumber);
+
+            if ($response->successful()) {
+                return response()->json($response->json());
+            }
+            return $this->sendError(ErrorMessage::ERROR_1);
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }

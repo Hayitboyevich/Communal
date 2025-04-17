@@ -24,6 +24,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/create', 'create');
         Route::post('/info', 'info');
         Route::get('/inspector/{id?}', 'inspector');
+        Route::post('/organization', 'organization');
     });
 
     Route::controller(ProfileController::class)->prefix('profile')->group(function () {
