@@ -28,7 +28,7 @@ class UserCreateRequest extends FormRequest
             'birth_date' => 'required|date',
             'role_id' => 'required|array',
             'user_status_id' => 'required',
-            'files' => 'sometimes',
+            'docs' => 'sometimes',
             'images' => 'sometimes',
             'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];

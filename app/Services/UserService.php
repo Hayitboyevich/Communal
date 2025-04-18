@@ -38,24 +38,24 @@ class UserService
         DB::beginTransaction();
         try {
 
-            $user = $this->repository->create($request->except(['role_id', 'image', 'images', 'files']));
+
+            $user = $this->repository->create($request->except(['role_id', 'image', 'images', 'docs']));
 
             foreach ($request->role_id as $role) {
                 $user->roles()->attach($user->id, ['role_id' => $role]);
             }
 
-            if (!empty($request->image)) {
-                $path = $this->fileService->uploadImage($request->image, 'user/images');
+            if ($request->hasFile('image')) {
+                $path = $this->fileService->uploadImage($request->file('image'), 'user/images');
                 $user->update(['image' => $path]);
             }
 
-            if (!empty($request->images)) {
+            if ($request->images) {
                 $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/images'), $request->images);
                 $user->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
             }
-
-            if (!empty($request->files)) {
-                $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->files);
+            if ($request->docs) {
+                $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->docs);
                 $user->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
             }
 
