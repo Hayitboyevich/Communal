@@ -3,6 +3,7 @@
 namespace Modules\Water\Http\Controllers;
 
 use App\Constants\ErrorMessage;
+use App\Enums\LogType;
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -62,6 +63,7 @@ class ProtocolController extends BaseController
         try {
             $protocol = $this->service->create($request->except('images'));
             $this->service->saveImages($protocol, $request['images']);
+
             DB::commit();
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol created successfully.');
         }catch (\Exception $exception){

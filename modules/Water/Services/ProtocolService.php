@@ -6,6 +6,7 @@ use App\Constants\ErrorMessage;
 use App\Enums\UserRoleEnum;
 use App\Services\FileService;
 use Modules\Water\Const\CategoryType;
+use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Contracts\ProtocolRepositoryInterface;
 use Modules\Water\Enums\ProtocolStatusEnum;
 use Modules\Water\Models\Protocol;
@@ -13,10 +14,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProtocolService
 {
+    private HistoryService  $historyService;
     public function __construct(
         protected ProtocolRepositoryInterface $repository,
         protected FileService $fileService
-    ){}
+    ){
+        $this->historyService = new HistoryService('protocol_histories');
+    }
 
     public function getAll($user, $roleId, $filters = [])
     {
@@ -26,15 +30,17 @@ class ProtocolService
 
     public function findById(?int $id)
     {
-        return $this->repository->findById($id);
+        return  $this->repository->findById($id);
     }
 
     public function create(?array $data)
     {
-        return  $this->repository->create($data);
+        $protocol =  $this->repository->create($data);
+        $this->createHistory($protocol, ProtocolHistoryType::CREATE_FIRST);
+        return $protocol;
     }
 
-    public function update($user, $roleId,?int $id, ?array $data)
+    public function update($user, $roleId,?int $id, ?array $data, $type)
     {
         if ($roleId == UserRoleEnum::INSPECTOR->value && $data['protocol_status_id'] == ProtocolStatusEnum::NOT_DEFECT->value)
         {
@@ -46,7 +52,10 @@ class ProtocolService
             $data['is_finished'] = true;
         }
 
-        return $this->repository->update($id, $data);
+
+        $protocol =  $this->repository->update($id, $data);
+        $this->createHistory($protocol, $type);
+        return $protocol;
     }
 
 
@@ -91,7 +100,6 @@ class ProtocolService
                 'all' => 0
             ];
         }
-
     }
 
     public function reject($user, $roleId, $id)
@@ -121,7 +129,18 @@ class ProtocolService
             $protocol->$column = json_encode(array_map(fn($path) => ['url' => $path], $paths));
             $protocol->save();
         }
+    }
 
+    public function createHistory($protocol, $type, $comment = null, $meta = null)
+    {
+       return  $this->historyService->createHistory(
+            modelId: $protocol->id,
+            status: $protocol->protocol_status_id->value,
+            type: $type,
+            date: null,
+            comment: $comment,
+            additionalInfo: $meta
+        );
     }
 
 }

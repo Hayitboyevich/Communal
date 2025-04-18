@@ -90,7 +90,6 @@ class ProtocolRepository implements ProtocolRepositoryInterface
         $protocol = $this->findById($data['id']);
         $protocol->update([
             'inspector_id' => $data['inspector_id'],
-            'protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT,
         ]);
         return $protocol;
     }
