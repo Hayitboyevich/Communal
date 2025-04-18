@@ -23,7 +23,7 @@ class ProtocolResource extends JsonResource
             'address' => $this->address,
             'description' => $this->description,
             'user' => $this->user ? [
-                'id' => $this->user_id,
+                'id' => $this->user->id,
                 'name' => $this->user->full_name ?? '',
             ] : null,
             'inspector' => $this->inspector ? [
