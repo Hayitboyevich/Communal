@@ -8,7 +8,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\UserStatusResource;
 use App\Models\User;
+use App\Models\UserStatus;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
@@ -35,6 +37,15 @@ class UserController extends BaseController
                 $id ? 'User retrieved successfully.' : 'Users retrieved successfully.',
                 $id ? null : pagination($users)
             );
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function status(): JsonResponse
+    {
+        try {
+            return $this->sendSuccess(UserStatusResource::collection(UserStatus::all()), 'User status retrieved successfully.');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }

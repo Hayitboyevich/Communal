@@ -2,10 +2,8 @@
 
 namespace Modules\Water\Services;
 
-use App\Enums\LogType;
 use App\Enums\UserRoleEnum;
 use App\Http\Requests\ProtocolChangeRequest;
-use App\Models\ObjectStatus;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\FileService;
@@ -76,6 +74,13 @@ class ProtocolService
                 $type = ProtocolHistoryType::SEND_HMQO;
             }
             $historyId = $this->createHistory($protocol, $type, $request->comment);
+            if (!empty($request->files)){
+                $this->createHistoryFiles($historyId, $request->files);
+            }
+            if (!empty($request->images)){
+                $this->createHistoryImages($historyId, $request->images);
+            }
+
             ProtocolHistory::query()->find($historyId);
             DB::commit();
             return $protocol;
@@ -186,7 +191,20 @@ class ProtocolService
             $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'protocol/files'), $files);
             $protocol->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
         }
+    }
 
+    public function createHistoryFiles($id, $files)
+    {
+        $history = ProtocolHistory::query()->findOrFail($id);
+        $paths = array_map(fn($file) => $this->fileService->uploadFile($file, 'protocol-history/files'), $files);
+        $history->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+    }
+
+    public function createHistoryImages($id, $images)
+    {
+        $history = ProtocolHistory::query()->findOrFail($id);
+        $paths = array_map(fn($file) => $this->fileService->uploadFile($file, 'protocol-history/images'), $images);
+        $history->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
     }
 
     public function uploadFiles(Protocol $protocol, string $column, ?array $files)

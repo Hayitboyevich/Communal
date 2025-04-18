@@ -21,6 +21,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 
     Route::controller(UserController::class)->prefix('user')->group(function () {
         Route::get('/', 'index');
+        Route::get('/status', 'status');
         Route::post('/create', 'create');
         Route::post('/edit/{id}', 'edit');
         Route::post('/info', 'info');

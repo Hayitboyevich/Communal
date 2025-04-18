@@ -5,6 +5,7 @@ namespace Modules\Water\Services;
 use Illuminate\Support\Facades\Auth;
 use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Contracts\HistoryRepositoryInterface;
+use Modules\Water\Models\ProtocolHistory;
 use Modules\Water\Repositories\HistoryRepository;
 
 class HistoryService
@@ -64,7 +65,9 @@ class HistoryService
 
     public function createImages($id, $data)
     {
-
+        $history = ProtocolHistory::query()->findOrFail($id);
+        $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'protocol/files'), $files);
+        $protocol->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
     }
 
     public function createFiles($id, $data)
