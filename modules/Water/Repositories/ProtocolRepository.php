@@ -98,12 +98,13 @@ class ProtocolRepository implements ProtocolRepositoryInterface
     {
         try {
             if ($roleId == UserRoleEnum::WATER_INSPECTOR->value) {
-                return  $this->findById($id)->update(['protocol_status_id' => ProtocolStatusEnum::NOT_DEFECT, 'is_finished' => true]);
-            }if ($roleId == UserRoleEnum::INSPECTOR->value) {
-                return  $this->findById($id)->update(['protocol_status_id' => ProtocolStatusEnum::CONFIRM_NOT_DEFECT]);
+                return $this->findById($id)->update(['protocol_status_id' => ProtocolStatusEnum::NOT_DEFECT, 'is_finished' => true]);
+            }
+            if ($roleId == UserRoleEnum::INSPECTOR->value) {
+                return $this->findById($id)->update(['protocol_status_id' => ProtocolStatusEnum::CONFIRM_NOT_DEFECT]);
             }
             return null;
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             throw $exception;
         }
     }
@@ -118,7 +119,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
             $protocol->update(['protocol_status_id' => ProtocolStatusEnum::REJECTED->value]);
             return $protocol;
 
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             throw $exception;
         }
     }
@@ -126,9 +127,51 @@ class ProtocolRepository implements ProtocolRepositoryInterface
     public function confirmDefect($user, $roleId, $id)
     {
         try {
-            return $this->findById($id)->update(['protocol_status_id' => ProtocolStatusEnum::NOT_DEFECT, 'is_finished' => true]);
+            $protocol =  $this->findById($id);
+            $protocol->update(['protocol_status_id' => ProtocolStatusEnum::NOT_DEFECT, 'is_finished' => true]);
+            return $protocol;
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
+    }
 
-        }  catch (\Exception $exception){
+    public function rejectResult($user, $roleId, $id)
+    {
+        try {
+            $protocol = $this->findById($id);
+            if (!$protocol) {
+                throw new \Exception("Protocol not found");
+            }
+            $protocol->update(['protocol_status_id' => ProtocolStatusEnum::FORMED->value]);
+            return $protocol;
+
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    public function confirmResult($user, $roleId, $id)
+    {
+        try {
+            $protocol = $this->findById($id);
+            $protocol->update(['protocol_status_id' => ProtocolStatusEnum::CONFIRMED, 'is_finished' => true]);
+            return $protocol;
+
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    public function change($id, $data)
+    {
+        try {
+            $protocol = $this->findById($id);
+            if (!$protocol) throw new \Exception("Protocol not found");
+
+            $protocol->update([
+                'protocol_status_id' => $data['protocol_status_id'],
+            ]);
+        } catch (\Exception $exception) {
             throw $exception;
         }
     }
@@ -137,7 +180,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
     {
         try {
             return $this->findById($id)->update(['protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT]);
-        }  catch (\Exception $exception){
+        } catch (\Exception $exception) {
             throw $exception;
         }
     }

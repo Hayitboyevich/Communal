@@ -22,6 +22,10 @@ interface ProtocolRepositoryInterface
     public function sendDefect($user, $roleId, $id);
 
     public function confirmDefect($user, $roleId, $id);
+    public function confirmResult($user, $roleId, $id);
     public function rejectDefect($user, $roleId, $id);
+    public function rejectResult($user, $roleId, $id);
+
+    public function change($id, $data);
 
 }

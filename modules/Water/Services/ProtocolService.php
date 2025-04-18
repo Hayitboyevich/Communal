@@ -4,15 +4,18 @@ namespace Modules\Water\Services;
 
 use App\Enums\LogType;
 use App\Enums\UserRoleEnum;
+use App\Http\Requests\ProtocolChangeRequest;
 use App\Models\ObjectStatus;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\FileService;
+use Illuminate\Support\Facades\DB;
 use Modules\Water\Const\CategoryType;
 use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Contracts\ProtocolRepositoryInterface;
 use Modules\Water\Enums\ProtocolStatusEnum;
 use Modules\Water\Models\Protocol;
+use Modules\Water\Models\ProtocolHistory;
 use Modules\Water\Models\ProtocolStatus;
 
 class ProtocolService
@@ -62,6 +65,25 @@ class ProtocolService
         return $protocol;
     }
 
+    public function statusChange($id, ProtocolChangeRequest $request)
+    {
+        DB::beginTransaction();
+        try {
+            $protocol = $this->repository->change($id, $request->except('images', 'files', 'comment'));
+            if ($protocol->protocol_status_id == ProtocolStatusEnum::CONFIRM_RESULT) {
+                $type = ProtocolHistoryType::CONFIRM_RESULT;
+            }else{
+                $type = ProtocolHistoryType::SEND_HMQO;
+            }
+            $historyId = $this->createHistory($protocol, $type, $request->comment);
+            ProtocolHistory::query()->find($historyId);
+            DB::commit();
+            return $protocol;
+        }catch (\Exception $exception){
+            DB::rollBack();
+            throw  $exception;
+        }
+    }
 
     public function confirmDefect($user, $roleId, $id)
     {
@@ -70,10 +92,26 @@ class ProtocolService
         return $protocol;
     }
 
-    public function rejectDefect($user, $roleId, $id)
+    public function confirmResult($user, $roleId, $id)
     {
-        $protocol = $this->repository->rejectDefect($user, $roleId, $id);
-        $this->createHistory($protocol, ProtocolHistoryType::REJECT_DEFECT);
+        $protocol = $this->repository->confirmResult($user, $roleId, $id);
+        $this->createHistory($protocol, ProtocolHistoryType::CONFIRMED);
+        return $protocol;
+    }
+
+    public function rejectResult($user, $roleId, $data)
+    {
+        $protocol = $this->repository->rejectResult($user, $roleId, $data['id']);
+        $this->createHistory($protocol, ProtocolHistoryType::REJECT_RESULT, $data['comment']);
+        return $protocol;
+    }
+
+
+
+    public function rejectDefect($user, $roleId, $data)
+    {
+        $protocol = $this->repository->rejectDefect($user, $roleId, $data['id']);
+        $this->createHistory($protocol, ProtocolHistoryType::REJECT_DEFECT, $data['comment']);
         return $protocol;
     }
 

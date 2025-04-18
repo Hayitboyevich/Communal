@@ -17,6 +17,10 @@ class UserResource extends JsonResource
             'middle_name' => $this->middle_name,
             'surname' => $this->surname,
             'phone' => $this->phone,
+            'status' => $this->status ? [
+                'id' => $this->status->id,
+                'name' => $this->status->name
+            ] : null,
             'image' => $this->image ? Storage::disk('public')->url($this->image) : null,
             'region' => $this->region ? RegionResource::make($this->region) : null,
             'district' => $this->district ? DistrictResource::make($this->district) : null,

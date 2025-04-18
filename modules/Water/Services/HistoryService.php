@@ -29,6 +29,10 @@ class HistoryService
             ProtocolHistoryType::REJECT,
             ProtocolHistoryType::CONFIRM_NOT_DEFECT,
             ProtocolHistoryType::NOT_DEFECT,
+            ProtocolHistoryType::CONFIRM_RESULT,
+            ProtocolHistoryType::REJECT_RESULT,
+            ProtocolHistoryType::SEND_HMQO,
+            ProtocolHistoryType::CONFIRMED,
             => $this->shapeTaskContent(
                 status: $status,
                 comment: $comment,
@@ -56,5 +60,15 @@ class HistoryService
             'comment' => $comment,
             'additionalInfo' => $additionalInfo
         ];
+    }
+
+    public function createImages($id, $data)
+    {
+
+    }
+
+    public function createFiles($id, $data)
+    {
+
     }
 }

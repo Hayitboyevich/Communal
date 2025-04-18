@@ -55,6 +55,7 @@ class UserController extends BaseController
     {
         try {
             $user = $this->service->update($id, $request);
+            return $this->sendSuccess(new UserResource($user), 'User updated successfully.');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }

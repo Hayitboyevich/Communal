@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\UserStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserCreateRequest extends FormRequest
@@ -38,7 +39,7 @@ class UserCreateRequest extends FormRequest
         $this->merge([
             'login' => $this->passport,
             'password' => $this->pin,
-            'user_status_id' => 1
+            'user_status_id' => UserStatusEnum::ACTIVE->value
         ]);
 
     }

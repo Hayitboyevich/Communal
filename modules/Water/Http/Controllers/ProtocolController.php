@@ -4,6 +4,7 @@ namespace Modules\Water\Http\Controllers;
 
 use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
+use App\Http\Requests\ProtocolChangeRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -102,6 +103,15 @@ class ProtocolController extends BaseController
         }
     }
 
+    public function statusChange($id, ProtocolChangeRequest $request): JsonResponse
+    {
+        try {
+            $protocol = $this->service->statusChange($id, $request);
+            return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol status changed successfully.');
+        }catch (\Exception $exception){
+            return  $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
 
     public function confirmDefect(): JsonResponse
     {
@@ -115,12 +125,32 @@ class ProtocolController extends BaseController
     public function rejectDefect(): JsonResponse
     {
         try {
-            $protocol = $this->service->rejectDefect($this->user, $this->roleId, request('id'));
+            $protocol = $this->service->rejectDefect($this->user, $this->roleId, request()->all());
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol rejected successfully.');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
 
+    }
+
+    public function confirmResult(): JsonResponse
+    {
+        try {
+            $protocol = $this->service->confirmResult($this->user, $this->roleId, request('id'));
+            return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol confirmed successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function rejectResult(): JsonResponse
+    {
+        try {
+            $protocol = $this->service->rejectResult($this->user, $this->roleId, request()->all());
+            return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol rejected successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
     }
 
     public function history($id): JsonResponse

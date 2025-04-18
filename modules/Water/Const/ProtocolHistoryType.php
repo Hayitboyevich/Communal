@@ -13,6 +13,10 @@ class ProtocolHistoryType
     const REJECT = 7;
     const CONFIRM_NOT_DEFECT = 8;
     const NOT_DEFECT = 9;
+    const CONFIRM_RESULT = 10;
+    const REJECT_RESULT = 11;
+    const SEND_HMQO = 12;
+    const CONFIRMED = 13;
 
     public static function getLabel($type): string
     {
@@ -33,6 +37,14 @@ class ProtocolHistoryType
                 return 'Ko\'rsatma rad qilindi';
             case self::CONFIRM_NOT_DEFECT:
                 return 'Kamchilik aniqlanmadi tasdiqlash';
+            case self::CONFIRM_RESULT:
+                return 'Ko\'rsatma tasdiqlash uchun yuborildi';
+            case self::CONFIRMED:
+                return 'Ko\'rsatma tasdiqlandi';
+            case self::REJECT_RESULT:
+                return 'Ko\'rsatma rad qilindi';
+            case self::SEND_HMQO:
+                return 'Ko\'rsatma HMQOga yuborildi';
             case self::NOT_DEFECT:
                 return 'Kamchilik aniqlanmadi';
             default:
