@@ -23,11 +23,19 @@ class UserRepository implements UserRepositoryInterface
 
     public function find($id)
     {
-        $user = User::query()->find($id);
+        return  User::query()->findOrFail($id);
     }
 
-    public function update($id, array $data){
-
+    public function update($id, array $data)
+    {
+        try {
+            $user = $this->find($id);
+            if (!$user) throw new \Exception("User not found");
+            $user->update($data);
+            return $user;
+        }catch (\Exception $exception){
+            throw  $exception;
+        }
     }
 
     public function delete($id){

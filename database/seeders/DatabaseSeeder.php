@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ProtocolStatusSeeder::class,
             ProtocolTypeSeeder::class,
+            UserStatusSeeder::class,
         ]);
     }
 }

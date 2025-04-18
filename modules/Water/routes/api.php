@@ -20,6 +20,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/create/third/{id}', 'createThird');
         Route::post('/confirm/defect', 'confirmDefect');
         Route::post('/reject/defect', 'rejectDefect');
+        Route::post('/history/{id}', 'history');
         Route::get('/{id?}', 'index');
     });
 

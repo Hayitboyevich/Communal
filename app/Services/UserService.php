@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\UserRepositoryInterface;
 use App\Http\Requests\UserCreateRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
@@ -37,15 +38,25 @@ class UserService
         DB::beginTransaction();
         try {
 
-            $user = $this->repository->create($request->except(['role_id', 'image']));
-            
+            $user = $this->repository->create($request->except(['role_id', 'image', 'images', 'files']));
+
             foreach ($request->role_id as $role) {
                 $user->roles()->attach($user->id, ['role_id' => $role]);
             }
 
-            if (!empty($data['image'])) {
-                $path = $this->fileService->uploadImage($data['image'], 'user/images');
+            if (!empty($request->image)) {
+                $path = $this->fileService->uploadImage($request->image, 'user/images');
                 $user->update(['image' => $path]);
+            }
+
+            if (!empty($request->images)) {
+                $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/images'), $request->images);
+                $user->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+            }
+
+            if (!empty($request->files)) {
+                $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->files);
+                $user->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
             }
 
             DB::commit();
@@ -55,6 +66,41 @@ class UserService
             throw $exception;
         }
     }
+
+    public function update($id, UserUpdateRequest $request)
+    {
+        DB::beginTransaction();
+        try {
+
+            $user = $this->repository->update($id, $request->except(['role_id', 'image', 'images', 'files']));
+            foreach ($request->role_id as $role) {
+                $user->roles()->attach($user->id, ['role_id' => $role]);
+            }
+
+            if (!empty($request->image)) {
+                $path = $this->fileService->uploadImage($request->image, 'user/images');
+                $user->update(['image' => $path]);
+            }
+
+            if (!empty($request->images)) {
+                $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/images'), $request->images);
+                $user->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+            }
+
+            if (!empty($request->files)) {
+                $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->files);
+                $user->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+            }
+
+            DB::commit();
+            return $user;
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
+    }
+
+
 
     public function getInfo(string $pin, string $birth_date)
     {

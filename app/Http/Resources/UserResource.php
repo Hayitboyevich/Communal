@@ -20,6 +20,7 @@ class UserResource extends JsonResource
             'image' => $this->image ? Storage::disk('public')->url($this->image) : null,
             'region' => $this->region ? RegionResource::make($this->region) : null,
             'district' => $this->district ? DistrictResource::make($this->district) : null,
+            'roles' => $this->roles ? RoleResource::collection($this->roles) : null,
         ];
     }
 }

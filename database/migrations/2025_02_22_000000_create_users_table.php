@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('pin')->nullable()->unique();
             $table->string('phone')->nullable();
             $table->date('birth_date')->nullable();
+            $table->bigInteger('user_status_id')->index()->nullable();
             $table->string('image')->nullable();
             $table->string('password');
             $table->timestamp('last_login_at')->nullable();

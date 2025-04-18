@@ -6,6 +6,7 @@ use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserCreateRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\UserService;
@@ -45,6 +46,15 @@ class UserController extends BaseController
             $user = $this->service->create($request);
             return $this->sendSuccess(new UserResource($user), 'User created successfully.');
 
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function edit($id, UserUpdateRequest $request): JsonResponse
+    {
+        try {
+            $user = $this->service->update($id, $request);
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }

@@ -4,8 +4,9 @@ namespace Modules\Water\Repositories;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Modules\Water\Contracts\HistoryRepositoryInterface;
 
-class HistoryRepository
+class HistoryRepository implements HistoryRepositoryInterface
 {
     public function __construct(protected  $table)
     {
@@ -28,7 +29,7 @@ class HistoryRepository
             ->orderBy('id', 'desc')
             ->get([
                 'id',
-                'gu_id',
+                'guid',
                 'content',
                 'created_at'
             ]);
@@ -38,16 +39,16 @@ class HistoryRepository
     {
         return DB::table($this->table)->where('id', $id)->where('type', LogType::TASK_HISTORY)->first([
             'id',
-            'gu_id',
+            'guid',
             'content',
             'created_at'
         ]);
     }
 
-    public function createHistory(int $modelId, array $content, int $type): int
+    public function createHistory(int $guid, array $content, int $type): int
     {
         return DB::table($this->table)->insertGetId([
-            'model_id' => $modelId,
+            'guid' => $guid,
             'content' => json_encode($content),
             'type' => $type,
             'created_at' => Carbon::now(),

@@ -2,23 +2,28 @@
 
 namespace Modules\Water\Services;
 
-use App\Constants\ErrorMessage;
+use App\Enums\LogType;
 use App\Enums\UserRoleEnum;
+use App\Models\ObjectStatus;
+use App\Models\Role;
+use App\Models\User;
 use App\Services\FileService;
 use Modules\Water\Const\CategoryType;
 use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Contracts\ProtocolRepositoryInterface;
 use Modules\Water\Enums\ProtocolStatusEnum;
 use Modules\Water\Models\Protocol;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Modules\Water\Models\ProtocolStatus;
 
 class ProtocolService
 {
-    private HistoryService  $historyService;
+    private HistoryService $historyService;
+
     public function __construct(
         protected ProtocolRepositoryInterface $repository,
-        protected FileService $fileService
-    ){
+        protected FileService                 $fileService
+    )
+    {
         $this->historyService = new HistoryService('protocol_histories');
     }
 
@@ -30,30 +35,29 @@ class ProtocolService
 
     public function findById(?int $id)
     {
-        return  $this->repository->findById($id);
+        return $this->repository->findById($id);
     }
 
     public function create(?array $data)
     {
-        $protocol =  $this->repository->create($data);
+        $protocol = $this->repository->create($data);
         $this->createHistory($protocol, ProtocolHistoryType::CREATE_FIRST);
         return $protocol;
     }
 
-    public function update($user, $roleId,?int $id, ?array $data, $type)
+    public function update($user, $roleId, ?int $id, ?array $data, $type)
     {
-        if ($roleId == UserRoleEnum::INSPECTOR->value && $data['protocol_status_id'] == ProtocolStatusEnum::NOT_DEFECT->value)
-        {
+        if ($roleId == UserRoleEnum::INSPECTOR->value && $data['protocol_status_id'] == ProtocolStatusEnum::NOT_DEFECT->value) {
+            $type = ProtocolHistoryType::CONFIRM_NOT_DEFECT;
             $data['protocol_status_id'] = ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value;
         }
-        if ($roleId == UserRoleEnum::WATER_INSPECTOR->value && $data['protocol_status_id'] == ProtocolStatusEnum::NOT_DEFECT->value)
-        {
+        if ($roleId == UserRoleEnum::WATER_INSPECTOR->value && $data['protocol_status_id'] == ProtocolStatusEnum::NOT_DEFECT->value) {
             $data['protocol_status_id'] = ProtocolStatusEnum::NOT_DEFECT->value;
             $data['is_finished'] = true;
+            $type = ProtocolHistoryType::NOT_DEFECT;
         }
 
-
-        $protocol =  $this->repository->update($id, $data);
+        $protocol = $this->repository->update($id, $data);
         $this->createHistory($protocol, $type);
         return $protocol;
     }
@@ -61,23 +65,46 @@ class ProtocolService
 
     public function confirmDefect($user, $roleId, $id)
     {
-       return  $this->repository->confirmDefect($user, $roleId, $id);
+        $protocol = $this->repository->confirmDefect($user, $roleId, $id);
+        $this->createHistory($protocol, ProtocolHistoryType::CONFIRM_DEFECT);
+        return $protocol;
     }
 
     public function rejectDefect($user, $roleId, $id)
     {
-        return  $this->repository->rejectDefect($user, $roleId, $id);
+        $protocol = $this->repository->rejectDefect($user, $roleId, $id);
+        $this->createHistory($protocol, ProtocolHistoryType::REJECT_DEFECT);
+        return $protocol;
     }
 
     public function attach(?array $data, $user, ?int $roleId)
     {
-        return $this->repository->attach($data, $user, $roleId);
+        $protocol = $this->repository->attach($data, $user, $roleId);
+        $this->createHistory($protocol, ProtocolHistoryType::ATTACH_INSPECTOR);
+        return $protocol;
+    }
+
+    public function history($id)
+    {
+        $protocol = $this->findById($id);
+        return $protocol->histories->map(function ($history) {
+            return [
+                'id' => $history->id,
+                'user' => $history->content->user ? User::query()->find($history->content->user, ['name', 'surname', 'middle_name']) : null,
+                'role' => $history->content->role ? Role::query()->find($history->content->role, ['name', 'description']) : null,
+                'status' => $history->content->status ? ProtocolStatus::query()->find($history->content->status, ['id', 'name']) : null,
+                'type' => $history->type,
+                'is_change' => $history->type ? ProtocolHistoryType::getLabel($history->type) : null,
+                'created_at' => $history->created_at,
+            ];
+        })->sortByDesc('created_at')->values();
+
     }
 
     public function count($user, $roleId, $filters = []): array
     {
         $query = $this->repository->all($user, $roleId);
-        if ($filters['category'] == CategoryType::MONITORING){
+        if ($filters['category'] == CategoryType::MONITORING) {
             return [
                 'all' => $query->clone()->where('category', CategoryType::MONITORING)->count(),
                 'enter_result' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::ENTER_RESULT->value)->count(),
@@ -85,7 +112,7 @@ class ProtocolService
                 'forming' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::ENTER_RESULT->value)->count(),
                 'not_defect' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::NOT_DEFECT->value)->count(),
             ];
-        }elseif($filters['category'] == CategoryType::REGULATION){
+        } elseif ($filters['category'] == CategoryType::REGULATION) {
             return [
                 'all' => $query->clone()->where('category', CategoryType::REGULATION)->count(),
                 'formed' => $query->clone()->where('category', CategoryType::REGULATION)->where('protocol_status_id', ProtocolStatusEnum::FORMED->value)->count(),
@@ -94,17 +121,18 @@ class ProtocolService
                 'confirm_result' => $query->clone()->where('category', CategoryType::REGULATION)->where('protocol_status_id', ProtocolStatusEnum::CONFIRM_RESULT->value)->count(),
                 'confirmed' => $query->clone()->where('category', CategoryType::REGULATION)->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED->value)->count(),
             ];
-        }
-        else{
+        } else {
             return [
                 'all' => 0
             ];
         }
     }
 
-    public function reject($user, $roleId, $id)
+    public function reject($user, $roleId, $data)
     {
-        return $this->repository->reject($user, $roleId, $id);
+        $protocol = $this->repository->reject($user, $roleId, $data['id']);
+        $this->createHistory($protocol, ProtocolHistoryType::REJECT, $data['comment']);
+        return $protocol;
     }
 
 
@@ -116,12 +144,13 @@ class ProtocolService
 
     public function saveFiles(Protocol $protocol, ?array $files)
     {
-        if(!empty($files)){
+        if (!empty($files)) {
             $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'protocol/files'), $files);
             $protocol->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
         }
 
     }
+
     public function uploadFiles(Protocol $protocol, string $column, ?array $files)
     {
         if (!empty($files)) {
@@ -131,10 +160,10 @@ class ProtocolService
         }
     }
 
-    public function createHistory($protocol, $type, $comment = null, $meta = null)
+    public function createHistory($protocol, $type, $comment = "", $meta = null)
     {
-       return  $this->historyService->createHistory(
-            modelId: $protocol->id,
+        return $this->historyService->createHistory(
+            guid: $protocol->id,
             status: $protocol->protocol_status_id->value,
             type: $type,
             date: null,

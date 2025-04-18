@@ -17,12 +17,18 @@ class HistoryService
         $this->repository = new HistoryRepository($tableName);
     }
 
-    public function createHistory(int $modelId, int $status, int $type, ?string $date, ?string $comment = "", mixed $additionalInfo = null): int
+    public function createHistory(int $guid, int $status, int $type, ?string $date, ?string $comment = "", mixed $additionalInfo = null): int
     {
         $content = match ($type) {
             ProtocolHistoryType::CREATE_FIRST,
             ProtocolHistoryType::CREATE_SECOND,
             ProtocolHistoryType::CREATE_THIRD,
+            ProtocolHistoryType::CONFIRM_DEFECT,
+            ProtocolHistoryType::REJECT_DEFECT,
+            ProtocolHistoryType::ATTACH_INSPECTOR,
+            ProtocolHistoryType::REJECT,
+            ProtocolHistoryType::CONFIRM_NOT_DEFECT,
+            ProtocolHistoryType::NOT_DEFECT,
             => $this->shapeTaskContent(
                 status: $status,
                 comment: $comment,
@@ -36,7 +42,7 @@ class HistoryService
             return false;
         }
 
-        return $this->repository->createHistory(modelId: $modelId, content: $content, type: $type);
+        return $this->repository->createHistory(guid: $guid, content: $content, type: $type);
     }
 
     private function shapeTaskContent(int $status, string $comment, ?string $date, mixed $additionalInfo): array
