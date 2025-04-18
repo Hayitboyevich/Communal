@@ -25,5 +25,15 @@ class RoleSeeder extends Seeder
             'name' => 'suv inspektor',
             'description' => 'suv inspektor'
         ]);
+
+        Role::query()->create([
+            'name' => 'Kadr',
+            'description' => 'Res kadr'
+        ]);
+
+        Role::query()->create([
+            'name' => 'Viloyat inspektor',
+            'description' => 'Viloyat inspektor'
+        ]);
     }
 }
