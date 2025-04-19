@@ -73,7 +73,7 @@ class UserService
         DB::beginTransaction();
         try {
 
-            $user = $this->repository->update($id, $request->except(['role_id', 'image', 'images', 'files']));
+            $user = $this->repository->update($id, $request->except(['role_id', 'image', 'images', 'docs']));
             foreach ($request->role_id as $role) {
                 $user->roles()->attach($user->id, ['role_id' => $role]);
             }
