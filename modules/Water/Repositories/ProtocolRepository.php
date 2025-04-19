@@ -171,6 +171,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
             $protocol->update([
                 'protocol_status_id' => $data['protocol_status_id'],
             ]);
+            return $protocol;
         } catch (\Exception $exception) {
             throw $exception;
         }

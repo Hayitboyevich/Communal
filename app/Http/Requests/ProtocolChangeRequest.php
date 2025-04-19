@@ -20,7 +20,7 @@ class ProtocolChangeRequest extends FormRequest
             'comment' => 'required|string',
             'protocol_status_id' => 'required|exists:protocol_statuses,id',
             'images' => 'sometimes',
-            'files' => 'sometimes',
+            'docs' => 'sometimes',
         ];
     }
 

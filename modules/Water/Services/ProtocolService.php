@@ -67,15 +67,15 @@ class ProtocolService
     {
         DB::beginTransaction();
         try {
-            $protocol = $this->repository->change($id, $request->except('images', 'files', 'comment'));
+            $protocol = $this->repository->change($id, $request->except('images', 'docs', 'comment'));
             if ($protocol->protocol_status_id == ProtocolStatusEnum::CONFIRM_RESULT) {
                 $type = ProtocolHistoryType::CONFIRM_RESULT;
             }else{
                 $type = ProtocolHistoryType::SEND_HMQO;
             }
             $historyId = $this->createHistory($protocol, $type, $request->comment);
-            if (!empty($request->files)){
-                $this->createHistoryFiles($historyId, $request->files);
+            if (!empty($request->docs)){
+                $this->createHistoryFiles($historyId, $request->docs);
             }
             if (!empty($request->images)){
                 $this->createHistoryImages($historyId, $request->images);

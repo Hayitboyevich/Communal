@@ -23,7 +23,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/reject/defect', 'rejectDefect');
         Route::post('/reject/result', 'rejectResult');
         Route::post('/status/change/{id}', 'statusChange');
-        Route::post('/history/{id}', 'history');
+        Route::get('/history/{id}', 'history');
         Route::get('/{id?}', 'index');
     });
 
