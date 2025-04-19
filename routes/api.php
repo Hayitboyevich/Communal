@@ -53,6 +53,8 @@ Route::group(['middleware' => ['auth:api']], function () {
 Route::group(['middleware' => ['basic']], function () {
     Route::controller(InformationController::class)->prefix('info')->group(function () {
         Route::get('/types', 'types');
+        Route::get('/region/{id?}', 'region');
+        Route::get('/district', 'district');
     });
 });
 
