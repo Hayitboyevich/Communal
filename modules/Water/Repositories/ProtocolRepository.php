@@ -3,6 +3,7 @@
 namespace Modules\Water\Repositories;
 
 use App\Enums\UserRoleEnum;
+use Modules\Water\Const\Step;
 use Modules\Water\Const\TypeList;
 use Modules\Water\Contracts\ProtocolRepositoryInterface;
 use Modules\Water\Enums\ProtocolStatusEnum;
@@ -181,7 +182,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
     {
         try {
             $protocol =  $this->findById($id);
-            $protocol->update(['protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT]);
+            $protocol->update(['protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT, 'step' => Step::ONE]);
             return $protocol;
         } catch (\Exception $exception) {
             throw $exception;
