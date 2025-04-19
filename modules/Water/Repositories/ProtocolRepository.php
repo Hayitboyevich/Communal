@@ -180,7 +180,9 @@ class ProtocolRepository implements ProtocolRepositoryInterface
     public function rejectDefect($user, $roleId, $id)
     {
         try {
-            return $this->findById($id)->update(['protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT]);
+            $protocol =  $this->findById($id);
+            $protocol->update(['protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT]);
+            return $protocol;
         } catch (\Exception $exception) {
             throw $exception;
         }
