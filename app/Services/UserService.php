@@ -88,8 +88,8 @@ class UserService
                 $user->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
             }
 
-            if (!empty($request->files)) {
-                $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->files);
+            if (!empty($request->docs)) {
+                $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->docs);
                 $user->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
             }
 
