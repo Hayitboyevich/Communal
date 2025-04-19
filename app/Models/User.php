@@ -75,7 +75,9 @@ class User extends Authenticatable implements JWTSubject
         return $query->where(function ($query) use ($searchTerm) {
             $query->whereRaw('LOWER(name) LIKE ?', ['%' . $searchTerm . '%'])
                 ->orWhereRaw('LOWER(middle_name) LIKE ?', ['%' . $searchTerm . '%'])
-                ->orWhereRaw('LOWER(surname) LIKE ?', ['%' . $searchTerm . '%']);
+                ->orWhereRaw('LOWER(surname) LIKE ?', ['%' . $searchTerm . '%'])
+                ->orWhereRaw('LOWER(phone) LIKE ?', ['%' . $searchTerm . '%'])
+                ->orWhereRaw('LOWER(pin) LIKE ?', ['%' . $searchTerm . '%']);
         });
     }
 

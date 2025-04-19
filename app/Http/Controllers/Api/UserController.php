@@ -24,9 +24,10 @@ class UserController extends BaseController
     public function index($id = null): JsonResponse
     {
         try {
+            $filters = request()->only(['search', 'region_id', 'district_id', 'role_id', 'status']);
             $users = $id
                 ? $this->service->findById($id)
-                : $this->service->getAll()->paginate(request('per_page', 15));
+                : $this->service->getAll($filters)->paginate(request('per_page', 15));
 
             $resource = $id
                 ? UserResource::make($users)

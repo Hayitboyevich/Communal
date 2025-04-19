@@ -19,10 +19,11 @@ class UserService
     )
     {}
 
-    public function getAll()
+    public function getAll($filters)
     {
         try {
-           return $this->repository->all();
+           $query =  $this->repository->all();
+           return $this->repository->search($query, $filters);
         }catch (\Exception $exception){
             throw $exception;
         }
@@ -100,8 +101,6 @@ class UserService
         }
     }
 
-
-
     public function getInfo(string $pin, string $birth_date)
     {
         try {
@@ -143,16 +142,7 @@ class UserService
     public function getInspectors($filters)
     {
         $query = $this->repository->all()->whereHas('inspectors');
-        return  $query
-            ->when(isset($filters['region_id']), function ($query) use ($filters) {
-                $query->where('region_id', $filters['region_id']);
-            })
-            ->when(isset($filters['full_name']), function ($query) use ($filters) {
-                $query->searchByFullName($filters['full_name']);
-            })
-            ->when(isset($filters['phone']), function ($query) use ($filters) {
-                $query->where('phone', $filters['phone']);
-            });
+        return  $this->repository->search($query, $filters);
     }
 
 }
