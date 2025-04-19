@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
             'auth:api' => \Illuminate\Auth\Middleware\Authenticate::class,
+            'basic' => \App\Http\Middleware\BasicAuthMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\InformationController;
 
 
 Route::controller(AuthController::class)->group(function () {
@@ -47,6 +48,12 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/{id}', 'getDistrict');
     });
 
+});
+
+Route::group(['middleware' => ['basic']], function () {
+    Route::controller(InformationController::class)->prefix('info')->group(function () {
+        Route::get('/types', 'types');
+    });
 });
 
 
