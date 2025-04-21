@@ -190,7 +190,7 @@ class ProtocolController extends BaseController
     {
         try {
             $protocol = Protocol::query()->findOrFail($id);
-            $pdf = Pdf::loadView('pdf.regulation', compact(
+            $pdf = Pdf::loadView('pdf.protocol', compact(
                 'protocol'
             ));
             $pdfOutput = $pdf->output();
