@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProtocolOgohRequest;
 use App\Http\Resources\DistrictResource;
 use App\Http\Resources\RegionResource;
 use App\Models\Region;
@@ -58,11 +59,11 @@ class InformationController extends Controller
         }
     }
 
-    public function protocolCreate(ProtocolFirstStepRequest $request): JsonResponse
+    public function protocolCreate(ProtocolOgohRequest $request): JsonResponse
     {
         DB::beginTransaction();
         try {
-            $protocol = $this->service->create($request->except('images'));
+            $protocol = $this->service->create($request->except('images', 'region', 'district'));
             $this->service->saveImages($protocol, $request['images']);
             DB::commit();
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol created successfully.');
