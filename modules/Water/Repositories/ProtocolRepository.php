@@ -21,7 +21,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
             case UserRoleEnum::MANAGER->value:
                 return Protocol::query()->where('region_id', $user->region_id);
             case UserRoleEnum::WATER_INSPECTOR->value:
-                return Protocol::query()->where('user_id', $user->id);
+                return Protocol::query()->where('user_id', $user->id)->where('role_id', $roleId);
             default:
                 return Protocol::query()->whereRaw('1 = 0');
         }
