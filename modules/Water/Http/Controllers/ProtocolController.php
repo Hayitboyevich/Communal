@@ -5,6 +5,7 @@ namespace Modules\Water\Http\Controllers;
 use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\ProtocolChangeRequest;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ use Modules\Water\Http\Requests\ProtocolFirstStepRequest;
 use Modules\Water\Http\Requests\ProtocolSecondStepRequest;
 use Modules\Water\Http\Requests\ProtocolThirdStepRequest;
 use Modules\Water\Http\Resources\ProtocolResource;
+use Modules\Water\Models\Protocol;
 use Modules\Water\Services\ProtocolService;
 
 class ProtocolController extends BaseController
@@ -179,6 +181,22 @@ class ProtocolController extends BaseController
         try {
          $protocol = $this->service->reject($this->user, $this->roleId, request()->all());
          return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol rejected successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function pdf($id): JsonResponse
+    {
+        try {
+            $protocol = Protocol::query()->findOrFail($id);
+            $pdf = Pdf::loadView('pdf.regulation', compact(
+                'protocol'
+            ));
+            $pdfOutput = $pdf->output();
+            $pdfBase64 = base64_encode($pdfOutput);
+            return $this->sendSuccess($pdfBase64, 'PDF');
+
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
