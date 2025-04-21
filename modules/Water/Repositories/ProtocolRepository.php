@@ -44,6 +44,9 @@ class ProtocolRepository implements ProtocolRepositoryInterface
                         });
                 });
             })
+            ->when(isset($filters['user_id']), function ($query) use ($filters) {
+                $query->where('user_id', $filters['user_id']);
+            })
             ->when(isset($filters['type']), function ($query) use ($filters) {
                 $query->where('type', $filters['type']);
             })

@@ -10,11 +10,21 @@ use App\Http\Resources\RegionResource;
 use App\Models\Region;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Modules\Water\Http\Requests\ProtocolFirstStepRequest;
+use Modules\Water\Http\Resources\ProtocolResource;
 use Modules\Water\Http\Resources\ProtocolTypeResource;
 use Modules\Water\Models\ProtocolType;
+use Modules\Water\Services\ProtocolService;
 
 class InformationController extends BaseController
 {
+
+    public function __construct(
+        protected ProtocolService $service
+    ){
+        parent::__construct();
+    }
     public function types(): JsonResponse
     {
         try {
@@ -46,4 +56,42 @@ class InformationController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
+    public function protocolCreate(ProtocolFirstStepRequest $request): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $protocol = $this->service->create($request->except('images'));
+            $this->service->saveImages($protocol, $request['images']);
+            DB::commit();
+            return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol created successfully.');
+        }catch (\Exception $exception){
+            DB::rollBack();
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function getProtocol($id = null): JsonResponse
+    {
+        try {
+            $filters = request()->only(['status', 'user_id', 'protocol_number', 'district_id', 'region_id', 'protocol_type', 'type', 'attach', 'category']);
+            $protocols = $id
+                ? $this->service->findById($id)
+                : $this->service->getAll($this->user, $this->roleId, $filters)->paginate(request('per_page', 15));
+
+            $resource = $id
+                ? ProtocolResource::make($protocols)
+                : ProtocolResource::collection($protocols);
+
+            return $this->sendSuccess(
+                $resource,
+                $id ? 'Protocol retrieved successfully.' : 'Protocols retrieved successfully.',
+                $id ? null : pagination($protocols)
+            );
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+
+    }
+
 }

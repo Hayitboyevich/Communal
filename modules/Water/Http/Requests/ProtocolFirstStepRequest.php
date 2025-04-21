@@ -32,14 +32,14 @@ class ProtocolFirstStepRequest extends FormRequest
             'images' => 'required|array',
             'type' => 'required|integer',
             'user_id' => 'required|integer',
-            'role_id' => 'required|integer',
+            'role_id' => 'required_if:type,1|required_if:type,2|integer',
         ];
     }
 
     public function prepareForValidation()
     {
         $this->merge([
-            'protocol_status_id' => in_array($this->role_id, [UserRoleEnum::INSPECTOR->value, UserRoleEnum::WATER_INSPECTOR->value]) ? ProtocolStatusEnum::ENTER_RESULT->value : ProtocolStatusEnum::NEW->value,
+            'protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT->value,
             'inspector_id' => $this->role_id == UserRoleEnum::INSPECTOR->value ? Auth::id() : null,
             'step' => Step::ONE,
             'category' => CategoryType::MONITORING
