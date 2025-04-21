@@ -19,13 +19,12 @@ use Modules\Water\Models\ProtocolStatus;
 use Modules\Water\Models\ProtocolType;
 use Modules\Water\Services\ProtocolService;
 
-class InformationController extends BaseController
+class InformationController extends Controller
 {
 
     public function __construct(
         protected ProtocolService $service
     ){
-        parent::__construct();
     }
     public function types(): JsonResponse
     {
@@ -112,6 +111,38 @@ class InformationController extends BaseController
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
+    }
+
+    private function sendSuccess($result, $message, $meta = []): JsonResponse
+    {
+        $response = [
+            'success' => true,
+            'message' => $message,
+            'result' => [
+                'data' => $result,
+            ],
+        ];
+
+        if (!empty($meta)) {
+            $response['meta'] = $meta;
+        }
+
+        return response()->json($response, 200);
+    }
+
+    private function sendError($error, $errorMessages = [], $code = 404): JsonResponse
+    {
+        $response = [
+            'success' => false,
+            'message' => $error,
+            'code' => $code,
+        ];
+
+        if (!empty($errorMessages)) {
+            $response['data'] = $errorMessages;
+        }
+
+        return response()->json($response, $code);
     }
 
 }
