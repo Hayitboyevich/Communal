@@ -56,6 +56,8 @@ Route::group(['middleware' => ['basic']], function () {
         Route::get('/region/{id?}', 'region');
         Route::get('/district', 'district');
         Route::post('/protocol-create', 'protocolCreate');
+        Route::get('/protocol-history', 'protocolHistory');
+        Route::get('/protocol-status', 'protocolStatus');
         Route::get('/protocol/{id?}', 'getProtocol');
     });
 });

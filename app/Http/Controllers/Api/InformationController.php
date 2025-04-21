@@ -13,7 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Water\Http\Requests\ProtocolFirstStepRequest;
 use Modules\Water\Http\Resources\ProtocolResource;
+use Modules\Water\Http\Resources\ProtocolStatusResource;
 use Modules\Water\Http\Resources\ProtocolTypeResource;
+use Modules\Water\Models\ProtocolStatus;
 use Modules\Water\Models\ProtocolType;
 use Modules\Water\Services\ProtocolService;
 
@@ -92,6 +94,24 @@ class InformationController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
 
+    }
+
+    public function protocolHistory($id): JsonResponse
+    {
+        try {
+            return $this->sendSuccess($this->service->history($id), 'Object History');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function protocolStatus($id): JsonResponse
+    {
+        try {
+            return $this->sendSuccess(ProtocolStatusResource::collection(ProtocolStatus::all()), 'Protocol status fetched successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
     }
 
 }
