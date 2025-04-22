@@ -5,7 +5,9 @@ namespace App\Http\Requests;
 use App\Enums\UserRoleEnum;
 use App\Models\District;
 use App\Models\Region;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 use Modules\Water\Const\CategoryType;
 use Modules\Water\Const\Step;
@@ -18,7 +20,6 @@ class ProtocolOgohRequest extends FormRequest
     {
         return true;
     }
-
 
     public function rules(): array
     {
@@ -46,8 +47,17 @@ class ProtocolOgohRequest extends FormRequest
             'protocol_status_id' =>  ProtocolStatusEnum::ENTER_RESULT->value ,
             'step' => Step::ONE,
             'category' => CategoryType::MONITORING,
-            'region_id' => Region::query()->where('soato', $this->region)->first()->id ,
-            'district_id' => District::query()->where('soato', $this->district)->first()->id ,
+            'region_id' => Region::query()->where('soato', $this->region)->first()?->id,
+            'district_id' => District::query()->where('soato', $this->district)->first()?->id,
         ]);
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Validatsiyadan o‘tmadi.',
+            'errors' => $validator->errors()
+        ], 422));
     }
 }
