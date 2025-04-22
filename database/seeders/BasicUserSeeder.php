@@ -16,6 +16,7 @@ class BasicUserSeeder extends Seeder
             'name' => 'suv nazorati',
             'login' => 'suv_nazorat',
             'password' => Hash::make('39gvT6l<kdyT'),
+            'type' => 1,
         ]);
     }
 }
