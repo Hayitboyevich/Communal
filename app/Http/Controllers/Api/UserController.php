@@ -106,7 +106,7 @@ class UserController extends BaseController
         try {
             $filters = request()->only(['region_id', 'full_name', 'phone', 'pin']);
 
-            $users = $this->service->getInspectors($filters)->get();
+            $users = $this->service->getInspectors($this->user, $this->roleId, $filters)->get();
 
            return $this->sendSuccess(UserResource::collection($users), 'Inspectors retrieved successfully.');
         }catch (\Exception $exception){

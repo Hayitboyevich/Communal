@@ -138,9 +138,9 @@ class UserService
         }
     }
 
-    public function getInspectors($filters)
+    public function getInspectors($user, $roleId, $filters)
     {
-        $query = $this->repository->all()->whereHas('inspectors');
+        $query = $this->repository->all($user, $roleId)->whereHas('inspectors');
         return  $this->repository->search($query, $filters);
     }
 
