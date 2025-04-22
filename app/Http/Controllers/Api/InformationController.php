@@ -67,7 +67,10 @@ class InformationController extends BaseController
             $protocol = $this->service->create($request->except('images', 'region', 'district'));
             $this->service->saveImages($protocol, $request['images']);
             DB::commit();
-            return $this->sendSuccess("Appeal successfully send. As soon as answer.", 'Protocol created successfully.');
+            return response()->json([
+                "status" => "success",
+                "data" => "Appeal successfully send. As soon as answer."
+            ]);
         }catch (\Exception $exception){
             DB::rollBack();
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
