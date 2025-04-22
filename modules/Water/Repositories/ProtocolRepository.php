@@ -39,7 +39,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
                                     ->where('protocol_status_id', ProtocolStatusEnum::FORMING);
                             })->orWhere(function ($s) {
                                 $s->where('type', TypeList::OGOH_FUQARO)
-                                    ->where('protocol_status_id', ProtocolStatusEnum::NEW);
+                                    ->where('protocol_status_id', ProtocolStatusEnum::ENTER_RESULT);
                             });
                         });
                 });
