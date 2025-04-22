@@ -8,11 +8,12 @@ use App\Http\Resources\ImageResource;
 use App\Http\Resources\RegionResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage;
 use Modules\Water\Const\TypeList;
+use Modules\Water\Models\ProtocolType;
 
-class ProtocolResource extends JsonResource
+class ProtocolListResource extends JsonResource
 {
+
     public function toArray(Request $request): array
     {
         return [

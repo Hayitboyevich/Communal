@@ -13,6 +13,7 @@ use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Http\Requests\ProtocolFirstStepRequest;
 use Modules\Water\Http\Requests\ProtocolSecondStepRequest;
 use Modules\Water\Http\Requests\ProtocolThirdStepRequest;
+use Modules\Water\Http\Resources\ProtocolListResource;
 use Modules\Water\Http\Resources\ProtocolResource;
 use Modules\Water\Models\Protocol;
 use Modules\Water\Services\ProtocolService;
@@ -36,7 +37,7 @@ class ProtocolController extends BaseController
 
             $resource = $id
                 ? ProtocolResource::make($protocols)
-                : ProtocolResource::collection($protocols);
+                : ProtocolListResource::collection($protocols);
 
             return $this->sendSuccess(
                 $resource,

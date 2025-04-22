@@ -45,6 +45,30 @@ if (!function_exists('postData')) {
     }
 }
 
+
+
+if (!function_exists('getUser')) {
+    function getUser(?string $baseUrl, ?string $param = null){
+        try {
+            $response = Http::withBasicAuth(
+                config('water.ogoh.login'),
+                config('water.ogoh.password')
+            )
+                ->timeout(10)
+                ->post($baseUrl, ['user_id' => $param]);
+
+            if ($response->successful()) {
+                return $response->json() ?? null;
+            } else {
+                return null;
+            }
+        } catch (Exception $e) {
+            return null;
+        }
+
+    }
+}
+
 if (!function_exists('getData'))
 {
     function getData(string $baseUrl, ?string $param = null)
