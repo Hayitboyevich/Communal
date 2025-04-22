@@ -42,7 +42,7 @@ class ProtocolService
     public function create(?array $data)
     {
         $protocol = $this->repository->create($data);
-//        $this->createHistory($protocol, ProtocolHistoryType::CREATE_FIRST);
+        $this->createHistory($protocol, ProtocolHistoryType::CREATE_FIRST);
         return $protocol;
     }
 

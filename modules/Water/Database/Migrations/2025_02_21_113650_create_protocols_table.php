@@ -21,6 +21,8 @@ return new class extends Migration
             $table->foreignId('region_id')->nullable()->index()->constrained('regions')->nullOnDelete();
             $table->foreignId('district_id')->nullable()->index()->constrained('districts')->nullOnDelete();
             $table->string('address')->nullable();
+            $table->string('fish')->nullable()->comment('ogoh fuqarodan keladi');
+            $table->string('phone_number')->nullable()->comment('Ogoh fuqarodan keladi');
             $table->text('description')->nullable()->comment('1-qadamdagi qoshimcha malumot');
             $table->decimal('lat', 10, 8)->nullable();
             $table->decimal('long', 11, 8)->nullable();

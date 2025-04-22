@@ -2,13 +2,11 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\UserRoleEnum;
 use App\Models\District;
 use App\Models\Region;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Support\Facades\Auth;
 use Modules\Water\Const\CategoryType;
 use Modules\Water\Const\Step;
 use Modules\Water\Enums\ProtocolStatusEnum;
@@ -38,6 +36,8 @@ class ProtocolOgohRequest extends FormRequest
             'type' => 'required|integer',
             'user_id' => 'required|integer',
             'role_id' => 'sometimes',
+            'fish'=> 'required|string',
+            'phone_number'=> 'required|string',
         ];
     }
 

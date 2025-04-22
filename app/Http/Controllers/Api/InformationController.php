@@ -20,12 +20,13 @@ use Modules\Water\Models\ProtocolStatus;
 use Modules\Water\Models\ProtocolType;
 use Modules\Water\Services\ProtocolService;
 
-class InformationController extends Controller
+class InformationController extends BaseController
 {
 
     public function __construct(
         protected ProtocolService $service
     ){
+        parent::__construct();
     }
     public function types(): JsonResponse
     {
@@ -79,7 +80,7 @@ class InformationController extends Controller
             $filters = request()->only(['status', 'user_id', 'protocol_number', 'district_id', 'region_id', 'protocol_type', 'type', 'attach', 'category']);
             $protocols = $id
                 ? $this->service->findById($id)
-                : $this->service->getAll($this->user, $this->roleId, $filters)->paginate(request('per_page', 15));
+                : $this->service->getAll($this->user, $this->roleId,$filters)->paginate(request('per_page', 15));
 
             $resource = $id
                 ? ProtocolResource::make($protocols)
@@ -114,36 +115,36 @@ class InformationController extends Controller
         }
     }
 
-    private function sendSuccess($result, $message, $meta = []): JsonResponse
-    {
-        $response = [
-            'success' => true,
-            'message' => $message,
-            'result' => [
-                'data' => $result,
-            ],
-        ];
-
-        if (!empty($meta)) {
-            $response['meta'] = $meta;
-        }
-
-        return response()->json($response, 200);
-    }
-
-    private function sendError($error, $errorMessages = [], $code = 404): JsonResponse
-    {
-        $response = [
-            'success' => false,
-            'message' => $error,
-            'code' => $code,
-        ];
-
-        if (!empty($errorMessages)) {
-            $response['data'] = $errorMessages;
-        }
-
-        return response()->json($response, $code);
-    }
+//    private function sendSuccess($result, $message, $meta = []): JsonResponse
+//    {
+//        $response = [
+//            'success' => true,
+//            'message' => $message,
+//            'result' => [
+//                'data' => $result,
+//            ],
+//        ];
+//
+//        if (!empty($meta)) {
+//            $response['meta'] = $meta;
+//        }
+//
+//        return response()->json($response, 200);
+//    }
+//
+//    private function sendError($error, $errorMessages = [], $code = 404): JsonResponse
+//    {
+//        $response = [
+//            'success' => false,
+//            'message' => $error,
+//            'code' => $code,
+//        ];
+//
+//        if (!empty($errorMessages)) {
+//            $response['data'] = $errorMessages;
+//        }
+//
+//        return response()->json($response, $code);
+//    }
 
 }

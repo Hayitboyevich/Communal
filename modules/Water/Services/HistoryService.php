@@ -62,16 +62,4 @@ class HistoryService
             'additionalInfo' => $additionalInfo
         ];
     }
-
-    public function createImages($id, $data)
-    {
-        $history = ProtocolHistory::query()->findOrFail($id);
-        $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'protocol/files'), $files);
-        $protocol->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
-    }
-
-    public function createFiles($id, $data)
-    {
-
-    }
 }

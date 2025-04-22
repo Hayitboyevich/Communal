@@ -31,7 +31,6 @@ class AuthController extends BaseController
             $resClient = Http::post($url);
             $response = json_decode($resClient->getBody(), true);
 
-
             $url = 'https://sso.egov.uz/sso/oauth/Authorization.do?grant_type=one_access_token_identify
             &client_id=' . config('services.oneId.id') .
                 '&client_secret=' . config('services.oneId.secret') .
