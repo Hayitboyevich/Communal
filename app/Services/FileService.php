@@ -9,15 +9,13 @@ class FileService
 {
     public function uploadImage(UploadedFile $file, string $path): string
     {
-        $filename = $this->generateUniqueFileName($file);
-        return $file->storeAs($path, $filename, 'public');
+        return $file->store($path, 'public');
     }
 
 
     public function uploadFile(UploadedFile $file, string $path): string
     {
-        $filename = $this->generateUniqueFileName($file);
-        return $file->storeAs($path, $filename, 'public');
+        return $file->store($path, 'public');
     }
 
 
