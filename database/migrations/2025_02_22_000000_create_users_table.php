@@ -25,6 +25,7 @@ return new class extends Migration
             $table->date('birth_date')->nullable();
             $table->bigInteger('user_status_id')->index()->nullable();
             $table->string('image')->nullable();
+            $table->tinyInteger('type')->nullable();
             $table->string('password');
             $table->timestamp('last_login_at')->nullable();
             $table->timestamps();
