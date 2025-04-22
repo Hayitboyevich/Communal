@@ -97,7 +97,9 @@ class AuthController extends BaseController
             $token = JWTAuth::claims(['role_id' => \request('role_id')])->fromUser($user);
             $success['token'] = $token;
             $success['id'] = $user->id;
-            $success['full_name'] = $user->name;
+            $success['name'] = $user->name;
+            $success['middle_name'] = $user->middle_name;
+            $success['surname'] = $user->surname;
             $success['pin'] = $user->pin;
             $success['role'] = new RoleResource($role);
             $success['region'] = $user->region_id ? new RegionResource($user->region) : null;
