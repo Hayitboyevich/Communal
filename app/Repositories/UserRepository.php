@@ -3,13 +3,30 @@
 namespace App\Repositories;
 
 use App\Contracts\UserRepositoryInterface;
+use App\Enums\UserRoleEnum;
 use App\Models\User;
 
 class UserRepository implements UserRepositoryInterface
 {
-    public function all()
+    public function all($user, $roleId)
     {
-        return User::query();
+        switch ($roleId) {
+            case UserRoleEnum::HR->value:
+                return User::query()->whereHas('roles', function ($query) use ($user) {
+                    $query->whereIn('role_id', [UserRoleEnum::INSPECTOR->value, UserRoleEnum::MANAGER->value]);
+                });
+            case UserRoleEnum::WATER_INSPECTOR->value:
+                return User::query()->whereHas('roles', function ($query) use ($user) {
+                    $query->whereIn('role_id', [UserRoleEnum::WATER_INSPECTOR->value]);
+                });
+            case UserRoleEnum::MANAGER->value:
+                return User::query()->whereHas('roles', function ($query) use ($user) {
+                    $query->whereIn('role_id', [UserRoleEnum::WATER_INSPECTOR->value]);
+                })->where('region_id', $user->region_id);
+
+            default:
+                return User::query()->whereRaw('1 = 0');
+        }
     }
 
     public function create(?array $data)

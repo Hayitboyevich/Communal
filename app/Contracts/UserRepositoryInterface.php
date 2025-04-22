@@ -4,7 +4,7 @@ namespace App\Contracts;
 
 interface UserRepositoryInterface
 {
-    public function all();
+    public function all($user, $roleId);
     public function find($id);
 
     public function create(?array $data);

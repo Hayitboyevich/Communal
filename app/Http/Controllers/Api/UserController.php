@@ -27,7 +27,7 @@ class UserController extends BaseController
             $filters = request()->only(['search', 'region_id', 'district_id', 'role_id', 'status']);
             $users = $id
                 ? $this->service->findById($id)
-                : $this->service->getAll($filters)->paginate(request('per_page', 15));
+                : $this->service->getAll($this->user, $this->roleId, $filters)->paginate(request('per_page', 15));
 
             $resource = $id
                 ? UserResource::make($users)

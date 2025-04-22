@@ -19,10 +19,10 @@ class UserService
     )
     {}
 
-    public function getAll($filters)
+    public function getAll($user, $roleId,$filters)
     {
         try {
-           $query =  $this->repository->all();
+           $query =  $this->repository->all($user, $roleId);
            return $this->repository->search($query, $filters);
         }catch (\Exception $exception){
             throw $exception;

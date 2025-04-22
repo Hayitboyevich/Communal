@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\AuthController;
 
 
 
-Route::group(['middleware' => ['auth:api']], function () {
+Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(ProtocolController::class)->prefix('protocol')->group(function () {
         Route::post('/attach', 'attach');

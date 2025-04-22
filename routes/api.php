@@ -18,7 +18,7 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 
-Route::group(['middleware' => ['auth:api']], function () {
+Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(UserController::class)->prefix('user')->group(function () {
         Route::get('/', 'index');
@@ -39,7 +39,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     });
 
     Route::controller(RoleController::class)->prefix('role')->group(function () {
-        Route::get('/{id?}', 'index');
+        Route::get('/{id?}', 'roles');
     });
 
 

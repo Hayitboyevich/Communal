@@ -30,4 +30,16 @@ class RoleController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
+    public function roles(): JsonResponse
+    {
+        try {
+            $role = Role::query()->find($this->roleId);
+            $roles =  Role::query()->whereIn('id', $role->children)->paginate(request('per_page', 10));
+            return $this->sendSuccess(RoleResource::collection($roles), 'Roles', pagination($roles));
+        }catch (\Exception $exception){
+            return $this->sendError($exception->getMessage());
+        }
+
+    }
 }

@@ -9,6 +9,10 @@ class Role extends Model
 {
     protected $guarded = false;
 
+    protected $casts = [
+        'children' => 'array'
+    ];
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_roles', 'role_id', 'user_id');
