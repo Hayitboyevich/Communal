@@ -53,10 +53,9 @@ class HistoryService
     private function shapeTaskContent(int $status, string $comment, ?string $date, mixed $additionalInfo): array
     {
         $user = Auth::user();
-
         return [
-            'user' => Auth::check() ? $user->id : "",
-            'role' => method_exists($user, 'getRoleFromToken') ? (int)$user->getRoleFromToken() : null,
+            'user' => $user->type == 1 ? null : (Auth::check() ? $user->id : ""),
+            'role' => $user->type == 1 ? null : (int)$user->getRoleFromToken(),
             'date' => ($date == null) ? now() : $date,
             'status' => $status,
             'comment' => $comment,
