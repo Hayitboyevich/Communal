@@ -10,7 +10,7 @@ class Role extends Model
     protected $guarded = false;
 
     protected $casts = [
-        'children' => 'array'
+        'child' => 'array'
     ];
 
     public function users(): BelongsToMany

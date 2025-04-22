@@ -35,8 +35,12 @@ class RoleController extends BaseController
     {
         try {
             $role = Role::query()->find($this->roleId);
-            $roles =  Role::query()->whereIn('id', $role->children)->paginate(request('per_page', 10));
-            return $this->sendSuccess(RoleResource::collection($roles), 'Roles', pagination($roles));
+            if (!empty($role->child)) {
+                $roles =  Role::query()->whereIn('id', $role->child)->paginate(request('per_page', 10));
+                return $this->sendSuccess(RoleResource::collection($roles), 'Roles', pagination($roles));
+            }
+            return $this->sendSuccess([], 'Role not found');
+
         }catch (\Exception $exception){
             return $this->sendError($exception->getMessage());
         }
