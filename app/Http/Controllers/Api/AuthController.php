@@ -53,9 +53,7 @@ class AuthController extends BaseController
             $meta = [
                 'roles' => RoleResource::collection($user->roles),
                 'access_token' => $encodedData,
-                'name' => $user->name,
-                'middle_name' => $user->middle_name,
-                'surname' => $user->surname
+                'full_name' => $user->full_name,
             ];
             return $this->sendSuccess($meta, 'User find.');
         }catch (\Exception $exception){
