@@ -152,7 +152,7 @@ class ProtocolService
 
     public function count($user, $roleId, $filters = []): array
     {
-        $query = $this->repository->all($user, $roleId);
+        $query = $this->repository->all($user, $roleId)->where('type', $filters['type']);
         if ($filters['category'] == CategoryType::MONITORING) {
             return [
                 'all' => $query->clone()->where('category', CategoryType::MONITORING)->count(),
