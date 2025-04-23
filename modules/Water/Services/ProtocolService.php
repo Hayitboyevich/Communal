@@ -4,6 +4,8 @@ namespace Modules\Water\Services;
 
 use App\Enums\UserRoleEnum;
 use App\Http\Requests\ProtocolChangeRequest;
+use App\Http\Resources\DocumentResource;
+use App\Http\Resources\ImageResource;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\FileService;
@@ -57,6 +59,7 @@ class ProtocolService
             $data['is_finished'] = true;
             $type = ProtocolHistoryType::NOT_DEFECT;
         }
+
 
         $protocol = $this->repository->update($id, $data);
         $this->createHistory($protocol, $type);
@@ -137,6 +140,8 @@ class ProtocolService
                 'role' => $history->content->role ? Role::query()->find($history->content->role, ['name', 'description']) : null,
                 'status' => $history->content->status ? ProtocolStatus::query()->find($history->content->status, ['id', 'name']) : null,
                 'type' => $history->type,
+                'files' => $history->documents ? DocumentResource::collection($history->documents): null,
+                'images' =>$history->images ? ImageResource::collection($history->images): null,
                 'is_change' => $history->type ? ProtocolHistoryType::getLabel($history->type) : null,
                 'created_at' => $history->created_at,
             ];
