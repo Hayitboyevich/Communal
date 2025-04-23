@@ -136,6 +136,7 @@ class ProtocolService
         return $protocol->histories->map(function ($history) {
             return [
                 'id' => $history->id,
+                'comment' => $history->content->comment,
                 'user' => $history->content->user ? User::query()->find($history->content->user, ['name', 'surname', 'middle_name']) : null,
                 'role' => $history->content->role ? Role::query()->find($history->content->role, ['name', 'description']) : null,
                 'status' => $history->content->status ? ProtocolStatus::query()->find($history->content->status, ['id', 'name']) : null,
