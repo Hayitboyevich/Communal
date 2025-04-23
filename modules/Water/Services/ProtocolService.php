@@ -158,7 +158,7 @@ class ProtocolService
                 'all' => $query->clone()->where('category', CategoryType::MONITORING)->count(),
                 'enter_result' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::ENTER_RESULT->value)->count(),
                 'confirm_not_defect' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value)->count(),
-                'forming' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::ENTER_RESULT->value)->count(),
+                'forming' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::FORMING->value)->count(),
                 'not_defect' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::NOT_DEFECT->value)->count(),
             ];
         } elseif ($filters['category'] == CategoryType::REGULATION) {
