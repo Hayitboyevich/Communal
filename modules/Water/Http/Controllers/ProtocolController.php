@@ -168,7 +168,7 @@ class ProtocolController extends BaseController
     public function count(): JsonResponse
     {
         try {
-            $filters = \request()->only(['status', 'category']);
+            $filters = \request()->only(['status', 'category', 'type']);
             $data = $this->service->count($this->user, $this->roleId, $filters);
             return $this->sendSuccess($data, 'Count of protocols retrieved successfully.');
         }catch (\Exception $exception){
