@@ -8,6 +8,7 @@ use Modules\Water\Const\TypeList;
 use Modules\Water\Contracts\ProtocolRepositoryInterface;
 use Modules\Water\Enums\ProtocolStatusEnum;
 use Modules\Water\Models\Protocol;
+use Modules\Water\Models\ProtocolType;
 
 class ProtocolRepository implements ProtocolRepositoryInterface
 {
@@ -22,6 +23,8 @@ class ProtocolRepository implements ProtocolRepositoryInterface
                 return Protocol::query()->where('region_id', $user->region_id);
             case UserRoleEnum::WATER_INSPECTOR->value:
                 return Protocol::query()->where('user_id', $user->id)->where('role_id', $roleId);
+            case UserRoleEnum::OGOH->value:
+                return Protocol::query()->where('type', TypeList::OGOH_FUQARO);
             default:
                 return Protocol::query()->whereRaw('1 = 0');
         }

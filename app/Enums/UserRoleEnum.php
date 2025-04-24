@@ -10,4 +10,6 @@ enum UserRoleEnum: int
     case HR = 4;
     case MANAGER = 5;
     case WATER_HR = 6;
+
+    case OGOH = 101;
 }

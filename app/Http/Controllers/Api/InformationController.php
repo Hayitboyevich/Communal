@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Constants\ErrorMessage;
+use App\Enums\UserRoleEnum;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\ProtocolOgohRequest;
 use App\Http\Resources\DistrictResource;
@@ -82,7 +83,9 @@ class InformationController extends BaseController
             $filters = request()->only(['status', 'user_id', 'protocol_number', 'district_id', 'region_id', 'protocol_type', 'type', 'attach', 'category']);
             $protocols = $id
                 ? $this->service->findById($id)
-                : $this->service->getAll($this->user, $this->roleId,$filters)->paginate(request('per_page', 15));
+                : $this->service->getAll($this->user, UserRoleEnum::OGOH->value,$filters)->paginate(request('per_page', 15));
+
+            dd($protocols);
 
             $resource = $id
                 ? ProtocolOgohListResource::make($protocols)
