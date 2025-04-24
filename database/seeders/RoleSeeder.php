@@ -27,8 +27,9 @@ class RoleSeeder extends Seeder
         ]);
 
         Role::query()->create([
-            'name' => 'Kadr',
-            'description' => 'Res kadr'
+            'name' => 'Inspektor Kadr',
+            'description' => 'Res kadr',
+            'child' => [2, 5]
         ]);
 
         Role::query()->create([
@@ -37,8 +38,9 @@ class RoleSeeder extends Seeder
         ]);
 
         Role::query()->create([
-            'name' => 'Kadr',
-            'description' => 'Suv kadr'
+            'name' => 'Suv Kadr',
+            'description' => 'Suv kadr',
+            'child' => [3]
         ]);
     }
 }

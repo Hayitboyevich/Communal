@@ -7,9 +7,11 @@ use App\Http\Controllers\BaseController;
 use App\Http\Requests\ProtocolOgohRequest;
 use App\Http\Resources\DistrictResource;
 use App\Http\Resources\RegionResource;
+use App\Models\District;
 use App\Models\Region;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Modules\Water\Http\Resources\ProtocolOgohListResource;
 use Modules\Water\Http\Resources\ProtocolResource;
 use Modules\Water\Http\Resources\ProtocolStatusResource;
 use Modules\Water\Http\Resources\ProtocolTypeResource;
@@ -83,8 +85,8 @@ class InformationController extends BaseController
                 : $this->service->getAll($this->user, $this->roleId,$filters)->paginate(request('per_page', 15));
 
             $resource = $id
-                ? ProtocolResource::make($protocols)
-                : ProtocolResource::collection($protocols);
+                ? ProtocolOgohListResource::make($protocols)
+                : ProtocolOgohListResource::collection($protocols);
 
             return $this->sendSuccess(
                 $resource,
@@ -115,36 +117,23 @@ class InformationController extends BaseController
         }
     }
 
-//    private function sendSuccess($result, $message, $meta = []): JsonResponse
-//    {
-//        $response = [
-//            'success' => true,
-//            'message' => $message,
-//            'result' => [
-//                'data' => $result,
-//            ],
-//        ];
-//
-//        if (!empty($meta)) {
-//            $response['meta'] = $meta;
-//        }
-//
-//        return response()->json($response, 200);
-//    }
-//
-//    private function sendError($error, $errorMessages = [], $code = 404): JsonResponse
-//    {
-//        $response = [
-//            'success' => false,
-//            'message' => $error,
-//            'code' => $code,
-//        ];
-//
-//        if (!empty($errorMessages)) {
-//            $response['data'] = $errorMessages;
-//        }
-//
-//        return response()->json($response, $code);
-//    }
+    public function protocolReport($regionId = null): JsonResponse
+    {
+        try {
+            $startDate = request('date_from');
+            $endDate = request('date_to');
+
+            $regionId = request('region_id');
+
+            $regions = $regionId
+                ? District::query()->where('region_id', $regionId)->get(['id', 'name_uz'])
+                : Region::all(['id', 'name_uz']);
+
+            $group = $regionId ? 'district_id' : 'region_id';
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
 
 }

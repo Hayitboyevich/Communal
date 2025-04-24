@@ -16,6 +16,7 @@ return new class extends Migration
             $table->tinyInteger('step')->nullable();
             $table->tinyInteger('category')->nullable();
             $table->integer('inspector_id')->index()->nullable();
+            $table->boolean('is_administrative')->default(false);
             $table->foreignId('protocol_type_id')->nullable()->index()->constrained('protocol_types')->nullOnDelete();
             $table->foreignId('protocol_status_id')->nullable()->index()->constrained('protocol_statuses')->nullOnDelete();
             $table->foreignId('region_id')->nullable()->index()->constrained('regions')->nullOnDelete();

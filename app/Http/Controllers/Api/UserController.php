@@ -76,7 +76,7 @@ class UserController extends BaseController
     public function info(): JsonResponse
     {
         try {
-            $data = $this->service->getInfo(request('pin'), request('birth_date'));
+            $data = $this->service->getInfo(request('pin'), request('birth_date'), request('type'));
 
             return $this->sendSuccess($data, 'Passport Information Get Successfully');
 

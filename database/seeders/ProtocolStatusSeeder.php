@@ -24,8 +24,8 @@ class ProtocolStatusSeeder extends Seeder
         ]);
 
         ProtocolStatus::create([
-            'name' => 'Ko\'rsatma shakllantirish',
-            'description' => 'Ko\'rsatma shakllantirish',
+            'name' => 'Kamchilik aniqlandi',
+            'description' => 'Kamchilik aniqlandi',
         ]);
 
         ProtocolStatus::create([

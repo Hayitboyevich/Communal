@@ -100,12 +100,13 @@ class UserService
         }
     }
 
-    public function getInfo(string $pin, string $birth_date)
+    public function getInfo(string $pin, string $birth_date, ?string $type = null)
     {
         try {
             $url = config('services.passport.url') . '?' . http_build_query([
                     'pinfl' => $pin,
-                    'birth_date' => $birth_date
+                    'birth_date' => $birth_date,
+                    'type' => $type
                 ]);
 
             $authHeader = 'Basic ' . base64_encode(
