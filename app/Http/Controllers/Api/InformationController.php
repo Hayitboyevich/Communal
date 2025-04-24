@@ -85,7 +85,6 @@ class InformationController extends BaseController
                 ? $this->service->findById($id)
                 : $this->service->getAll($this->user, UserRoleEnum::OGOH->value,$filters)->paginate(request('per_page', 15));
 
-            dd($protocols);
 
             $resource = $id
                 ? ProtocolOgohListResource::make($protocols)
