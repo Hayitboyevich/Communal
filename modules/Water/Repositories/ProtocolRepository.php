@@ -171,10 +171,13 @@ class ProtocolRepository implements ProtocolRepositoryInterface
         try {
             $protocol = $this->findById($id);
             if (!$protocol) throw new \Exception("Protocol not found");
-
+            if ($data['protocol_status_id'] == ProtocolStatusEnum::HMQO->value){
+                $protocol->update([
+                    'is_administrative' => true,
+                ]);
+            }
             $protocol->update([
                 'protocol_status_id' => $data['protocol_status_id'],
-                'is_administrative' => $data['protocol_status_id'] == ProtocolStatusEnum::HMQO->value,
             ]);
             return $protocol;
         } catch (\Exception $exception) {
