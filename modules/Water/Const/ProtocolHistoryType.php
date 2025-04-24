@@ -24,7 +24,7 @@ class ProtocolHistoryType
             case self::CREATE_FIRST:
                 return 'Protocol yaratildi';
             case self::CREATE_SECOND:
-                return 'Ko\'rsatma shakllantirishda';
+                return 'Kamchilik aniqlandi';
             case self::CREATE_THIRD:
                 return 'Ko\'rsatma shakllantirildi';
             case self::CONFIRM_DEFECT:
@@ -44,7 +44,7 @@ class ProtocolHistoryType
             case self::REJECT_RESULT:
                 return 'Ko\'rsatma rad qilindi';
             case self::SEND_HMQO:
-                return 'Ko\'rsatma HMQOga yuborildi';
+                return 'HMQOga yuborildi';
             case self::NOT_DEFECT:
                 return 'Kamchilik aniqlanmadi';
             default:
