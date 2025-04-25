@@ -5,6 +5,7 @@ namespace Modules\Water\Http\Resources;
 use App\Http\Resources\ImageResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class ProtocolOgohListResource extends JsonResource
 {
@@ -24,7 +25,9 @@ class ProtocolOgohListResource extends JsonResource
             'region' => $this->district ? $this->district->name_uz : null,
             'latitude' => $this->lat,
             'longitude' => $this->long,
-            'files' => $this->images ?  ImageResource::collection($this->images) : null,
+            'files' => $this->images ?  $this->images->map(function ($image) {
+                return Storage::disk('public')->url($image->url);
+            }) : null,
             'address' => $this->address,
             'created_at' => $this->created_at,
         ];
