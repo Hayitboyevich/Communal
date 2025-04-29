@@ -10,6 +10,7 @@ use App\Http\Resources\DistrictResource;
 use App\Http\Resources\RegionResource;
 use App\Models\District;
 use App\Models\Region;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Modules\Water\Http\Resources\ProtocolOgohListResource;
@@ -119,23 +120,7 @@ class InformationController extends BaseController
         }
     }
 
-    public function protocolReport($regionId = null): JsonResponse
-    {
-        try {
-            $startDate = request('date_from');
-            $endDate = request('date_to');
 
-            $regionId = request('region_id');
-
-            $regions = $regionId
-                ? District::query()->where('region_id', $regionId)->get(['id', 'name_uz'])
-                : Region::all(['id', 'name_uz']);
-
-            $group = $regionId ? 'district_id' : 'region_id';
-        }catch (\Exception $exception){
-            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
-        }
-    }
 
 
 }

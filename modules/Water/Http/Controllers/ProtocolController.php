@@ -3,8 +3,12 @@
 namespace Modules\Water\Http\Controllers;
 
 use App\Constants\ErrorMessage;
+use App\Enums\UserRoleEnum;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\ProtocolChangeRequest;
+use App\Models\District;
+use App\Models\Region;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -197,6 +201,48 @@ class ProtocolController extends BaseController
             $pdfOutput = $pdf->output();
             $pdfBase64 = base64_encode($pdfOutput);
             return $this->sendSuccess($pdfBase64, 'PDF');
+
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function protocolReport($regionId = null): JsonResponse
+    {
+        try {
+            $startDate = request('date_from');
+            $endDate = request('date_to');
+
+            $regionId = request('region_id');
+
+            $regions = $regionId
+                ? District::query()->where('region_id', $regionId)->get(['id', 'name_uz'])
+                : Region::all(['id', 'name_uz']);
+
+            $group = $regionId ? 'district_id' : 'region_id';
+
+            $userCounts = User::query()
+                ->selectRaw($group . ', COUNT(*) as count')
+                ->leftJoin('user_roles', 'user_roles.user_id', '=', 'users.id')
+                ->where('user_roles.role_id', UserRoleEnum::INSPECTOR->value)
+                ->groupBy($group)
+                ->pluck('count', $group);
+
+            $data = $regions->map(function ($region) use (
+                $userCounts,
+
+            ) {
+                $regionId = $region->id;
+
+                return [
+                    'id' => $region->id,
+                    'name' => $region->name_uz,
+                    'inspector_count' => $userCounts->get($regionId, 0),
+
+                ];
+            });
+
+            return $this->sendSuccess($data->values(), 'Data retrieved successfully');
 
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
