@@ -9,7 +9,6 @@ class RouteServiceProvider extends BaseRouteServiceProvider
 {
     public function boot(): void
     {
-
         $this->routes(function (){
             Route::middleware('api')
                 ->prefix('api')

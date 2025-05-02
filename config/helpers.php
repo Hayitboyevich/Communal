@@ -70,8 +70,23 @@ if (!function_exists('getUser')) {
 
 if (!function_exists('getData'))
 {
-    function getData(string $baseUrl, ?string $param = null)
+    function getData(string $url, ?string $login = null, $password = null)
     {
-        return 'kalish';
+        try {
+            $response = Http::withBasicAuth(
+                $login,
+                $password
+            )
+                ->timeout(10)
+                ->post($url);
+
+            if ($response->successful()) {
+                return $response->json() ?? null;
+            } else {
+                return null;
+            }
+        } catch (Exception $e) {
+            return null;
+        }
     }
 }

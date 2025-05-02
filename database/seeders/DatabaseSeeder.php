@@ -16,13 +16,17 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RoleSeeder::class,
-            RegionSeeder::class,
-            UserSeeder::class,
-            ProtocolStatusSeeder::class,
-            ProtocolTypeSeeder::class,
-            UserStatusSeeder::class,
-            BasicUserSeeder::class,
+//            RoleSeeder::class,
+//            RegionSeeder::class,
+//            UserSeeder::class,
+//            ProtocolStatusSeeder::class,
+//            ProtocolTypeSeeder::class,
+//            UserStatusSeeder::class,
+//            BasicUserSeeder::class,
+            MonitoringTypeSeeder::class,
+            MonitoringBaseSeeder::class,
+            PlaceSeeder::class,
+            ViolationTypeSeeder::class
         ]);
     }
 }
