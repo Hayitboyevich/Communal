@@ -3,6 +3,7 @@
 namespace Modules\Water\Http\Controllers;
 
 use App\Constants\ErrorMessage;
+use App\Enums\ObjectStatusEnum;
 use App\Enums\UserRoleEnum;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\ProtocolChangeRequest;
@@ -14,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Modules\Water\Const\ProtocolHistoryType;
+use Modules\Water\Enums\ProtocolStatusEnum;
 use Modules\Water\Http\Requests\ProtocolFirstStepRequest;
 use Modules\Water\Http\Requests\ProtocolSecondStepRequest;
 use Modules\Water\Http\Requests\ProtocolThirdStepRequest;
@@ -228,16 +230,32 @@ class ProtocolController extends BaseController
                 ->groupBy($group)
                 ->pluck('count', $group);
 
+            $protocolCounts = $this->getGroupedCounts(
+                query: Protocol::query(),
+                selectRaw:$group,
+                groupBy:[$group, 'protocol_status_id', 'type'],
+                startDate: $startDate,
+                endDate: $endDate
+            )->groupBy($group);
+
             $data = $regions->map(function ($region) use (
                 $userCounts,
+                $protocolCounts,
 
             ) {
                 $regionId = $region->id;
+                $regionProtocols = $protocolCounts->get($regionId, collect());
 
                 return [
                     'id' => $region->id,
                     'name' => $region->name_uz,
                     'inspector_count' => $userCounts->get($regionId, 0),
+                    'all_protocols' => $regionProtocols->sum('count'),
+                    'defect_count' => $regionProtocols->whereNotIn('object_status_id', [ProtocolStatusEnum::ENTER_RESULT,ProtocolStatusEnum::NOT_DEFECT, ProtocolStatusEnum::CONFIRM_NOT_DEFECT, ProtocolStatusEnum::REJECTED])->sum('count'),
+                    'remedy_count' => $regionProtocols->where('type', 2)->sum('count'),
+                    'confirmed_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED)->sum('count'),
+                    'administrative_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::ADMINISTRATIVE)->sum('count'),
+                    'hmqo_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::HMQO)->sum('count'),
 
                 ];
             });
@@ -247,5 +265,20 @@ class ProtocolController extends BaseController
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
+    }
+
+    private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
+    {
+        if ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        }
+        if (\request('program_id')) {
+            $query->where('program_id', \request('program_id'));
+        }
+
+        return $query
+            ->selectRaw("$selectRaw, COUNT(*) as count")
+            ->groupBy(...$groupBy)
+            ->get();
     }
 }
