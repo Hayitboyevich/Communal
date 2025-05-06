@@ -8,7 +8,6 @@ use Modules\Water\Const\TypeList;
 use Modules\Water\Contracts\ProtocolRepositoryInterface;
 use Modules\Water\Enums\ProtocolStatusEnum;
 use Modules\Water\Models\Protocol;
-use Modules\Water\Models\ProtocolType;
 
 class ProtocolRepository implements ProtocolRepositoryInterface
 {
@@ -18,6 +17,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
             case UserRoleEnum::INSPECTOR->value:
                 return Protocol::query()->where('inspector_id', $user->id);
             case UserRoleEnum::ADMIN->value:
+            case UserRoleEnum::RES_VIEWER->value:
                 return Protocol::query();
             case UserRoleEnum::MANAGER->value:
                 return Protocol::query()->where('region_id', $user->region_id);
@@ -46,6 +46,10 @@ class ProtocolRepository implements ProtocolRepositoryInterface
                             });
                         });
                 });
+            })
+            ->when(isset($filters['inspector_id']), function ($query) use ($filters) {
+                $query->where('user_id', $filters['inspector_id'])
+                    ->orWhere('inspector_id', $filters['inspector_id']);
             })
             ->when(isset($filters['user_id']), function ($query) use ($filters) {
                 $query->where('user_id', $filters['user_id']);
@@ -134,7 +138,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
     public function confirmDefect($user, $roleId, $id)
     {
         try {
-            $protocol =  $this->findById($id);
+            $protocol = $this->findById($id);
             $protocol->update(['protocol_status_id' => ProtocolStatusEnum::NOT_DEFECT, 'is_finished' => true]);
             return $protocol;
         } catch (\Exception $exception) {
@@ -174,7 +178,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
         try {
             $protocol = $this->findById($id);
             if (!$protocol) throw new \Exception("Protocol not found");
-            if ($data['protocol_status_id'] == ProtocolStatusEnum::HMQO->value){
+            if ($data['protocol_status_id'] == ProtocolStatusEnum::HMQO->value) {
                 $protocol->update([
                     'is_administrative' => true,
                 ]);
@@ -191,7 +195,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
     public function rejectDefect($user, $roleId, $id)
     {
         try {
-            $protocol =  $this->findById($id);
+            $protocol = $this->findById($id);
             $protocol->update(['protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT, 'step' => Step::ONE]);
             return $protocol;
         } catch (\Exception $exception) {

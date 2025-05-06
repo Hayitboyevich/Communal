@@ -22,6 +22,11 @@ class UserRepository implements UserRepositoryInterface
             case UserRoleEnum::MANAGER->value:
                 return User::query()->where('region_id', $user->region_id);
 
+            case UserRoleEnum::RES_VIEWER->value:
+                return User::query()->whereHas('roles', function ($query) use ($user) {
+                    $query->whereIn('role_id', [UserRoleEnum::INSPECTOR->value]);
+                });
+
             default:
                 return User::query()->whereRaw('1 = 0');
         }
