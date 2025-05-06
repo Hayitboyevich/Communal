@@ -48,8 +48,10 @@ class ProtocolRepository implements ProtocolRepositoryInterface
                 });
             })
             ->when(isset($filters['inspector_id']), function ($query) use ($filters) {
-                $query->where('user_id', $filters['inspector_id'])
-                    ->orWhere('inspector_id', $filters['inspector_id']);
+                $query->where(function ($q) use ($filters) {
+                    $q->where('user_id', $filters['inspector_id'])
+                        ->orWhere('inspector_id', $filters['inspector_id']);
+                });
             })
             ->when(isset($filters['user_id']), function ($query) use ($filters) {
                 $query->where('user_id', $filters['user_id']);
@@ -75,6 +77,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
             ->when(isset($filters['protocol_type']), function ($query) use ($filters) {
                 $query->where('protocol_type_id', $filters['protocol_type']);
             });
+
 
     }
 
