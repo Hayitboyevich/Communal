@@ -70,15 +70,16 @@ if (!function_exists('getUser')) {
 
 if (!function_exists('getData'))
 {
-    function getData(string $url, ?string $login = null, $password = null)
+    function getData(string $url, ?string $login = null, $password = null, $param = null)
     {
         try {
+            $baseUrl = $param ? $url.$param : $url;
             $response = Http::withBasicAuth(
                 $login,
                 $password
             )
                 ->timeout(10)
-                ->post($url);
+                ->post($baseUrl);
 
             if ($response->successful()) {
                 return $response->json() ?? null;

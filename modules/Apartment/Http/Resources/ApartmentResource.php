@@ -12,8 +12,9 @@ class ApartmentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'description' => $this->description,
+            'street_name' => $this->street_name,
+            'street_id' => $this->street_id,
+            'home_name' => $this->street_id,
         ];
     }
 }

@@ -6,6 +6,8 @@ use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
 use App\Models\Place;
 use App\Models\ViolationType;
+use Illuminate\Database\Eloquent\Casts\Json;
+use Illuminate\Http\JsonResponse;
 use Modules\Apartment\Http\Resources\ApartmentResource;
 use Modules\Apartment\Http\Resources\CompanyResource;
 use Modules\Apartment\Http\Resources\MonitoringBaseResource;
@@ -54,10 +56,11 @@ class InformationController extends BaseController
         }
     }
 
-    public function company($id = null)
+    public function company($id = null): JsonResponse
     {
         try {
-            return $this->sendSuccess(CompanyResource::collection(Company::all()), 'Company list');
+            $companies = Company::query()->where('district_id', $id)->get();
+            return $this->sendSuccess(CompanyResource::collection($companies), 'Company list');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
         }
@@ -66,7 +69,8 @@ class InformationController extends BaseController
     public function apartment($id = null)
     {
         try {
-            return $this->sendSuccess(ApartmentResource::collection(Apartment::all()), 'Apartment list');
+            $apartments = Apartment::query()->where('company_id', $id)->get();
+            return $this->sendSuccess(ApartmentResource::collection($apartments), 'Apartment list');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
         }

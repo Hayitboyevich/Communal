@@ -19,7 +19,7 @@ class CreateCompanyCommand extends Command
     {
         try {
             Company::query()->truncate();
-            $data = getData(config('apartment.company.company_url'), config('apartment.company.login'), config('apartment.company.password'));
+            $data = getData(config('apartment.company.url'), config('apartment.company.login'), config('apartment.company.password'));
 
             foreach ($data['data'] as $item) {
 

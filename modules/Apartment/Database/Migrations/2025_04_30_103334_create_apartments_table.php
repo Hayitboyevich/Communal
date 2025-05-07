@@ -11,7 +11,11 @@ return new class extends Migration
     {
         Schema::create('apartments', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->integer('company_id')->index();
+            $table->string('street_name')->nullable();
+            $table->integer('street_id')->nullable();
+            $table->integer('home_id')->nullable();
+            $table->string('home_name')->nullable();
             $table->timestamps();
         });
     }
