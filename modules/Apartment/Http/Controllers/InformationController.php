@@ -59,7 +59,7 @@ class InformationController extends BaseController
     public function company($id = null): JsonResponse
     {
         try {
-            $companies = Company::query()->where('district_id', $id)->get();
+            $companies = Company::query()->where('district_id', request('district_id'))->get();
             return $this->sendSuccess(CompanyResource::collection($companies), 'Company list');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
@@ -69,7 +69,7 @@ class InformationController extends BaseController
     public function apartment($id = null)
     {
         try {
-            $apartments = Apartment::query()->where('company_id', $id)->get();
+            $apartments = Apartment::query()->where('company_id', request('company_id'))->get();
             return $this->sendSuccess(ApartmentResource::collection($apartments), 'Apartment list');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
