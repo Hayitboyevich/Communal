@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
+use Modules\Water\Const\Step;
 use Modules\Water\Enums\ProtocolStatusEnum;
 
 class MonitoringCreateRequest extends FormRequest
@@ -42,7 +43,8 @@ class MonitoringCreateRequest extends FormRequest
         $this->merge([
             'user_id' => Auth::id(),
             'role_id' => $user->getRoleFromToken(),
-            'monitoring_status_id' => ProtocolStatusEnum::ENTER_RESULT->value
+            'monitoring_status_id' => ProtocolStatusEnum::ENTER_RESULT->value,
+            'step' => Step::ONE
         ]);
     }
 
