@@ -59,6 +59,12 @@ class MonitoringResource extends JsonResource
             'lat' => $this->lat,
             'long' => $this->long,
             'created_at' => $this->created_at,
+            'additional_comment' => $this->additional_comment,
+            'additional_files' => collect(json_decode($this->additional_files, true))->map(function ($file) {
+                return [
+                    'url' => url('storage/'.$file['url']),
+                ];
+            }),
             'images' => $this->images ? ImageResource::collection($this->images) : null,
             'docs' => $this->documents ? DocumentResource::collection($this->documents) : null
         ];

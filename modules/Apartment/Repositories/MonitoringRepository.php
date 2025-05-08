@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Apartment\Contracts\MonitoringRepositoryInterface;
 use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Models\Regulation;
+use Modules\Water\Models\Protocol;
 
 class MonitoringRepository implements MonitoringRepositoryInterface
 {
@@ -58,6 +59,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $monitoring = $this->findById($id);
             $monitoring->update([
                 'monitoring_status_id' => $data['monitoring_status_id'],
+                'additional_comment' => $data['additional_comment'] ?? null,
                 'step' => $data['step'],
             ]);
 
@@ -76,6 +78,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                 ]);
 
                 $this->saveImages($regulation, $item['images']);
+                $this->uploadFiles($monitoring, 'additional_files', $data['additional_files']);
             }
             DB::commit();
             return $monitoring;
@@ -89,5 +92,14 @@ class MonitoringRepository implements MonitoringRepositoryInterface
     {
         $paths = array_map(fn($image) => $this->fileService->uploadImage($image, 'regulation/images'), $images);
         $regulation->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+    }
+
+    public function uploadFiles(Monitoring $monitoring, string $column, ?array $files)
+    {
+        if (!empty($files)) {
+            $paths = array_map(fn($file) => $this->fileService->uploadFile($file, 'protocol/files'), $files);
+            $monitoring->$column = json_encode(array_map(fn($path) => ['url' => $path], $paths));
+            $monitoring->save();
+        }
     }
 }
