@@ -2,6 +2,8 @@
 
 namespace Modules\Apartment\Http\Resources;
 
+use App\Http\Resources\DocumentResource;
+use App\Http\Resources\ImageResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -57,6 +59,8 @@ class MonitoringResource extends JsonResource
             'lat' => $this->lat,
             'long' => $this->long,
             'created_at' => $this->created_at,
+            'images' => $this->images ? ImageResource::collection($this->images) : null,
+            'docs' => $this->documents ? DocumentResource::collection($this->documents) : null
         ];
     }
 }
