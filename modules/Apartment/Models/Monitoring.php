@@ -56,7 +56,7 @@ class Monitoring extends Model
 
     public function apartment(): BelongsTo
     {
-        return $this->belongsTo(Apartment::class, 'apartment_id');
+        return $this->belongsTo(Apartment::class, 'apartment_id', 'home_id');
     }
     public function region(): BelongsTo
     {

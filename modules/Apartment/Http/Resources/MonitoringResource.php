@@ -41,11 +41,11 @@ class MonitoringResource extends JsonResource
             ] : null,
             'company' => $this->company ? [
                 'id' => $this->company_id,
-                'name' => $this->company->name
+                'name' => $this->company->company_name
             ] : null,
             'apartment' => $this->apartment ? [
                 'id' => $this->apartment_id,
-                'name' => $this->home_name
+                'name' => $this->apartment->home_name
             ] : null,
             'region' => $this->region ? [
                 'id' => $this->region_id,
