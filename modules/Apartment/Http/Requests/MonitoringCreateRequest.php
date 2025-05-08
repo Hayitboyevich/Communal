@@ -22,7 +22,7 @@ class MonitoringCreateRequest extends FormRequest
         return [
             'monitoring_type_id' => 'required|integer|exists:monitoring_types,id',
             'monitoring_base_id' => 'required|integer|exists:monitoring_bases,id',
-            'company_id' => 'required|integer|exists:companies,id',
+            'company_id' => 'required|integer|exists:companies,company_id',
             'apartment_id' => 'sometimes',
             'region_id' => 'required|integer|exists:regions,id',
             'district_id' => 'required|integer|exists:districts,id',
