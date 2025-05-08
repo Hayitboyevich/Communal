@@ -27,8 +27,4 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     });
 
-
-
-
-
 });

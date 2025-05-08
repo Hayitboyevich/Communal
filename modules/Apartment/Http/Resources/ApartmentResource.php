@@ -15,6 +15,7 @@ class ApartmentResource extends JsonResource
             'street_name' => $this->street_name,
             'street_id' => $this->street_id,
             'home_name' => $this->home_name,
+            'home_id' => $this->home_id,
         ];
     }
 }
