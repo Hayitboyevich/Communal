@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Modules\Water\Const\Step;
 
 class MonitoringCreateSecondRequest extends FormRequest
 {
@@ -23,6 +24,8 @@ class MonitoringCreateSecondRequest extends FormRequest
 
     public function prepareForValidation()
     {
-
+        $this->merge([
+            'step' => Step::TWO
+        ]);
     }
 }

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('monitorings', function (Blueprint $table) {
             $table->id();
             $table->integer('monitoring_status_id')->nullable()->index();
+            $table->tinyInteger('step')->nullable();
             $table->integer('user_id')->nullable()->index();
             $table->integer('role_id')->nullable()->index();
             $table->integer('monitoring_type_id')->index()->nullable()->comment('organish turi');

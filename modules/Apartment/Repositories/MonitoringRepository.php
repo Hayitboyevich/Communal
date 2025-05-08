@@ -58,6 +58,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $monitoring = $this->findById($id);
             $monitoring->update([
                 'monitoring_status_id' => $data['monitoring_status_id'],
+                'step' => $data['step'],
             ]);
 
             foreach ($data['regulations'] as $item) {
