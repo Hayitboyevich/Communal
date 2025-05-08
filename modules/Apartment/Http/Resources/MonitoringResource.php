@@ -16,7 +16,11 @@ class MonitoringResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'status' => $this->monitoring_status_id,
+            'step' => $this->step,
+            'status' => $this->status ? [
+               'id' => $this->monitoring_status_id,
+               'name' => $this->status->name,
+            ] : null,
             'user' => $this->user ? [
                 'id' => $this->user_id,
                 'full_name' => $this->user->full_name

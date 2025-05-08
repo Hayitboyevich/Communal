@@ -67,4 +67,9 @@ class Monitoring extends Model
     {
         return $this->belongsTo(District::class, 'district_id');
     }
+
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(MonitoringStatus::class, 'monitoring_status_id');
+    }
 }
