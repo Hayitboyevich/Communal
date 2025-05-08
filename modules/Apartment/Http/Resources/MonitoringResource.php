@@ -25,7 +25,7 @@ class MonitoringResource extends JsonResource
             ] : null,
             'user' => $this->user ? [
                 'id' => $this->user_id,
-                'full_name' => $this->user->full_name
+                'name' => $this->user->full_name
             ] : null,
             'role' => $this->role ? [
                 'id' => $this->role_id,
