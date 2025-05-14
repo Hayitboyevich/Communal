@@ -12,4 +12,8 @@ interface MonitoringRepositoryInterface
 
     public function create($data);
     public function createSecond($id, $data);
+
+    public function confirm($id);
+    public function reject($id);
+    public function violation($data);
 }

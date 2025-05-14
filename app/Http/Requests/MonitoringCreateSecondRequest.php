@@ -19,8 +19,8 @@ class MonitoringCreateSecondRequest extends FormRequest
         return [
             'monitoring_status_id' => 'required|exists:protocol_statuses,id',
             'regulations' => 'sometimes',
-            'additional_comment' => 'required_if:monitoring_status_id,4',
-            'additional_files' => 'required_if:monitoring_status_id,4',
+            'additional_comment' => 'required_if:monitoring_status_id,3',
+            'additional_files' => 'required_if:monitoring_status_id,3',
         ];
     }
 

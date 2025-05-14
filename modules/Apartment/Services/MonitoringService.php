@@ -4,8 +4,10 @@ namespace Modules\Apartment\Services;
 
 use App\Http\Requests\MonitoringCreateSecondRequest;
 use App\Services\FileService;
+use Illuminate\Support\Facades\Request;
 use Modules\Apartment\Contracts\MonitoringRepositoryInterface;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
+use Modules\Apartment\Http\Requests\ViolationRequest;
 use Modules\Apartment\Models\Monitoring;
 use Modules\Water\Models\Protocol;
 use Modules\Water\Services\HistoryService;
@@ -16,7 +18,7 @@ class MonitoringService
 
     public function __construct(
         protected MonitoringRepositoryInterface $repository,
-        protected FileService                 $fileService
+        protected FileService                   $fileService
     )
     {
         $this->historyService = new HistoryService('monitoring_histories');
@@ -37,10 +39,10 @@ class MonitoringService
     {
         try {
             $monitoring = $this->repository->create($request->except('images', 'docs'));
-            $this->saveImages($monitoring, $request['images']);
-            $this->saveFiles($monitoring, $request['docs']);
+            $this->saveImages($monitoring, $request['images'], 'monitoring/images');
+            $this->saveFiles($monitoring, $request['docs'], 'monitoring/files');
             return $monitoring;
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             throw  $exception;
         }
     }
@@ -49,21 +51,67 @@ class MonitoringService
     {
         try {
             return $this->repository->createSecond($id, $request->all());
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             throw  $exception;
         }
     }
 
-    private function saveImages(Monitoring $monitoring, ?array $images)
+    public function confirm($id)
     {
-        $paths = array_map(fn($image) => $this->fileService->uploadImage($image, 'monitoring/images'), $images);
-        $monitoring->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+        try {
+            return $this->repository->confirm($id);
+        } catch (\Exception $exception) {
+            throw  $exception;
+        }
     }
-    private function saveFiles(Monitoring $monitoring, ?array $files)
+
+    public function reject($id, Request $request)
+    {
+        try {
+            return $this->repository->reject($id);
+            //history yoziladi
+        } catch (\Exception $exception) {
+            throw  $exception;
+        }
+    }
+
+    public function createThird($id, ViolationRequest $request)
+    {
+        try {
+            foreach ($request->violations as $data) {
+                $violation = $this->repository->violation($data);
+                $this->saveImages($violation, $data['images'], 'violation/images');
+                $this->saveFiles($violation, $data['docs'], 'violation/files');
+            }
+        } catch (\Exception $exception) {
+            throw  $exception;
+        }
+    }
+
+    public function violation(ViolationRequest $request)
+    {
+        try {
+            foreach ($request->violations as $data) {
+                $violation = $this->repository->violation($data);
+                $this->saveImages($violation, $data['images'], 'violation/images');
+                $this->saveFiles($violation, $data['docs'], 'violation/files');
+            }
+        } catch (\Exception $exception) {
+            throw  $exception;
+        }
+    }
+
+    private function saveImages($model, ?array $images, $filePath)
+    {
+        $paths = array_map(fn($image) => $this->fileService->uploadImage($image, $filePath), $images);
+        $model->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+    }
+
+    private function saveFiles($model, ?array $files, $filePath)
     {
         if (!empty($files)) {
-            $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'monitoring/files'), $files);
-            $monitoring->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+            $paths = array_map(fn($file) => $this->fileService->uploadImage($file, $filePath), $files);
+            $model->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
         }
     }
 

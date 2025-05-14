@@ -5,8 +5,6 @@ namespace Modules\Apartment\Http\Controllers;
 use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
 use App\Models\Place;
-use App\Models\ViolationType;
-use Illuminate\Database\Eloquent\Casts\Json;
 use Illuminate\Http\JsonResponse;
 use Modules\Apartment\Http\Resources\ApartmentResource;
 use Modules\Apartment\Http\Resources\CompanyResource;
@@ -18,6 +16,7 @@ use Modules\Apartment\Models\Apartment;
 use Modules\Apartment\Models\Company;
 use Modules\Apartment\Models\MonitoringBase;
 use Modules\Apartment\Models\MonitoringType;
+use Modules\Apartment\Models\ViolationType;
 
 class InformationController extends BaseController
 {

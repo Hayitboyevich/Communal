@@ -5,8 +5,10 @@ namespace Modules\Apartment\Repositories;
 use App\Services\FileService;
 use Illuminate\Support\Facades\DB;
 use Modules\Apartment\Contracts\MonitoringRepositoryInterface;
+use Modules\Apartment\Enums\MonitoringStatusEnum;
 use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Models\Regulation;
+use Modules\Apartment\Models\Violation;
 use Modules\Water\Models\Protocol;
 
 class MonitoringRepository implements MonitoringRepositoryInterface
@@ -56,34 +58,125 @@ class MonitoringRepository implements MonitoringRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            $originalMonitoring = $this->findById($id);
+            $regulations = $data['regulations'];
+            $results = [];
+
+            foreach ($regulations as $index => $item) {
+                if ($index === 0) {
+                    $originalMonitoring->update([
+                        'monitoring_status_id' => $data['monitoring_status_id'],
+                        'additional_comment' => $data['additional_comment'] ?? null,
+                        'step' => $data['step'],
+                    ]);
+
+                    $regulation = Regulation::create([
+                        'monitoring_id' => $originalMonitoring->id,
+                        'place_id' => $item['place_id'],
+                        'violation_type_id' => $item['violation_type_id'],
+                        'comment' => $item['comment'],
+                        'user_type' => $item['user_type'],
+                        'pin' => $item['pin'],
+                        'birth_date' => $item['birth_date'],
+                        'fish' => $item['fish'],
+                        'phone' => $item['phone'],
+                        'description' => $item['description'],
+                    ]);
+
+                    $this->saveImages($regulation, $item['images']);
+                    if(isset($data['additional_files'])){
+                        $this->uploadFiles($originalMonitoring, 'additional_files', $data['additional_files']);
+                    }
+                    $results[] = $originalMonitoring;
+                } else {
+                    $newMonitoring = $originalMonitoring->replicate();
+                    $newMonitoring->monitoring_status_id = $data['monitoring_status_id'];
+                    $newMonitoring->additional_comment = $data['additional_comment'] ?? null;
+                    $newMonitoring->step = $data['step'];
+                    $newMonitoring->save();
+
+                    foreach ($originalMonitoring->images as $image) {
+                        $newImage = $image->replicate();
+                        $newImage->imageable_id = $newMonitoring->id;
+                        $newImage->save();
+                    }
+
+                    foreach ($originalMonitoring->documents as $document) {
+                        $newDocument = $document->replicate();
+                        $newDocument->documentable_id = $newMonitoring->id;
+                        $newDocument->save();
+                    }
+
+                    $regulation = Regulation::create([
+                        'monitoring_id' => $newMonitoring->id,
+                        'place_id' => $item['place_id'],
+                        'violation_type_id' => $item['violation_type_id'],
+                        'comment' => $item['comment'],
+                        'user_type' => $item['user_type'],
+                        'pin' => $item['pin'],
+                        'birth_date' => $item['birth_date'],
+                        'fish' => $item['fish'],
+                        'phone' => $item['phone'],
+                        'description' => $item['description'],
+                    ]);
+
+                    $this->saveImages($regulation, $item['images']);
+                    if (isset($data['additional_files'])){
+                        $this->uploadFiles($newMonitoring, 'additional_files', $data['additional_files']);
+                    }
+                    $results[] = $newMonitoring;
+                }
+            }
+
+            DB::commit();
+            return $results;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    public function confirm($id)
+    {
+        try {
             $monitoring = $this->findById($id);
             $monitoring->update([
-                'monitoring_status_id' => $data['monitoring_status_id'],
-                'additional_comment' => $data['additional_comment'] ?? null,
-                'step' => $data['step'],
+               'monitoring_status_id' => MonitoringStatusEnum::NOT_DEFECT->value,
+            ]);
+            return $monitoring;
+        }catch (\Exception $exception){
+            throw $exception;
+        }
+    }
+
+    public function reject($id)
+    {
+        try {
+            $monitoring = $this->findById($id);
+            $monitoring->update([
+                'monitoring_status_id' => MonitoringStatusEnum::ENTER_RESULT->value,
             ]);
 
-            foreach ($data['regulations'] as $item) {
-                $regulation = Regulation::query()->create([
-                    'monitoring_id' => $monitoring->id,
-                    'place_id' => $item['place_id'],
-                    'violation_type_id' => $item['violation_type_id'],
-                    'comment' => $item['comment'],
-                    'user_type' => $item['user_type'],
-                    'pin' => $item['pin'],
-                    'birth_date' => $item['birth_date'],
-                    'fish' => $item['fish'],
-                    'phone' => $item['phone'],
-                    'description' => $item['description'],
-                ]);
-
-                $this->saveImages($regulation, $item['images']);
-                $this->uploadFiles($monitoring, 'additional_files', $data['additional_files']);
-            }
-            DB::commit();
+            //history yoziladi
             return $monitoring;
-        } catch (\Exception $exception) {
-            DB::rollBack();
+        } catch (\Exception $exception){
+            throw $exception;
+        }
+    }
+
+    public function violation($data)
+    {
+        try {
+            $violation = new Violation();
+            $violation->regulation_id = $data['regulation_id'];
+            $violation->type = $data['type'];
+            $violation->desc = $data['description'];
+            $violation->deadline = $data['deadline'];
+            $violation->save();
+            return $violation;
+
+        }catch (\Exception $exception){
             throw $exception;
         }
     }
@@ -94,7 +187,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
         $regulation->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
     }
 
-    public function uploadFiles(Monitoring $monitoring, string $column, ?array $files)
+    private function uploadFiles(Monitoring $monitoring, string $column, ?array $files)
     {
         if (!empty($files)) {
             $paths = array_map(fn($file) => $this->fileService->uploadFile($file, 'protocol/files'), $files);

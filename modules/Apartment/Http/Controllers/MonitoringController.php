@@ -6,7 +6,9 @@ use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\MonitoringCreateSecondRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Request;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
+use Modules\Apartment\Http\Requests\ViolationRequest;
 use Modules\Apartment\Http\Resources\MonitoringResource;
 use Modules\Apartment\Services\MonitoringService;
 
@@ -54,14 +56,25 @@ class MonitoringController extends BaseController
     public function createSecond($id, MonitoringCreateSecondRequest $request): JsonResponse
     {
         try {
-            $monitoring = $this->service->createSecond($id, $request);
-            return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring created successfully.');
+
+            $this->service->createSecond($id, $request);
+            return $this->sendSuccess([], 'Monitoring created successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function violation($id, ViolationRequest $request)
+    {
+        try {
+            $this->service->createThird($id, $request);
+            return $this->sendSuccess([], 'Monitoring violation successfully.');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
         }
     }
 
-    public function createThird()
+    public function createThird(): JsonResponse
     {
         try{
 
@@ -69,4 +82,26 @@ class MonitoringController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
         }
     }
+
+    public function confirm($id): JsonResponse
+    {
+        try {
+           $monitoring = $this->service->confirm($id);
+           return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring confirmed successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
+        }
+    }
+
+    public function reject($id, Request $request): JsonResponse
+    {
+        try {
+            $monitoring = $this->service->reject($id, $request);
+            return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring confirmed successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
+        }
+    }
+
+
 }

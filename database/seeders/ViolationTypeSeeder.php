@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Imports\ViolationTypeImport;
-use App\Models\ViolationType;
 use Illuminate\Database\Seeder;
 use Maatwebsite\Excel\Facades\Excel;
+use Modules\Apartment\Models\ViolationType;
 
 class ViolationTypeSeeder extends Seeder
 {

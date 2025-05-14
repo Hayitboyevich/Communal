@@ -2,9 +2,9 @@
 
 namespace App\Imports;
 
-use App\Models\ViolationType;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Modules\Apartment\Models\ViolationType;
 
 class ViolationTypeImport implements ToModel, WithHeadingRow
 {

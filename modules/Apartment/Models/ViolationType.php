@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace Modules\Apartment\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class ViolationType extends Model
 {
-    //
+
 }
