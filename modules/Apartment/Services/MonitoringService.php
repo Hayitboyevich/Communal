@@ -6,6 +6,7 @@ use App\Http\Requests\MonitoringCreateSecondRequest;
 use App\Services\FileService;
 use Illuminate\Support\Facades\Request;
 use Modules\Apartment\Contracts\MonitoringRepositoryInterface;
+use Modules\Apartment\Enums\MonitoringStatusEnum;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
 use Modules\Apartment\Http\Requests\ViolationRequest;
 use Modules\Apartment\Models\Monitoring;
@@ -71,6 +72,22 @@ class MonitoringService
             return $this->repository->reject($id);
             //history yoziladi
         } catch (\Exception $exception) {
+            throw  $exception;
+        }
+    }
+
+    public function count($user, $roleId, $filters = [])
+    {
+        try {
+            $query = $this->repository->all($user, $roleId);
+            return [
+                'all' => $query->clone()->count(),
+                'enter_result' => $query->clone()->where('protocol_status_id', MonitoringStatusEnum::ENTER_RESULT->value)->count(),
+                'confirm_not_defect' => $query->clone()->where('protocol_status_id', MonitoringStatusEnum::CONFIRM_DEFECT->value)->count(),
+                'not_defect' => $query->clone()->where('protocol_status_id', MonitoringStatusEnum::NOT_DEFECT->value)->count(),
+                'defect' => $query->clone()->where('protocol_status_id', MonitoringStatusEnum::DEFECT->value)->count(),
+            ];
+        }catch (\Exception $exception){
             throw  $exception;
         }
     }

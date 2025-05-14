@@ -15,6 +15,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::post('/confirm', 'confirm');
         Route::post('/reject', 'reject');
         Route::post('/violation', 'violation');
+        Route::get('/count', 'count');
     });
 
     Route::controller(MonitoringStatusController::class)->prefix('monitoring')->group(function () {
