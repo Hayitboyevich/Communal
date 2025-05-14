@@ -59,7 +59,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
         DB::beginTransaction();
         try {
             $originalMonitoring = $this->findById($id);
-            $regulations = $data['regulations'];
+
             $results = [];
             if($data['monitoring_status_id'] == MonitoringStatusEnum::CONFIRM_DEFECT->value)
             {
@@ -73,6 +73,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                     $this->uploadFiles($originalMonitoring, 'additional_files', $data['additional_files'], 'monitoring/files');
                 }
             }else{
+                $regulations = $data['regulations'];
                 foreach ($regulations as $index => $item) {
                     if ($index === 0) {
                         $originalMonitoring->update([
