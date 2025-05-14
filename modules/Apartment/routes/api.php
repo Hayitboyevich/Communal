@@ -8,7 +8,6 @@ use Modules\Apartment\Http\Controllers\InformationController;
 Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(MonitoringController::class)->prefix('monitoring')->group(function () {
-        Route::get('/{id?}', 'index');
         Route::post('/create', 'create');
         Route::post('/create/second/{id}', 'createSecond');
         Route::post('/create/third/{id}', 'createThird');
@@ -16,6 +15,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::post('/reject', 'reject');
         Route::post('/violation', 'violation');
         Route::get('/count', 'count');
+        Route::get('/{id?}', 'index');
     });
 
     Route::controller(MonitoringStatusController::class)->prefix('monitoring')->group(function () {

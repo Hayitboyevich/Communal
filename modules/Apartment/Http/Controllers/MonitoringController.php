@@ -74,7 +74,7 @@ class MonitoringController extends BaseController
         }
     }
 
-    public function violation($id, ViolationRequest $request)
+    public function violation($id, ViolationRequest $request): JsonResponse
     {
         try {
             $this->service->createThird($id, $request);
