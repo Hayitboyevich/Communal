@@ -61,72 +61,81 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $originalMonitoring = $this->findById($id);
             $regulations = $data['regulations'];
             $results = [];
+            if($data['monitoring_status_id'] == MonitoringStatusEnum::NOT_DEFECT->value)
+            {
+                $originalMonitoring->update([
+                    'monitoring_status_id' => $data['monitoring_status_id'],
+                    'additional_comment' => $data['additional_comment'] ?? null,
+                    'step' => $data['step'],
+                ]);
 
-            foreach ($regulations as $index => $item) {
-                if ($index === 0) {
-                    $originalMonitoring->update([
-                        'monitoring_status_id' => $data['monitoring_status_id'],
-                        'additional_comment' => $data['additional_comment'] ?? null,
-                        'step' => $data['step'],
-                    ]);
+                if(isset($data['additional_files'])){
+                    $this->uploadFiles($originalMonitoring, 'additional_files', $data['additional_files'], 'monitoring/files');
+                }
+            }else{
+                foreach ($regulations as $index => $item) {
+                    if ($index === 0) {
+                        $originalMonitoring->update([
+                            'monitoring_status_id' => $data['monitoring_status_id'],
+                            'additional_comment' => $data['additional_comment'] ?? null,
+                            'step' => $data['step'],
+                        ]);
 
-                    $regulation = Regulation::create([
-                        'monitoring_id' => $originalMonitoring->id,
-                        'place_id' => $item['place_id'],
-                        'violation_type_id' => $item['violation_type_id'],
-                        'comment' => $item['comment'],
-                        'user_type' => $item['user_type'],
-                        'pin' => $item['pin'],
-                        'birth_date' => $item['birth_date'],
-                        'fish' => $item['fish'],
-                        'phone' => $item['phone'],
-                        'description' => $item['description'],
-                    ]);
+                        $regulation = Regulation::create([
+                            'monitoring_id' => $originalMonitoring->id,
+                            'place_id' => $item['place_id'],
+                            'violation_type_id' => $item['violation_type_id'],
+                            'comment' => $item['comment'],
+                            'user_type' => $item['user_type'],
+                            'pin' => $item['pin'],
+                            'birth_date' => $item['birth_date'],
+                            'fish' => $item['fish'],
+                            'phone' => $item['phone'],
+                            'description' => $item['description'],
+                        ]);
 
-                    $this->saveImages($regulation, $item['images']);
-                    if(isset($data['additional_files'])){
-                        $this->uploadFiles($originalMonitoring, 'additional_files', $data['additional_files']);
+                        $this->saveImages($regulation, $item['images']);
+
+                        $results[] = $originalMonitoring;
+                    } else {
+                        $newMonitoring = $originalMonitoring->replicate();
+                        $newMonitoring->monitoring_status_id = $data['monitoring_status_id'];
+                        $newMonitoring->additional_comment = $data['additional_comment'] ?? null;
+                        $newMonitoring->step = $data['step'];
+                        $newMonitoring->save();
+
+                        foreach ($originalMonitoring->images as $image) {
+                            $newImage = $image->replicate();
+                            $newImage->imageable_id = $newMonitoring->id;
+                            $newImage->save();
+                        }
+
+                        foreach ($originalMonitoring->documents as $document) {
+                            $newDocument = $document->replicate();
+                            $newDocument->documentable_id = $newMonitoring->id;
+                            $newDocument->save();
+                        }
+
+                        $regulation = Regulation::create([
+                            'monitoring_id' => $newMonitoring->id,
+                            'place_id' => $item['place_id'],
+                            'violation_type_id' => $item['violation_type_id'],
+                            'comment' => $item['comment'],
+                            'user_type' => $item['user_type'],
+                            'pin' => $item['pin'],
+                            'birth_date' => $item['birth_date'],
+                            'fish' => $item['fish'],
+                            'phone' => $item['phone'],
+                            'description' => $item['description'],
+                        ]);
+
+                        $this->saveImages($regulation, $item['images']);
+                        $results[] = $newMonitoring;
                     }
-                    $results[] = $originalMonitoring;
-                } else {
-                    $newMonitoring = $originalMonitoring->replicate();
-                    $newMonitoring->monitoring_status_id = $data['monitoring_status_id'];
-                    $newMonitoring->additional_comment = $data['additional_comment'] ?? null;
-                    $newMonitoring->step = $data['step'];
-                    $newMonitoring->save();
-
-                    foreach ($originalMonitoring->images as $image) {
-                        $newImage = $image->replicate();
-                        $newImage->imageable_id = $newMonitoring->id;
-                        $newImage->save();
-                    }
-
-                    foreach ($originalMonitoring->documents as $document) {
-                        $newDocument = $document->replicate();
-                        $newDocument->documentable_id = $newMonitoring->id;
-                        $newDocument->save();
-                    }
-
-                    $regulation = Regulation::create([
-                        'monitoring_id' => $newMonitoring->id,
-                        'place_id' => $item['place_id'],
-                        'violation_type_id' => $item['violation_type_id'],
-                        'comment' => $item['comment'],
-                        'user_type' => $item['user_type'],
-                        'pin' => $item['pin'],
-                        'birth_date' => $item['birth_date'],
-                        'fish' => $item['fish'],
-                        'phone' => $item['phone'],
-                        'description' => $item['description'],
-                    ]);
-
-                    $this->saveImages($regulation, $item['images']);
-                    if (isset($data['additional_files'])){
-                        $this->uploadFiles($newMonitoring, 'additional_files', $data['additional_files']);
-                    }
-                    $results[] = $newMonitoring;
                 }
             }
+
+
 
             DB::commit();
             return $results;
@@ -187,10 +196,10 @@ class MonitoringRepository implements MonitoringRepositoryInterface
         $regulation->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
     }
 
-    private function uploadFiles(Monitoring $monitoring, string $column, ?array $files)
+    private function uploadFiles(Monitoring $monitoring, string $column, ?array $files, $filePath)
     {
         if (!empty($files)) {
-            $paths = array_map(fn($file) => $this->fileService->uploadFile($file, 'protocol/files'), $files);
+            $paths = array_map(fn($file) => $this->fileService->uploadFile($file, $filePath), $files);
             $monitoring->$column = json_encode(array_map(fn($path) => ['url' => $path], $paths));
             $monitoring->save();
         }
