@@ -9,12 +9,14 @@ use Illuminate\Http\JsonResponse;
 use Modules\Apartment\Http\Resources\ApartmentResource;
 use Modules\Apartment\Http\Resources\CompanyResource;
 use Modules\Apartment\Http\Resources\MonitoringBaseResource;
+use Modules\Apartment\Http\Resources\MonitoringStatusResource;
 use Modules\Apartment\Http\Resources\MonitoringTypeResource;
 use Modules\Apartment\Http\Resources\PlaceResource;
 use Modules\Apartment\Http\Resources\ViolationTypeResource;
 use Modules\Apartment\Models\Apartment;
 use Modules\Apartment\Models\Company;
 use Modules\Apartment\Models\MonitoringBase;
+use Modules\Apartment\Models\MonitoringStatus;
 use Modules\Apartment\Models\MonitoringType;
 use Modules\Apartment\Models\ViolationType;
 
@@ -72,6 +74,15 @@ class InformationController extends BaseController
             return $this->sendSuccess(ApartmentResource::collection($apartments), 'Apartment list');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
+        }
+    }
+
+    public function monitoringStatus($id=null)
+    {
+        try {
+            return $this->sendSuccess(MonitoringStatusResource::collection(MonitoringStatus::all()), 'Monitoring Status List');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 

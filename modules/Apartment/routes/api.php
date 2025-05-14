@@ -28,6 +28,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::get('/monitoring-type/{id?}', 'monitoringType');
         Route::get('/monitoring-base/{id?}', 'monitoringBase');
         Route::get('/company/{id?}', 'company');
+        Route::get('monitoring-status/{id?}', 'monitoringStatus');
         Route::get('/apartment/{id?}', 'apartment');
 
     });
