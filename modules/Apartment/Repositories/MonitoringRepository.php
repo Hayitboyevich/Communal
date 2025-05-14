@@ -61,7 +61,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $originalMonitoring = $this->findById($id);
             $regulations = $data['regulations'];
             $results = [];
-            if($data['monitoring_status_id'] == MonitoringStatusEnum::NOT_DEFECT->value)
+            if($data['monitoring_status_id'] == MonitoringStatusEnum::CONFIRM_DEFECT->value)
             {
                 $originalMonitoring->update([
                     'monitoring_status_id' => $data['monitoring_status_id'],
