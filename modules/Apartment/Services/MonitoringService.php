@@ -96,20 +96,7 @@ class MonitoringService
     {
         try {
             foreach ($request->violations as $data) {
-                $violation = $this->repository->violation($data);
-                $this->saveImages($violation, $data['images'], 'violation/images');
-                $this->saveFiles($violation, $data['docs'], 'violation/files');
-            }
-        } catch (\Exception $exception) {
-            throw  $exception;
-        }
-    }
-
-    public function violation(ViolationRequest $request)
-    {
-        try {
-            foreach ($request->violations as $data) {
-                $violation = $this->repository->violation($data);
+                $violation = $this->repository->createThird($id, $data);
                 $this->saveImages($violation, $data['images'], 'violation/images');
                 $this->saveFiles($violation, $data['docs'], 'violation/files');
             }

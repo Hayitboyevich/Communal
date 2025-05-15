@@ -74,7 +74,7 @@ class MonitoringController extends BaseController
         }
     }
 
-    public function violation($id, ViolationRequest $request): JsonResponse
+    public function createThird($id, ViolationRequest $request): JsonResponse
     {
         try {
             $this->service->createThird($id, $request);
@@ -84,14 +84,17 @@ class MonitoringController extends BaseController
         }
     }
 
-    public function createThird(): JsonResponse
-    {
-        try{
+//    public function violation($id, ViolationRequest $request): JsonResponse
+//    {
+//        try {
+//            $this->service->createThird($id, $request);
+//            return $this->sendSuccess([], 'Monitoring violation successfully.');
+//        }catch (\Exception $exception){
+//            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
+//        }
+//    }
 
-        }catch (\Exception $exception){
-            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
-        }
-    }
+
 
     public function confirm($id): JsonResponse
     {

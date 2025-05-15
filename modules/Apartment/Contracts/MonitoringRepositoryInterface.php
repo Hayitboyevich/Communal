@@ -15,5 +15,5 @@ interface MonitoringRepositoryInterface
 
     public function confirm($id);
     public function reject($id);
-    public function violation($data);
+    public function createThird($id, $data);
 }

@@ -175,18 +175,23 @@ class MonitoringRepository implements MonitoringRepositoryInterface
         }
     }
 
-    public function violation($data)
+    public function createThird($id, $data)
     {
+        DB::beginTransaction();
         try {
+            $monitoring = $this->findById($id);
+            $monitoring->update(['monitoring_status_id' => MonitoringStatusEnum::FORMED->value]);
             $violation = new Violation();
             $violation->regulation_id = $data['regulation_id'];
             $violation->type = $data['type'];
             $violation->desc = $data['description'];
             $violation->deadline = $data['deadline'];
             $violation->save();
+            DB::commit();
             return $violation;
 
         }catch (\Exception $exception){
+            DB::rollBack();
             throw $exception;
         }
     }
