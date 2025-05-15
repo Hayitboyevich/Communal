@@ -4,17 +4,22 @@ namespace Modules\Apartment\Repositories;
 
 use App\Services\FileService;
 use Illuminate\Support\Facades\DB;
+use Modules\Apartment\Const\MonitoringHistoryType;
 use Modules\Apartment\Contracts\MonitoringRepositoryInterface;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
 use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Models\Regulation;
 use Modules\Apartment\Models\Violation;
 use Modules\Water\Models\Protocol;
+use Modules\Water\Services\HistoryService;
 
 class MonitoringRepository implements MonitoringRepositoryInterface
 {
+
+    private HistoryService $historyService;
     public function __construct(protected FileService $fileService)
     {
+        $this->historyService = new HistoryService('monitoring_histories');
     }
 
     public function all($user, $roleId)
@@ -69,6 +74,8 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                     'step' => $data['step'],
                 ]);
 
+                $this->createHistory($originalMonitoring, MonitoringHistoryType::CONFIRM_DEFECT);
+
                 if(isset($data['additional_files'])){
                     $this->uploadFiles($originalMonitoring, 'additional_files', $data['additional_files'], 'monitoring/files');
                 }
@@ -104,6 +111,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                         $newMonitoring->additional_comment = $data['additional_comment'] ?? null;
                         $newMonitoring->step = $data['step'];
                         $newMonitoring->save();
+                        $this->createHistory($newMonitoring, MonitoringHistoryType::CREATE_FIRST);
 
                         foreach ($originalMonitoring->images as $image) {
                             $newImage = $image->replicate();
@@ -129,6 +137,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'phone' => $item['phone'],
                             'description' => $item['description'],
                         ]);
+                        $this->createHistory($newMonitoring, MonitoringHistoryType::CREATE_SECOND);
 
                         $this->saveImages($regulation, $item['images']);
                         $results[] = $newMonitoring;
@@ -196,6 +205,17 @@ class MonitoringRepository implements MonitoringRepositoryInterface
         }
     }
 
+    public function changeStatus($id, $status)
+    {
+        try {
+            $monitoring = $this->findById($id);
+            $monitoring->update(['monitoring_status_id' => $status]);
+            return $monitoring;
+        }catch (\Exception $exception){
+            throw $exception;
+        }
+    }
+
     private function saveImages(Regulation $regulation, ?array $images)
     {
         $paths = array_map(fn($image) => $this->fileService->uploadImage($image, 'regulation/images'), $images);
@@ -209,5 +229,17 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $monitoring->$column = json_encode(array_map(fn($path) => ['url' => $path], $paths));
             $monitoring->save();
         }
+    }
+
+    public function createHistory($monitoring, $type, $comment = "", $meta = null)
+    {
+        return $this->historyService->createHistory(
+            guid: $monitoring->id,
+            status: $monitoring->monitoring_status_id,
+            type: $type,
+            date: null,
+            comment: $comment,
+            additionalInfo: $meta
+        );
     }
 }

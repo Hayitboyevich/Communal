@@ -16,4 +16,5 @@ interface MonitoringRepositoryInterface
     public function confirm($id);
     public function reject($id);
     public function createThird($id, $data);
+    public function changeStatus($id, $status);
 }

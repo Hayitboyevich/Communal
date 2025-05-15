@@ -13,7 +13,9 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::post('/create/third/{id}', 'createThird');
         Route::post('/confirm/{id}', 'confirm');
         Route::post('/reject/{id}', 'reject');
-        Route::post('/violation', 'violation');
+        Route::post('/change-status/{id}', 'changeStatus');
+        Route::post('/confirm-regulation/{id}', 'confirmRegulation');
+        Route::post('/reject-regulation/{id}', 'rejectRegulation');
         Route::get('/count', 'count');
         Route::get('/{id?}', 'index');
     });

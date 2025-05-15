@@ -20,28 +20,12 @@ class HistoryService
 
     public function createHistory(int $guid, int $status, int $type, ?string $date, ?string $comment = "", mixed $additionalInfo = null): int
     {
-        $content = match ($type) {
-            ProtocolHistoryType::CREATE_FIRST,
-            ProtocolHistoryType::CREATE_SECOND,
-            ProtocolHistoryType::CREATE_THIRD,
-            ProtocolHistoryType::CONFIRM_DEFECT,
-            ProtocolHistoryType::REJECT_DEFECT,
-            ProtocolHistoryType::ATTACH_INSPECTOR,
-            ProtocolHistoryType::REJECT,
-            ProtocolHistoryType::CONFIRM_NOT_DEFECT,
-            ProtocolHistoryType::NOT_DEFECT,
-            ProtocolHistoryType::CONFIRM_RESULT,
-            ProtocolHistoryType::REJECT_RESULT,
-            ProtocolHistoryType::SEND_HMQO,
-            ProtocolHistoryType::CONFIRMED,
-            => $this->shapeTaskContent(
-                status: $status,
-                comment: $comment,
-                date: $date,
-                additionalInfo: $additionalInfo
-            ),
-            default => null,
-        };
+        $content = $this->shapeTaskContent(
+            status: $status,
+            comment: $comment,
+            date: $date,
+            additionalInfo: $additionalInfo
+        );
 
         if (!$content) {
             return false;

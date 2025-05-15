@@ -5,18 +5,23 @@ namespace Modules\Apartment\Http\Controllers;
 use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\MonitoringCreateSecondRequest;
+use App\Services\FileService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Request;
+use Modules\Apartment\Enums\MonitoringStatusEnum;
+use Modules\Apartment\Http\Requests\MonitoringChangeStatusRequest;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
 use Modules\Apartment\Http\Requests\ViolationRequest;
 use Modules\Apartment\Http\Resources\MonitoringResource;
+use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Services\MonitoringService;
 
 class MonitoringController extends BaseController
 {
     public function __construct(
         protected MonitoringService $service
-    ){
+    )
+    {
         parent::__construct();
     }
 
@@ -46,9 +51,9 @@ class MonitoringController extends BaseController
     public function count(): JsonResponse
     {
         try {
-           $data = $this->service->count($this->user, $this->roleId);
-           return $this->sendSuccess($data, 'Count');
-        }catch (\Exception $exception){
+            $data = $this->service->count($this->user, $this->roleId);
+            return $this->sendSuccess($data, 'Count');
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -56,9 +61,9 @@ class MonitoringController extends BaseController
     public function create(MonitoringCreateRequest $request): JsonResponse
     {
         try {
-           $monitoring = $this->service->create($request);
-           return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring created successfully.');
-        }catch (\Exception $exception){
+            $monitoring = $this->service->create($request);
+            return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring created successfully.');
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
         }
     }
@@ -69,7 +74,7 @@ class MonitoringController extends BaseController
 
             $this->service->createSecond($id, $request);
             return $this->sendSuccess([], 'Monitoring created successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -79,29 +84,17 @@ class MonitoringController extends BaseController
         try {
             $this->service->createThird($id, $request);
             return $this->sendSuccess([], 'Monitoring violation successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
         }
     }
 
-//    public function violation($id, ViolationRequest $request): JsonResponse
-//    {
-//        try {
-//            $this->service->createThird($id, $request);
-//            return $this->sendSuccess([], 'Monitoring violation successfully.');
-//        }catch (\Exception $exception){
-//            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
-//        }
-//    }
-
-
-
     public function confirm($id): JsonResponse
     {
         try {
-           $monitoring = $this->service->confirm($id);
-           return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring confirmed successfully.');
-        }catch (\Exception $exception){
+            $monitoring = $this->service->confirm($id);
+            return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring confirmed successfully.');
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
         }
     }
@@ -111,10 +104,41 @@ class MonitoringController extends BaseController
         try {
             $monitoring = $this->service->reject($id, $request);
             return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring confirmed successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
         }
     }
+
+    public function confirmRegulation($id): JsonResponse
+    {
+        try {
+            $monitoring = $this->service->confirmRegulation($id);
+            return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring confirmed successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function rejectRegulation($id): JsonResponse
+    {
+        try {
+            $monitoring = $this->service->rejectRegulation($id);
+            return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring confirmed successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function changeStatus($id, MonitoringChangeStatusRequest $request): JsonResponse
+    {
+        try {
+            $monitoring  = $this->service->changeStatus($id, $request);
+            return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring confirmed successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
 
 
 }

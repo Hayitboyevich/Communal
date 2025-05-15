@@ -5,11 +5,15 @@ namespace Modules\Apartment\Services;
 use App\Http\Requests\MonitoringCreateSecondRequest;
 use App\Services\FileService;
 use Illuminate\Support\Facades\Request;
+use Modules\Apartment\Const\MonitoringHistoryType;
 use Modules\Apartment\Contracts\MonitoringRepositoryInterface;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
+use Modules\Apartment\Http\Requests\MonitoringChangeStatusRequest;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
 use Modules\Apartment\Http\Requests\ViolationRequest;
 use Modules\Apartment\Models\Monitoring;
+use Modules\Apartment\Models\MonitoringHistory;
+use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Models\Protocol;
 use Modules\Water\Services\HistoryService;
 
@@ -42,6 +46,7 @@ class MonitoringService
             $monitoring = $this->repository->create($request->except('images', 'docs'));
             $this->saveImages($monitoring, $request['images'], 'monitoring/images');
             $this->saveFiles($monitoring, $request['docs'], 'monitoring/files');
+            $this->createHistory($monitoring, MonitoringHistoryType::CREATE_FIRST);
             return $monitoring;
         } catch (\Exception $exception) {
             throw  $exception;
@@ -60,7 +65,8 @@ class MonitoringService
     public function confirm($id)
     {
         try {
-            return $this->repository->confirm($id);
+            $monitoring = $this->repository->confirm($id);
+            $this->createHistory($monitoring, MonitoringHistoryType::CONFIRM_DEFECT);
         } catch (\Exception $exception) {
             throw  $exception;
         }
@@ -69,9 +75,45 @@ class MonitoringService
     public function reject($id, Request $request)
     {
         try {
-            return $this->repository->reject($id);
-            //history yoziladi
+            $monitoring = $this->repository->reject($id);
+            $historyId = $this->createHistory($monitoring, MonitoringHistoryType::REJECT_DEFECT, $request['comment']);
+            $monitoringHistory = MonitoringHistory::query()->find($historyId);
+            if (isset($request['images'])){
+                $this->saveImages($monitoringHistory, $request['images'], 'monitoring-history/images');
+            }
+
+            if (isset($request['docs'])){
+                $this->saveFiles($monitoringHistory, $request['docs'], 'monitoring-history/files');
+            }
+
         } catch (\Exception $exception) {
+            throw  $exception;
+        }
+    }
+
+    public function changeStatus($id, MonitoringChangeStatusRequest $request)
+    {
+        try {
+
+        }catch (\Exception $exception){
+            throw  $exception;
+        }
+    }
+
+    public function confirmRegulation($id)
+    {
+        try {
+            return $this->repository->changeStatus($id, MonitoringStatusEnum::DONE->value);
+        }catch (\Exception $exception){
+            throw  $exception;
+        }
+    }
+
+    public function rejectRegulation($id, Request $request)
+    {
+        try {
+            return $this->repository->changeStatus($id, MonitoringStatusEnum::FORMED->value);
+        }catch (\Exception $exception){
             throw  $exception;
         }
     }
@@ -117,6 +159,18 @@ class MonitoringService
             $paths = array_map(fn($file) => $this->fileService->uploadImage($file, $filePath), $files);
             $model->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
         }
+    }
+
+    public function createHistory($monitoring, $type, $comment = "", $meta = null)
+    {
+        return $this->historyService->createHistory(
+            guid: $monitoring->id,
+            status: $monitoring->monitoring_status_id,
+            type: $type,
+            date: null,
+            comment: $comment,
+            additionalInfo: $meta
+        );
     }
 
 }
