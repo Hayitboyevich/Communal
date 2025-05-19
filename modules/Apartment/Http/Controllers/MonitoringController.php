@@ -71,7 +71,6 @@ class MonitoringController extends BaseController
     public function createSecond($id, MonitoringCreateSecondRequest $request): JsonResponse
     {
         try {
-
             $this->service->createSecond($id, $request);
             return $this->sendSuccess([], 'Monitoring created successfully.');
         } catch (\Exception $exception) {

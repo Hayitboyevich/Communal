@@ -99,7 +99,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'birth_date' => $item['birth_date'],
                             'fish' => $item['fish'],
                             'phone' => $item['phone'],
-                            'description' => $item['description'],
+                            'description' => $item['description'] ?? null,
                         ]);
 
                         $this->saveImages($regulation, $item['images']);
