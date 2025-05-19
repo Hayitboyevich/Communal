@@ -94,7 +94,7 @@ class MonitoringService
     public function changeStatus($id, MonitoringChangeStatusRequest $request)
     {
         try {
-
+            return $this->repository->changeStatus($id, $request->monitoring_status_id);
         }catch (\Exception $exception){
             throw  $exception;
         }
@@ -139,8 +139,13 @@ class MonitoringService
         try {
             foreach ($request->violations as $data) {
                 $violation = $this->repository->createThird($id, $data);
-                $this->saveImages($violation, $data['images'], 'violation/images');
-                $this->saveFiles($violation, $data['docs'], 'violation/files');
+                if (isset($data['images']))
+                {
+                    $this->saveImages($violation, $data['images'], 'violation/images');
+                }
+                if (isset($data['docs'])){
+                    $this->saveFiles($violation, $data['docs'], 'violation/files');
+                }
             }
         } catch (\Exception $exception) {
             throw  $exception;

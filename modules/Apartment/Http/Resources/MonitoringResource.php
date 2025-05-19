@@ -65,6 +65,7 @@ class MonitoringResource extends JsonResource
                     'url' => url('storage/'.$file['url']),
                 ];
             }),
+            'regulations' => $this->regulation ? RegulationResource::make($this->regulation) : null,
             'images' => $this->images ? ImageResource::collection($this->images) : null,
             'docs' => $this->documents ? DocumentResource::collection($this->documents) : null
         ];

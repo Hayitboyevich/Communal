@@ -44,7 +44,7 @@ class MonitoringController extends BaseController
             );
 
         } catch (\Exception $exception) {
-            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
@@ -85,7 +85,7 @@ class MonitoringController extends BaseController
             $this->service->createThird($id, $request);
             return $this->sendSuccess([], 'Monitoring violation successfully.');
         } catch (\Exception $exception) {
-            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 

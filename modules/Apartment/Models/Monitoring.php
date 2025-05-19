@@ -10,6 +10,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\Water\Enums\ProtocolStatusEnum;
 
@@ -71,5 +72,10 @@ class Monitoring extends Model
     public function status(): BelongsTo
     {
         return $this->belongsTo(MonitoringStatus::class, 'monitoring_status_id');
+    }
+
+    public function regulation(): HasOne
+    {
+        return $this->hasOne(Regulation::class, 'monitoring_id');
     }
 }
