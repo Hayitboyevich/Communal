@@ -99,7 +99,6 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'birth_date' => $item['birth_date'],
                             'fish' => $item['fish'],
                             'phone' => $item['phone'],
-                            'description' => $item['description'] ?? null,
                         ]);
 
                         $this->saveImages($regulation, $item['images']);
@@ -135,7 +134,6 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'birth_date' => $item['birth_date'],
                             'fish' => $item['fish'],
                             'phone' => $item['phone'],
-                            'description' => $item['description'],
                         ]);
                         $this->createHistory($newMonitoring, MonitoringHistoryType::CREATE_SECOND);
 
