@@ -4,18 +4,15 @@ namespace Modules\Apartment\Services;
 
 use App\Http\Requests\MonitoringCreateSecondRequest;
 use App\Services\FileService;
-use Illuminate\Support\Facades\Request;
 use Modules\Apartment\Const\MonitoringHistoryType;
 use Modules\Apartment\Contracts\MonitoringRepositoryInterface;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
 use Modules\Apartment\Http\Requests\MonitoringChangeStatusRequest;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
 use Modules\Apartment\Http\Requests\ViolationRequest;
-use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Models\MonitoringHistory;
-use Modules\Water\Const\ProtocolHistoryType;
-use Modules\Water\Models\Protocol;
 use Modules\Water\Services\HistoryService;
+use Illuminate\Http\Request;
 
 class MonitoringService
 {
@@ -116,7 +113,7 @@ class MonitoringService
     {
         try {
             $monitoring =  $this->repository->changeStatus($id, MonitoringStatusEnum::FORMED->value);
-            $this->createHistory($monitoring, MonitoringHistoryType::REJECT, $request['comment']);
+            $this->createHistory($monitoring, type:MonitoringHistoryType::REJECT, comment: $request['comment']);
             return $monitoring;
         }catch (\Exception $exception){
             throw  $exception;

@@ -5,16 +5,13 @@ namespace Modules\Apartment\Http\Controllers;
 use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\MonitoringCreateSecondRequest;
-use App\Services\FileService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Request;
-use Modules\Apartment\Enums\MonitoringStatusEnum;
 use Modules\Apartment\Http\Requests\MonitoringChangeStatusRequest;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
 use Modules\Apartment\Http\Requests\ViolationRequest;
 use Modules\Apartment\Http\Resources\MonitoringResource;
-use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Services\MonitoringService;
+use Illuminate\Http\Request;
 
 class MonitoringController extends BaseController
 {
