@@ -17,6 +17,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
 {
 
     private HistoryService $historyService;
+
     public function __construct(protected FileService $fileService)
     {
         $this->historyService = new HistoryService('monitoring_histories');
@@ -34,9 +35,13 @@ class MonitoringRepository implements MonitoringRepositoryInterface
     public function filter($query, $filters)
     {
         try {
-            return $query->when(isset($filters['status']), function ($query) use ($filters) {
-                $query->where('monitoring_status_id', $filters['status']);
-            });
+            return $query
+                ->when(isset($filters['status']), function ($query) use ($filters) {
+                    $query->where('monitoring_status_id', $filters['status']);
+                })
+                ->when(isset($filters['type']), function ($query) use ($filters) {
+                    $query->where('type', $filters['type']);
+                });
         } catch (\Exception $exception) {
             throw $exception;
         }
@@ -79,8 +84,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $originalMonitoring = $this->findById($id);
 
             $results = [];
-            if($data['monitoring_status_id'] == MonitoringStatusEnum::CONFIRM_DEFECT->value)
-            {
+            if ($data['monitoring_status_id'] == MonitoringStatusEnum::CONFIRM_DEFECT->value) {
                 $originalMonitoring->update([
                     'monitoring_status_id' => $data['monitoring_status_id'],
                     'additional_comment' => $data['additional_comment'] ?? null,
@@ -89,10 +93,10 @@ class MonitoringRepository implements MonitoringRepositoryInterface
 
                 $this->createHistory($originalMonitoring, MonitoringHistoryType::CONFIRM_DEFECT);
 
-                if(isset($data['additional_files'])){
+                if (isset($data['additional_files'])) {
                     $this->uploadFiles($originalMonitoring, 'additional_files', $data['additional_files'], 'monitoring/files');
                 }
-            }else{
+            } else {
                 $regulations = $data['regulations'];
                 foreach ($regulations as $index => $item) {
                     if ($index === 0) {
@@ -157,7 +161,6 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             }
 
 
-
             DB::commit();
             return $results;
 
@@ -172,10 +175,10 @@ class MonitoringRepository implements MonitoringRepositoryInterface
         try {
             $monitoring = $this->findById($id);
             $monitoring->update([
-               'monitoring_status_id' => MonitoringStatusEnum::NOT_DEFECT->value,
+                'monitoring_status_id' => MonitoringStatusEnum::NOT_DEFECT->value,
             ]);
             return $monitoring;
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             throw $exception;
         }
     }
@@ -190,7 +193,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
 
             //history yoziladi
             return $monitoring;
-        } catch (\Exception $exception){
+        } catch (\Exception $exception) {
             throw $exception;
         }
     }
@@ -210,7 +213,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             DB::commit();
             return $violation;
 
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             DB::rollBack();
             throw $exception;
         }
@@ -222,7 +225,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $monitoring = $this->findById($id);
             $monitoring->update(['monitoring_status_id' => $status]);
             return $monitoring;
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             throw $exception;
         }
     }
