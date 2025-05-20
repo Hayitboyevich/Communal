@@ -26,6 +26,8 @@ return new class extends Migration
             $table->text('address_commit')->index()->nullable()->comment('organish otkazilgan joy haqida malumot');
             $table->string('lat')->nullable()->comment('lat');
             $table->string('long')->nullable()->comment('long');
+            $table->boolean('is_administrative')->default(false);
+            $table->boolean('send_court')->default(false);
             $table->text('additional_comment')->nullable()->comment('Qoidabuzarlik aniqlanmadi comment');
             $table->jsonb('additional_files')->nullable()->comment('Qoidabuzarlik aniqlanmadi file');
             $table->timestamps();
