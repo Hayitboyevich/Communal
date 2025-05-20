@@ -34,7 +34,9 @@ class MonitoringRepository implements MonitoringRepositoryInterface
     public function filter($query, $filters)
     {
         try {
-            return $query;
+            return $query->when(isset($filters['status']), function ($query) use ($filters) {
+                $query->where('monitoring_status_id', $filters['status']);
+            });
         } catch (\Exception $exception) {
             throw $exception;
         }
