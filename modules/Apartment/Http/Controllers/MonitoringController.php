@@ -25,7 +25,7 @@ class MonitoringController extends BaseController
     public function index($id = null): JsonResponse
     {
         try {
-            $filters = request()->only(['status']);
+            $filters = request()->only(['status', 'type']);
             $monitorings = $id
                 ? $this->service->findById($id)
                 : $this->service->getAll($this->user, $this->roleId, $filters)->paginate(request('per_page', 15));
