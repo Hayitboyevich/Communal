@@ -12,7 +12,14 @@ class RegulationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'comment' => $this->comment
+            'comment' => $this->comment,
+            'place' => $this->place ? PlaceResource::make($this->place): null,
+            'violation_type' => $this->violationType ? ViolationTypeResource::make($this->violationType): null,
+            'user_type' => $this->user_type,
+            'pin' => $this->pin,
+            'birth_date' => $this->birth_date,
+            'fish' => $this->fish,
+            'phone' => $this->phone,
         ];
     }
 }
