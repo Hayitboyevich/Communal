@@ -49,6 +49,17 @@ class MonitoringRepository implements MonitoringRepositoryInterface
         }
     }
 
+    public function update($id, $data)
+    {
+        try {
+            $monitoring = $this->findById($id);
+            $monitoring->update($data);
+            return $monitoring;
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
+    }
+
     public function create($data)
     {
         try {

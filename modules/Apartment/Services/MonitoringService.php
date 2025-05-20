@@ -94,7 +94,8 @@ class MonitoringService
     public function changeStatus($id, MonitoringChangeStatusRequest $request)
     {
         try {
-            return $this->repository->changeStatus($id, $request->monitoring_status_id);
+            $this->repository->changeStatus($id, $request->monitoring_status_id);
+            return  $this->repository->update($id, $request->only(['is_administrative', 'send_court']));
         }catch (\Exception $exception){
             throw  $exception;
         }

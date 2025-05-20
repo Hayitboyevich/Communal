@@ -11,6 +11,8 @@ interface MonitoringRepositoryInterface
     public function findById($id);
 
     public function create($data);
+
+    public function update($id, $data);
     public function createSecond($id, $data);
 
     public function confirm($id);
