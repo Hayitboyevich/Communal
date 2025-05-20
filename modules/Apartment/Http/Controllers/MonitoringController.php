@@ -118,10 +118,10 @@ class MonitoringController extends BaseController
         }
     }
 
-    public function rejectRegulation($id): JsonResponse
+    public function rejectRegulation($id, Request $request): JsonResponse
     {
         try {
-            $monitoring = $this->service->rejectRegulation($id);
+            $monitoring = $this->service->rejectRegulation($id, $request);
             return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring confirmed successfully.');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());

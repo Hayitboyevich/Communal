@@ -104,7 +104,9 @@ class MonitoringService
     public function confirmRegulation($id)
     {
         try {
-            return $this->repository->changeStatus($id, MonitoringStatusEnum::DONE->value);
+            $monitoring = $this->repository->changeStatus($id, MonitoringStatusEnum::DONE->value);
+            $this->createHistory($monitoring, MonitoringHistoryType::CONFIRMED);
+            return $monitoring;
         }catch (\Exception $exception){
             throw  $exception;
         }
@@ -113,7 +115,9 @@ class MonitoringService
     public function rejectRegulation($id, Request $request)
     {
         try {
-            return $this->repository->changeStatus($id, MonitoringStatusEnum::FORMED->value);
+            $monitoring =  $this->repository->changeStatus($id, MonitoringStatusEnum::FORMED->value);
+            $this->createHistory($monitoring, MonitoringHistoryType::REJECT, $request['comment']);
+            return $monitoring;
         }catch (\Exception $exception){
             throw  $exception;
         }
