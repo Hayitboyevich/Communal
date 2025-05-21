@@ -212,6 +212,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $monitoring->update(['monitoring_status_id' => MonitoringStatusEnum::FORMED->value]);
             $violation = new Violation();
             $violation->regulation_id = $data['regulation_id'];
+            $violation->monitoring_id = $data['monitoring_id'];
             $violation->type = $data['type'];
             $violation->desc = $data['description'];
             $violation->deadline = $data['deadline'];

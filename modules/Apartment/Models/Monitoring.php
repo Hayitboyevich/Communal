@@ -78,4 +78,9 @@ class Monitoring extends Model
     {
         return $this->hasOne(Regulation::class, 'monitoring_id');
     }
+
+    public function violation(): HasOne
+    {
+        return $this->hasOne(Violation::class, 'monitoring_id');
+    }
 }

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('violations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('monitoring_id')->constrained('monitorings')->onDelete('cascade');
             $table->foreignId('regulation_id')->constrained('regulations')->onDelete('cascade');
             $table->text('desc')->nullable();
             $table->date('deadline')->nullable();
