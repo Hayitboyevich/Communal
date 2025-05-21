@@ -58,7 +58,8 @@ class MonitoringController extends BaseController
     public function history($id): JsonResponse
     {
         try{
-            return $this->service->history($id);
+            $data = $this->service->history($id);
+            return $this->sendSuccess($data, 'History');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
