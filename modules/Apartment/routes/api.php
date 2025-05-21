@@ -17,7 +17,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::post('/confirm-regulation/{id}', 'confirmRegulation');
         Route::post('/reject-regulation/{id}', 'rejectRegulation');
         Route::get('/count', 'count');
-        Route::get('/history/{id}', 'count');
+        Route::get('/history/{id}', 'history');
         Route::get('/{id?}', 'index');
     });
 
