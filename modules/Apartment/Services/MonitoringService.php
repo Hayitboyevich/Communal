@@ -94,7 +94,7 @@ class MonitoringService
     {
         try {
             $monitoring = $this->repository->confirm($id);
-            $this->createHistory($monitoring, MonitoringHistoryType::CONFIRM_DEFECT);
+            $this->createHistory($monitoring, MonitoringHistoryType::CONFIRM_VIOLATION);
         } catch (\Exception $exception) {
             throw  $exception;
         }
@@ -104,7 +104,7 @@ class MonitoringService
     {
         try {
             $monitoring = $this->repository->reject($id);
-            $historyId = $this->createHistory($monitoring, MonitoringHistoryType::REJECT_DEFECT, $request['comment']);
+            $historyId = $this->createHistory($monitoring, MonitoringHistoryType::REJECT_VIOLATION_NOT_DETECTED, $request['comment']);
             $monitoringHistory = MonitoringHistory::query()->find($historyId);
             if (isset($request['images'])){
                 $this->saveImages($monitoringHistory, $request['images'], 'monitoring-history/images');
@@ -122,7 +122,22 @@ class MonitoringService
     public function changeStatus($id, MonitoringChangeStatusRequest $request)
     {
         try {
-            $this->repository->changeStatus($id, $request->monitoring_status_id);
+            $monitoring = $this->repository->changeStatus($id, $request->monitoring_status_id);
+            if ($request->monitoring_status_id == MonitoringStatusEnum::CONFIRM_RESULT->value){
+                $this->createHistory($monitoring, MonitoringHistoryType::REGULATION_NOT_DETECTED);
+            }
+            if ($request->monitoring_status_id == MonitoringStatusEnum::COURT->value){
+                $historyId = $this->createHistory($monitoring, MonitoringHistoryType::SEND_COURT, $request['comment']);
+
+                $monitoringHistory = MonitoringHistory::query()->find($historyId);
+                if (isset($request['images'])){
+                    $this->saveImages($monitoringHistory, $request['images'], 'monitoring-history/images');
+                }
+
+                if (isset($request['docs'])){
+                    $this->saveFiles($monitoringHistory, $request['docs'], 'monitoring-history/files');
+                }
+            }
             return  $this->repository->update($id, $request->only(['is_administrative', 'send_court']));
         }catch (\Exception $exception){
             throw  $exception;
@@ -133,7 +148,7 @@ class MonitoringService
     {
         try {
             $monitoring = $this->repository->changeStatus($id, MonitoringStatusEnum::DONE->value);
-            $this->createHistory($monitoring, MonitoringHistoryType::CONFIRMED);
+            $this->createHistory($monitoring, MonitoringHistoryType::CONFIRM_REGULATION);
             return $monitoring;
         }catch (\Exception $exception){
             throw  $exception;
@@ -144,7 +159,7 @@ class MonitoringService
     {
         try {
             $monitoring =  $this->repository->changeStatus($id, MonitoringStatusEnum::FORMED->value);
-            $this->createHistory($monitoring, type:MonitoringHistoryType::REJECT, comment: $request['comment']);
+            $this->createHistory($monitoring, type:MonitoringHistoryType::REJECT_REGULATION_NOT_DETECTED, comment: $request['comment']);
             return $monitoring;
         }catch (\Exception $exception){
             throw  $exception;

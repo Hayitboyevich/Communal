@@ -91,7 +91,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                     'step' => $data['step'],
                 ]);
 
-                $this->createHistory($originalMonitoring, MonitoringHistoryType::CONFIRM_DEFECT);
+                $this->createHistory($originalMonitoring, MonitoringHistoryType::VIOLATION_NOT_DETECTED);
 
                 if (isset($data['additional_files'])) {
                     $this->uploadFiles($originalMonitoring, 'additional_files', $data['additional_files'], 'monitoring/files');
@@ -158,7 +158,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'organization_name' => $item['organization_name'] ?? null,
                             'company_id' => $item['company_id'] ?? null,
                         ]);
-                        $this->createHistory($newMonitoring, MonitoringHistoryType::CREATE_SECOND);
+                        $this->createHistory($newMonitoring, MonitoringHistoryType::VIOLATION_DETECTED);
 
                         $this->saveImages($regulation, $item['images']);
                         $results[] = $newMonitoring;
