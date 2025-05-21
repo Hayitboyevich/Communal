@@ -10,6 +10,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\Water\Enums\ProtocolStatusEnum;
@@ -82,5 +83,10 @@ class Monitoring extends Model
     public function violation(): HasOne
     {
         return $this->hasOne(Violation::class, 'monitoring_id');
+    }
+
+    public function histories(): HasMany
+    {
+        return $this->hasMany(MonitoringHistory::class, 'guid');
     }
 }
