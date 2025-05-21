@@ -3,6 +3,10 @@
 namespace Modules\Apartment\Services;
 
 use App\Http\Requests\MonitoringCreateSecondRequest;
+use App\Http\Resources\DocumentResource;
+use App\Http\Resources\ImageResource;
+use App\Models\Role;
+use App\Models\User;
 use App\Services\FileService;
 use Modules\Apartment\Const\MonitoringHistoryType;
 use Modules\Apartment\Contracts\MonitoringRepositoryInterface;
@@ -11,6 +15,9 @@ use Modules\Apartment\Http\Requests\MonitoringChangeStatusRequest;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
 use Modules\Apartment\Http\Requests\ViolationRequest;
 use Modules\Apartment\Models\MonitoringHistory;
+use Modules\Apartment\Models\MonitoringStatus;
+use Modules\Water\Const\ProtocolHistoryType;
+use Modules\Water\Models\ProtocolStatus;
 use Modules\Water\Services\HistoryService;
 use Illuminate\Http\Request;
 
@@ -46,6 +53,30 @@ class MonitoringService
             $this->createHistory($monitoring, MonitoringHistoryType::CREATE_FIRST);
             return $monitoring;
         } catch (\Exception $exception) {
+            throw  $exception;
+        }
+    }
+
+    public function history($id)
+    {
+        try {
+            $monitoring = $this->findById($id);
+            return $monitoring->histories->map(function ($history) {
+                return [
+                    'id' => $history->id,
+                    'comment' => $history->content->comment,
+                    'user' => $history->content->user ? User::query()->find($history->content->user, ['name', 'surname', 'middle_name']) : null,
+                    'role' => $history->content->role ? Role::query()->find($history->content->role, ['name', 'description']) : null,
+                    'status' => $history->content->status ? MonitoringStatus::query()->find($history->content->status, ['id', 'name']) : null,
+                    'type' => $history->type,
+                    'files' => $history->documents ? DocumentResource::collection($history->documents): null,
+                    'images' =>$history->images ? ImageResource::collection($history->images): null,
+                    'is_change' => $history->type ? MonitoringHistoryType::getLabel($history->type) : null,
+                    'created_at' => $history->created_at,
+                ];
+            })->sortByDesc('created_at')->values();
+
+        }catch (\Exception $exception){
             throw  $exception;
         }
     }
