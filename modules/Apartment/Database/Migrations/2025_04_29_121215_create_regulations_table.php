@@ -17,6 +17,9 @@ return new class extends Migration
             $table->integer('place_id')->index()->nullable();
             $table->integer('violation_type_id')->index()->nullable();
             $table->text('comment')->index()->nullable();
+            $table->text('organization_name')->nullable();
+            $table->string('inn')->nullable();
+            $table->integer('company_id')->index()->nullable();
             $table->tinyInteger('user_type')->nullable();
             $table->string('pin')->nullable();
             $table->string('birth_date')->nullable();

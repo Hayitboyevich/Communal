@@ -113,6 +113,9 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'comment' => $item['comment'],
                             'user_type' => $item['user_type'],
                             'pin' => $item['pin'],
+                            'inn' => $item['inn'] ?? null,
+                            'organization_name' => $item['organization_name'] ?? null,
+                            'company_id' => $item['company_id'] ?? null,
                             'birth_date' => $item['birth_date'],
                             'fish' => $item['fish'],
                             'phone' => $item['phone'],
@@ -151,6 +154,9 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'birth_date' => $item['birth_date'],
                             'fish' => $item['fish'],
                             'phone' => $item['phone'],
+                            'inn' => $item['inn'] ?? null,
+                            'organization_name' => $item['organization_name'] ?? null,
+                            'company_id' => $item['company_id'] ?? null,
                         ]);
                         $this->createHistory($newMonitoring, MonitoringHistoryType::CREATE_SECOND);
 
