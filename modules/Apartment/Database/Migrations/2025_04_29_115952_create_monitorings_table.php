@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('long')->nullable()->comment('long');
             $table->boolean('is_administrative')->default(false);
             $table->boolean('send_court')->default(false);
+            $table->boolean('send_mib')->default(false);
             $table->text('additional_comment')->nullable()->comment('Qoidabuzarlik aniqlanmadi comment');
             $table->jsonb('additional_files')->nullable()->comment('Qoidabuzarlik aniqlanmadi file');
             $table->timestamps();

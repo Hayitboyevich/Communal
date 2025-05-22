@@ -21,6 +21,7 @@ class MonitoringResource extends JsonResource
             'step' => $this->step,
             'is_administrative' => $this->is_administrative,
             'send_court' => $this->send_court,
+            'send_mib' => $this->send_mib,
             'status' => $this->status ? [
                'id' => $this->monitoring_status_id,
                'name' => $this->status->name,

@@ -23,6 +23,7 @@ class MonitoringChangeStatusRequest extends FormRequest
             'comment' => 'sometimes',
             'is_administrative' => 'sometimes',
             'send_court' => 'sometimes',
+            'send_mib' => 'sometimes',
             'type' => 'required'
         ];
     }
@@ -32,6 +33,7 @@ class MonitoringChangeStatusRequest extends FormRequest
         $this->merge([
             'is_administrative' => $this->monitoring_status_id == MonitoringStatusEnum::ADMINISTRATIVE->value ? true : false,
             'send_court' => $this->monitoring_status_id == MonitoringStatusEnum::COURT->value ? true : false,
+            'send_mib' => $this->monitoring_status_id == MonitoringStatusEnum::MIB->value ? true : false,
             'type' => 2
         ]);
     }

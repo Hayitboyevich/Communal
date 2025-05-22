@@ -171,7 +171,8 @@ class MonitoringService
             return $this->repository->update($id, $request->only([
                 'is_administrative',
                 'send_court',
-                'type'
+                'type',
+                'send_mib'
             ]));
 
         } catch (\Exception $e) {
