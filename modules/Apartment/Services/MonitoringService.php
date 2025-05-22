@@ -123,24 +123,45 @@ class MonitoringService
     {
         try {
             $monitoring = $this->repository->changeStatus($id, $request->monitoring_status_id);
-            if ($request->monitoring_status_id == MonitoringStatusEnum::CONFIRM_RESULT->value){
-                $this->createHistory($monitoring, MonitoringHistoryType::REGULATION_NOT_DETECTED);
-            }
-            if ($request->monitoring_status_id == MonitoringStatusEnum::COURT->value){
-                $historyId = $this->createHistory($monitoring, MonitoringHistoryType::SEND_COURT, $request['comment']);
 
+            $historyId = null;
+            $statusId = $request->monitoring_status_id;
+
+            if ($statusId ==MonitoringStatusEnum::CONFIRM_RESULT->value) {
+                $historyId = $this->createHistory(
+                    $monitoring,
+                    type: MonitoringHistoryType::REGULATION_NOT_DETECTED,
+                    comment: $request['comment'] ?? null
+                );
+            } elseif ($statusId ==MonitoringStatusEnum::COURT->value) {
+                $historyId = $this->createHistory(
+                    $monitoring,
+                    type: MonitoringHistoryType::SEND_COURT,
+                    comment: $request['comment'] ?? null
+                );
+            }
+
+            if ($historyId) {
                 $monitoringHistory = MonitoringHistory::query()->find($historyId);
-                if (isset($request['images'])){
+
+                if (!empty($request['images'])) {
                     $this->saveImages($monitoringHistory, $request['images'], 'monitoring-history/images');
                 }
 
-                if (isset($request['docs'])){
+                if (!empty($request['docs'])) {
                     $this->saveFiles($monitoringHistory, $request['docs'], 'monitoring-history/files');
                 }
             }
-            return  $this->repository->update($id, $request->only(['is_administrative', 'send_court', 'type']));
-        }catch (\Exception $exception){
-            throw  $exception;
+
+            return $this->repository->update($id, $request->only([
+                'is_administrative',
+                'send_court',
+                'type'
+            ]));
+
+        } catch (\Exception $e) {
+            // Kerak bo‘lsa log yozish: \Log::error($e);
+            throw $e;
         }
     }
 
