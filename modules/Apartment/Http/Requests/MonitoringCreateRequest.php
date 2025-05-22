@@ -34,6 +34,7 @@ class MonitoringCreateRequest extends FormRequest
             'user_id' => 'required|integer|exists:users,id',
             'role_id' => 'required|integer|exists:users,id',
             'monitoring_status_id' => 'required|integer|exists:protocol_statuses,id',
+            'type' => 'required'
         ];
     }
 
@@ -44,7 +45,8 @@ class MonitoringCreateRequest extends FormRequest
             'user_id' => Auth::id(),
             'role_id' => $user->getRoleFromToken(),
             'monitoring_status_id' => ProtocolStatusEnum::ENTER_RESULT->value,
-            'step' => Step::ONE
+            'step' => Step::ONE,
+            'type' => 1
         ]);
     }
 

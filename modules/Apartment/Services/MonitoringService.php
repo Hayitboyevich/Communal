@@ -138,7 +138,7 @@ class MonitoringService
                     $this->saveFiles($monitoringHistory, $request['docs'], 'monitoring-history/files');
                 }
             }
-            return  $this->repository->update($id, $request->only(['is_administrative', 'send_court']));
+            return  $this->repository->update($id, $request->only(['is_administrative', 'send_court', 'type']));
         }catch (\Exception $exception){
             throw  $exception;
         }

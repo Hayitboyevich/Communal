@@ -209,7 +209,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
         DB::beginTransaction();
         try {
             $monitoring = $this->findById($id);
-            $monitoring->update(['monitoring_status_id' => MonitoringStatusEnum::FORMED->value]);
+            $monitoring->update(['monitoring_status_id' => MonitoringStatusEnum::FORMED->value, 'type' => 2]);
             $violation = new Violation();
             $violation->regulation_id = $data['regulation_id'];
             $violation->monitoring_id = $data['monitoring_id'];

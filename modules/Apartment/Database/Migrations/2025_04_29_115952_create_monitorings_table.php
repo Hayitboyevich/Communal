@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('monitoring_status_id')->nullable()->index();
             $table->tinyInteger('step')->nullable();
+            $table->tinyInteger('type')->nullable();
             $table->integer('user_id')->nullable()->index();
             $table->integer('role_id')->nullable()->index();
             $table->integer('monitoring_type_id')->index()->nullable()->comment('organish turi');

@@ -11,6 +11,10 @@ enum UserRoleEnum: int
     case MANAGER = 5;
     case WATER_HR = 6;
     case RES_VIEWER = 7;
+    case APARTMENT_HR = 10;
+    case APARTMENT_INSPECTOR = 8;
+    case APARTMENT_MANAGER = 9;
+    case APARTMENT_VIEWER = 11;
 
     case OGOH = 101;
 }
