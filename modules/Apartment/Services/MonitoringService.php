@@ -140,6 +140,21 @@ class MonitoringService
                     comment: $request['comment'] ?? null
                 );
             }
+            elseif ($statusId ==MonitoringStatusEnum::MIB->value) {
+                $historyId = $this->createHistory(
+                    $monitoring,
+                    type: MonitoringHistoryType::SEND_MIIB,
+                    comment: $request['comment'] ?? null
+                );
+            }
+
+            elseif ($statusId ==MonitoringStatusEnum::DONE->value) {
+                $historyId = $this->createHistory(
+                    $monitoring,
+                    type: MonitoringHistoryType::DONE,
+                    comment: $request['comment'] ?? null
+                );
+            }
 
             if ($historyId) {
                 $monitoringHistory = MonitoringHistory::query()->find($historyId);
@@ -160,7 +175,6 @@ class MonitoringService
             ]));
 
         } catch (\Exception $e) {
-            // Kerak bo‘lsa log yozish: \Log::error($e);
             throw $e;
         }
     }
@@ -216,6 +230,7 @@ class MonitoringService
                     $this->saveFiles($violation, $data['docs'], 'violation/files');
                 }
             }
+
         } catch (\Exception $exception) {
             throw  $exception;
         }

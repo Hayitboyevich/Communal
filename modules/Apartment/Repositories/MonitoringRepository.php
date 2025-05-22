@@ -10,6 +10,7 @@ use Modules\Apartment\Enums\MonitoringStatusEnum;
 use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Models\Regulation;
 use Modules\Apartment\Models\Violation;
+use Modules\Water\Const\Step;
 use Modules\Water\Models\Protocol;
 use Modules\Water\Services\HistoryService;
 
@@ -209,7 +210,8 @@ class MonitoringRepository implements MonitoringRepositoryInterface
         DB::beginTransaction();
         try {
             $monitoring = $this->findById($id);
-            $monitoring->update(['monitoring_status_id' => MonitoringStatusEnum::FORMED->value, 'type' => 2]);
+            $this->createHistory($monitoring, MonitoringHistoryType::REGULATION_FORMED);
+            $monitoring->update(['monitoring_status_id' => MonitoringStatusEnum::FORMED->value, 'type' => 2, 'step' => Step::THREE]);
             $violation = new Violation();
             $violation->regulation_id = $data['regulation_id'];
             $violation->monitoring_id = $data['monitoring_id'];
