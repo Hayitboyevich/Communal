@@ -32,7 +32,7 @@ class Monitoring extends Model
         return $this->morphMany(Image::class, 'imageable');
     }
 
-    public function type(): BelongsTo
+    public function monitoringType(): BelongsTo
     {
        return $this->belongsTo(MonitoringType::class, 'monitoring_type_id');
     }

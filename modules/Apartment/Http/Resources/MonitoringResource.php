@@ -33,9 +33,9 @@ class MonitoringResource extends JsonResource
                 'id' => $this->role_id,
                 'name' => $this->role->name
             ] : null,
-            'monitoring_type' => $this->type ? [
+            'monitoring_type' => $this->monitoringType ? [
                 'id' => $this->monitoring_type_id,
-                'name' => $this->type->name
+                'name' => $this->monitoringType->name ?? null
             ] : null,
             'monitoring_base' => $this->base ? [
                 'id' => $this->monitoring_base_id,
