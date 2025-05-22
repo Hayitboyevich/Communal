@@ -34,7 +34,7 @@ class InformationController extends BaseController
     public function violationType($id = null)
     {
         try {
-            return $this->sendSuccess(ViolationTypeResource::collection(ViolationType::all()), 'Violation type list');
+            return $this->sendSuccess(ViolationTypeResource::collection(ViolationType::query()->where('place_id', $id)), 'Violation type list');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
         }
