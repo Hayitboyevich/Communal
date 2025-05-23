@@ -113,6 +113,7 @@ class MonitoringService
             if (isset($request['docs'])){
                 $this->saveFiles($monitoringHistory, $request['docs'], 'monitoring-history/files');
             }
+            return$monitoring;
 
         } catch (\Exception $exception) {
             throw  $exception;

@@ -2,6 +2,7 @@
 
 namespace Modules\Apartment\Repositories;
 
+use App\Enums\UserRoleEnum;
 use App\Services\FileService;
 use Illuminate\Support\Facades\DB;
 use Modules\Apartment\Const\MonitoringHistoryType;
@@ -27,7 +28,16 @@ class MonitoringRepository implements MonitoringRepositoryInterface
     public function all($user, $roleId)
     {
         try {
-            return Monitoring::query();
+            switch ($roleId) {
+                case UserRoleEnum::APARTMENT_INSPECTOR->value:
+                    return Monitoring::query()->where('user_id', $user->id);
+                case UserRoleEnum::APARTMENT_VIEWER->value:
+                    return Monitoring::query();
+                case UserRoleEnum::APARTMENT_MANAGER->value:
+                    return Monitoring::query()->where('region_id', $user->region_id);
+                default:
+                    return Monitoring::query()->whereRaw('1 = 0');
+            }
         } catch (\Exception $exception) {
             throw $exception;
         }
