@@ -129,7 +129,6 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                         $results[] = $originalMonitoring;
                     } else {
                         $newMonitoring = $originalMonitoring->replicate();
-                        $this->createHistory($originalMonitoring, MonitoringHistoryType::VIOLATION_DETECTED);
                         $newMonitoring->monitoring_status_id = $data['monitoring_status_id'];
                         $newMonitoring->additional_comment = $data['additional_comment'] ?? null;
                         $newMonitoring->step = $data['step'];
