@@ -25,7 +25,7 @@ class InformationController extends BaseController
     public function place($id = null)
     {
         try {
-            return $this->sendSuccess(PlaceResource::collection(Place::all()), 'Place list');
+            return $this->sendSuccess(PlaceResource::collection(Place::query()->where('monitoring_type_id', $id)->get()), 'Place list');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
         }
