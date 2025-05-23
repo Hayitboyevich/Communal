@@ -179,7 +179,8 @@ class MonitoringService
                 'is_administrative',
                 'send_court',
                 'type',
-                'send_mib'
+                'send_mib',
+                'send_chora'
             ]));
 
         } catch (\Exception $e) {
