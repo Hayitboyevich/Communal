@@ -147,7 +147,7 @@ class MonitoringService
                     comment: $request['comment'] ?? null
                 );
             }
-            elseif ($statusId ==MonitoringStatusEnum::FIXED->value) {
+            elseif ($statusId == MonitoringStatusEnum::FIXED->value) {
                 $historyId = $this->createHistory(
                     $monitoring,
                     type: MonitoringHistoryType::DONE,

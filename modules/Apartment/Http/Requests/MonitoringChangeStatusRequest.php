@@ -24,6 +24,7 @@ class MonitoringChangeStatusRequest extends FormRequest
             'is_administrative' => 'sometimes',
             'send_court' => 'sometimes',
             'send_mib' => 'sometimes',
+            'send_chora' => 'sometimes',
             'type' => 'required'
         ];
     }
