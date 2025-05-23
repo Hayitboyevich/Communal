@@ -95,6 +95,7 @@ class MonitoringService
         try {
             $monitoring = $this->repository->confirm($id);
             $this->createHistory($monitoring, MonitoringHistoryType::CONFIRM_VIOLATION);
+            return $monitoring;
         } catch (\Exception $exception) {
             throw  $exception;
         }

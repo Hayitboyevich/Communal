@@ -71,7 +71,7 @@ class MonitoringController extends BaseController
             $monitoring = $this->service->create($request);
             return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring created successfully.');
         } catch (\Exception $exception) {
-            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
@@ -101,7 +101,7 @@ class MonitoringController extends BaseController
             $monitoring = $this->service->confirm($id);
             return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring confirmed successfully.');
         } catch (\Exception $exception) {
-            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
@@ -111,7 +111,7 @@ class MonitoringController extends BaseController
             $monitoring = $this->service->reject($id, $request);
             return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring confirmed successfully.');
         } catch (\Exception $exception) {
-            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
