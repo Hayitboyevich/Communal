@@ -30,11 +30,26 @@ class MonitoringChangeStatusRequest extends FormRequest
 
     public function prepareForValidation()
     {
-        $this->merge([
-            'is_administrative' => $this->monitoring_status_id == MonitoringStatusEnum::ADMINISTRATIVE->value ? true : false,
-            'send_court' => $this->monitoring_status_id == MonitoringStatusEnum::COURT->value ? true : false,
-            'send_mib' => $this->monitoring_status_id == MonitoringStatusEnum::MIB->value ? true : false,
-            'type' => 2
-        ]);
+        $data = [];
+        switch ($this->monitoring_status_id) {
+            case MonitoringStatusEnum::ADMINISTRATIVE->value:
+                $data['is_administrative'] = true;
+                break;
+
+            case MonitoringStatusEnum::COURT->value:
+                $data['send_court'] = true;
+                break;
+
+            case MonitoringStatusEnum::MIB->value:
+                $data['send_mib'] = true;
+                break;
+            case MonitoringStatusEnum::FIXED->value:
+                $data['send_chora'] = true;
+                break;
+        }
+
+        $data['type'] = 2;
+
+        $this->merge($data);
     }
 }

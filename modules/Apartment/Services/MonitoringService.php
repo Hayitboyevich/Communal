@@ -183,7 +183,8 @@ class MonitoringService
     public function confirmRegulation($id)
     {
         try {
-            $monitoring = $this->repository->changeStatus($id, MonitoringStatusEnum::DONE->value);
+            $this->repository->changeStatus($id, MonitoringStatusEnum::DONE->value);
+            $monitoring = $this->repository->update($id, ['type' => 4]);
             $this->createHistory($monitoring, MonitoringHistoryType::CONFIRM_REGULATION);
             return $monitoring;
         }catch (\Exception $exception){
