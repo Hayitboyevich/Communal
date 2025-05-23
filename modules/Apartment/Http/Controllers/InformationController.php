@@ -60,7 +60,18 @@ class InformationController extends BaseController
     public function company($id = null): JsonResponse
     {
         try {
-            $companies = Company::query()->where('district_id', request('district_id'))->get();
+            $filters = request()->only(['district_id', 'region_id', 'company_name']);
+            $companies = Company::query()
+                ->when(!empty($filters['district_id']), function ($query) use ($filters) {
+                    $query->where('district_id', $filters['district_id']);
+                })
+                ->when(!empty($filters['region_id']), function ($query) use ($filters) {
+                    $query->where('region_id', $filters['region_id']);
+                })
+                ->when(!empty($filters['company_name']), function ($query) use ($filters) {
+                    $query->where('company_name', 'like', '%' . $filters['company_name'] . '%');
+                })
+                ->get();
             return $this->sendSuccess(CompanyResource::collection($companies), 'Company list');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());

@@ -17,6 +17,7 @@ use Modules\Apartment\Http\Requests\ViolationRequest;
 use Modules\Apartment\Models\MonitoringHistory;
 use Modules\Apartment\Models\MonitoringStatus;
 use Modules\Water\Const\ProtocolHistoryType;
+use Modules\Water\Const\Step;
 use Modules\Water\Models\ProtocolStatus;
 use Modules\Water\Services\HistoryService;
 use Illuminate\Http\Request;
@@ -194,7 +195,7 @@ class MonitoringService
     {
         try {
             $this->repository->changeStatus($id, MonitoringStatusEnum::DONE->value);
-            $monitoring = $this->repository->update($id, ['type' => 4]);
+            $monitoring = $this->repository->update($id, ['step' => Step::FOUR]);
             $this->createHistory($monitoring, MonitoringHistoryType::CONFIRM_REGULATION);
             return $monitoring;
         }catch (\Exception $exception){
