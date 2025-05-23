@@ -34,7 +34,9 @@ class MonitoringCreateRequest extends FormRequest
             'user_id' => 'required|integer|exists:users,id',
             'role_id' => 'required|integer|exists:users,id',
             'monitoring_status_id' => 'required|integer|exists:protocol_statuses,id',
-            'type' => 'required'
+            'type' => 'required',
+            'bsk_type' => 'sometimes',
+            'address' => 'sometimes',
         ];
     }
 
