@@ -44,7 +44,7 @@ class ProtocolOgohRequest extends FormRequest
     public function prepareForValidation()
     {
         $this->merge([
-            'protocol_status_id' =>  ProtocolStatusEnum::ENTER_RESULT->value ,
+            'protocol_status_id' =>  ProtocolStatusEnum::ENTER_RESULT->value,
             'step' => Step::ONE,
             'category' => CategoryType::MONITORING,
             'region_id' => Region::query()->where('soato', $this->region)->first()?->id,
