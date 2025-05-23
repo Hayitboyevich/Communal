@@ -6,6 +6,7 @@ use App\Constants\ErrorMessage;
 use App\Enums\UserRoleEnum;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\ProtocolOgohRequest;
+use App\Http\Requests\ProtocolWaterRequest;
 use App\Http\Resources\DistrictResource;
 use App\Http\Resources\RegionResource;
 use App\Models\District;
@@ -71,6 +72,24 @@ class InformationController extends BaseController
             return response()->json([
                 "status" => "success",
                 "data" => "Appeal successfully send. As soon as answer."
+            ]);
+        }catch (\Exception $exception){
+            DB::rollBack();
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function protocolWater(ProtocolWaterRequest $request): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $protocol = $this->service->create($request->except('images', 'region', 'district', 'files'));
+            $this->service->saveImages($protocol, $request['images']);
+            $this->service->saveFiles($protocol, $request['files']);
+            DB::commit();
+            return response()->json([
+                "status" => "success",
+                "data" => []
             ]);
         }catch (\Exception $exception){
             DB::rollBack();
