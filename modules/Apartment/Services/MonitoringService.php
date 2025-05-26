@@ -221,7 +221,7 @@ class MonitoringService
 
             if ($filters['type'] == 1){
                 return [
-                    'all' => $query->clone(),
+                    'all' => $query->clone()->count(),
                     'enter_result' => $query->clone()->where('type', $filters['type'])->where('monitoring_status_id', MonitoringStatusEnum::ENTER_RESULT->value)->count(),
                     'confirm_not_defect' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::CONFIRM_DEFECT->value)->count(),
                     'not_defect' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::NOT_DEFECT->value)->count(),
@@ -229,7 +229,7 @@ class MonitoringService
                 ];
             }elseif ($filters['type'] == 2){
                 return [
-                    'all' => $query->clone(),
+                    'all' => $query->clone()->count(),
                     'formed' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::FORMED->value)->count(),
                     'administrative' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::ADMINISTRATIVE->value)->count(),
                     'done' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::DONE->value)->count(),
