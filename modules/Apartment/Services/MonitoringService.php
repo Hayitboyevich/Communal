@@ -214,16 +214,16 @@ class MonitoringService
         }
     }
 
-    public function count($user, $roleId, $filters = [])
+    public function count($user, $roleId,$filters = [])
     {
         try {
             $query = $this->repository->all($user, $roleId);
             return [
-                'all' => $query->clone()->count(),
-                'enter_result' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::ENTER_RESULT->value)->count(),
-                'confirm_not_defect' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::CONFIRM_DEFECT->value)->count(),
-                'not_defect' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::NOT_DEFECT->value)->count(),
-                'defect' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::DEFECT->value)->count(),
+                'all' => $query->clone()->where('type', $filters['type'])->count(),
+                'enter_result' => $query->clone()->where('type', $filters['type'])->where('monitoring_status_id', MonitoringStatusEnum::ENTER_RESULT->value)->count(),
+                'confirm_not_defect' => $query->clone()->where('type', $filters['type'])->where('monitoring_status_id', MonitoringStatusEnum::CONFIRM_DEFECT->value)->count(),
+                'not_defect' => $query->clone()->where('type', $filters['type'])->where('monitoring_status_id', MonitoringStatusEnum::NOT_DEFECT->value)->count(),
+                'defect' => $query->clone()->where('type', $filters['type'])->where('monitoring_status_id', MonitoringStatusEnum::DEFECT->value)->count(),
             ];
         }catch (\Exception $exception){
             throw  $exception;

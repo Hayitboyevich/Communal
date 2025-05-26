@@ -48,7 +48,8 @@ class MonitoringController extends BaseController
     public function count(): JsonResponse
     {
         try {
-            $data = $this->service->count($this->user, $this->roleId);
+            $filters = request()->only(['status', 'type']);
+            $data = $this->service->count($this->user, $this->roleId, $filters);
             return $this->sendSuccess($data, 'Count');
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
