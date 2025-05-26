@@ -217,14 +217,32 @@ class MonitoringService
     public function count($user, $roleId,$filters = [])
     {
         try {
-            $query = $this->repository->all($user, $roleId);
-            return [
-                'all' => $query->clone()->where('type', $filters['type'])->count(),
-                'enter_result' => $query->clone()->where('type', $filters['type'])->where('monitoring_status_id', MonitoringStatusEnum::ENTER_RESULT->value)->count(),
-                'confirm_not_defect' => $query->clone()->where('type', $filters['type'])->where('monitoring_status_id', MonitoringStatusEnum::CONFIRM_DEFECT->value)->count(),
-                'not_defect' => $query->clone()->where('type', $filters['type'])->where('monitoring_status_id', MonitoringStatusEnum::NOT_DEFECT->value)->count(),
-                'defect' => $query->clone()->where('type', $filters['type'])->where('monitoring_status_id', MonitoringStatusEnum::DEFECT->value)->count(),
-            ];
+            $query = $this->repository->all($user, $roleId)->where('type', $filters['type']);
+
+            if ($filters['type'] == 1){
+                return [
+                    'all' => $query->clone(),
+                    'enter_result' => $query->clone()->where('type', $filters['type'])->where('monitoring_status_id', MonitoringStatusEnum::ENTER_RESULT->value)->count(),
+                    'confirm_not_defect' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::CONFIRM_DEFECT->value)->count(),
+                    'not_defect' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::NOT_DEFECT->value)->count(),
+                    'defect' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::DEFECT->value)->count(),
+                ];
+            }elseif ($filters['type'] == 2){
+                return [
+                    'all' => $query->clone(),
+                    'formed' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::FORMED->value)->count(),
+                    'administrative' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::ADMINISTRATIVE->value)->count(),
+                    'done' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::DONE->value)->count(),
+                    'hmqo' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::HMQO->value)->count(),
+                    'confirm_result' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::CONFIRM_RESULT->value)->count(),
+                    'court' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::COURT->value)->count(),
+                    'mib' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::MIB->value)->count(),
+                    'sryx' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::SRYX->value)->count(),
+                    'fixed' => $query->clone()->where('monitoring_status_id', MonitoringStatusEnum::FIXED->value)->count(),
+                ];
+            }
+            return null;
+
         }catch (\Exception $exception){
             throw  $exception;
         }
