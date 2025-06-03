@@ -3,11 +3,13 @@
 namespace Modules\Apartment\Services;
 
 use App\Http\Requests\MonitoringCreateSecondRequest;
+use App\Http\Requests\MonitoringMyHomeRequest;
 use App\Http\Resources\DocumentResource;
 use App\Http\Resources\ImageResource;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\FileService;
+use Illuminate\Support\Facades\DB;
 use Modules\Apartment\Const\MonitoringHistoryType;
 use Modules\Apartment\Contracts\MonitoringRepositoryInterface;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
@@ -47,13 +49,32 @@ class MonitoringService
 
     public function create(MonitoringCreateRequest $request)
     {
+        DB::beginTransaction();
         try {
             $monitoring = $this->repository->create($request->except('images', 'docs'));
             $this->saveImages($monitoring, $request['images'], 'monitoring/images');
             $this->saveFiles($monitoring, $request['docs'], 'monitoring/files');
             $this->createHistory($monitoring, MonitoringHistoryType::CREATE_FIRST);
+            DB::commit();
             return $monitoring;
         } catch (\Exception $exception) {
+            DB::rollBack();
+            throw  $exception;
+        }
+    }
+
+    public function createBasic(MonitoringMyHomeRequest $request)
+    {
+        DB::beginTransaction();
+        try {
+            $monitoring = $this->repository->create($request->except('images', 'docs', 'region', 'district'));
+            $this->saveImages($monitoring, $request['images'], 'monitoring/images');
+            $this->saveFiles($monitoring, $request['docs'], 'monitoring/files');
+            $this->createHistory($monitoring, MonitoringHistoryType::CREATE_FIRST);
+            DB::commit();
+            return $monitoring;
+        }catch (\Exception $exception){
+            DB::rollBack();
             throw  $exception;
         }
     }
@@ -285,7 +306,7 @@ class MonitoringService
     {
         return $this->historyService->createHistory(
             guid: $monitoring->id,
-            status: $monitoring->monitoring_status_id,
+            status: $monitoring->monitoring_status_id->value,
             type: $type,
             date: null,
             comment: $comment,

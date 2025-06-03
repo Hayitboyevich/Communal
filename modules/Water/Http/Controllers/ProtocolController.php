@@ -251,7 +251,7 @@ class ProtocolController extends BaseController
                     'name' => $region->name_uz,
                     'inspector_count' => $userCounts->get($regionId, 0),
                     'all_protocols' => $regionProtocols->sum('count'),
-                    'defect_count' => $regionProtocols->whereNotIn('object_status_id', [ProtocolStatusEnum::ENTER_RESULT,ProtocolStatusEnum::NOT_DEFECT, ProtocolStatusEnum::CONFIRM_NOT_DEFECT, ProtocolStatusEnum::REJECTED])->sum('count'),
+                    'defect_count' => $regionProtocols->whereNotIn('protocol_status_id', [ProtocolStatusEnum::ENTER_RESULT,ProtocolStatusEnum::NOT_DEFECT, ProtocolStatusEnum::CONFIRM_NOT_DEFECT, ProtocolStatusEnum::REJECTED])->sum('count'),
                     'remedy_count' => $regionProtocols->where('type', 2)->sum('count'),
                     'confirmed_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED)->sum('count'),
                     'administrative_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::ADMINISTRATIVE)->sum('count'),

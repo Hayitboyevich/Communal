@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('monitoring_status_id')->nullable()->index();
             $table->tinyInteger('step')->nullable();
+            $table->tinyInteger('category')->nullable();
             $table->tinyInteger('type')->nullable();
             $table->tinyInteger('bsk_type')->nullable();
             $table->text('address')->nullable();

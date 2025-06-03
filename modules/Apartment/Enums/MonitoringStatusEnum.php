@@ -17,5 +17,6 @@ enum MonitoringStatusEnum: int
     case MIB = 11;
     case SRYX = 12;
     case  FIXED= 13;
+    case  NEW= 14;
 
 }

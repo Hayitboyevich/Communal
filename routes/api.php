@@ -60,6 +60,8 @@ Route::group(['middleware' => ['basic']], function () {
         Route::get('/protocol-history/{id}', 'protocolHistory');
         Route::get('/protocol-status', 'protocolStatus');
         Route::get('/protocol/{id?}', 'getProtocol');
+        Route::post('/monitoring-create', 'monitoringCreate');
+        Route::get('/monitoring-type', 'monitoringType');
     });
 });
 

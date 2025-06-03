@@ -13,15 +13,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Modules\Water\Enums\ProtocolStatusEnum;
+use Modules\Apartment\Enums\MonitoringStatusEnum;
 
 class Monitoring extends Model
 {
     protected $guarded = false;
 
-//    protected $casts = [
-//        'monit_status_id' => ProtocolStatusEnum::class,
-//    ];
+    protected $casts = [
+        'monitoring_status_id' => MonitoringStatusEnum::class,
+    ];
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');

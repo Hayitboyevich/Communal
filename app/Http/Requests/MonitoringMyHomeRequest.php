@@ -1,21 +1,24 @@
 <?php
 
-namespace Modules\Apartment\Http\Requests;
+namespace App\Http\Requests;
 
+use App\Models\District;
+use App\Models\Region;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Support\Facades\Auth;
+use Modules\Apartment\Enums\MonitoringStatusEnum;
+use Modules\Water\Const\CategoryType;
 use Modules\Water\Const\Step;
 use Modules\Water\Enums\ProtocolStatusEnum;
 
-class MonitoringCreateRequest extends FormRequest
+class MonitoringMyHomeRequest extends FormRequest
 {
+
     public function authorize(): bool
     {
         return true;
     }
-
 
     public function rules(): array
     {
@@ -30,27 +33,23 @@ class MonitoringCreateRequest extends FormRequest
             'lat' => 'required|string',
             'long' => 'required|string',
             'images' => 'required|array',
-            'docs' => 'required|array',
-            'user_id' => 'required|integer|exists:users,id',
-            'role_id' => 'required|integer|exists:users,id',
+            'docs' => 'sometimes',
             'monitoring_status_id' => 'required|integer|exists:protocol_statuses,id',
             'type' => 'required',
-            'bsk_type' => 'sometimes',
-            'address' => 'sometimes',
             'category' => 'required',
         ];
     }
 
     protected function prepareForValidation()
     {
-        $user = Auth::user();
         $this->merge([
-            'user_id' => Auth::id(),
-            'role_id' => $user->getRoleFromToken(),
-            'monitoring_status_id' => ProtocolStatusEnum::ENTER_RESULT->value,
+            'monitoring_status_id' => MonitoringStatusEnum::NEW->value,
+            'region_id' => Region::query()->where('soato', $this->region)->first()?->id,
+            'district_id' => District::query()->where('soato', $this->district)->first()?->id,
             'step' => Step::ONE,
+            'monitoring_base_id' => 5,
             'type' => Step::ONE,
-            'category' => Step::ONE,
+            'category' => Step::TWO,
         ]);
     }
 

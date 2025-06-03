@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Constants\ErrorMessage;
 use App\Enums\UserRoleEnum;
 use App\Http\Controllers\BaseController;
+use App\Http\Requests\MonitoringMyHomeRequest;
 use App\Http\Requests\ProtocolOgohRequest;
 use App\Http\Requests\ProtocolWaterRequest;
 use App\Http\Resources\DistrictResource;
@@ -14,6 +15,10 @@ use App\Models\Region;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Modules\Apartment\Http\Resources\MonitoringResource;
+use Modules\Apartment\Http\Resources\MonitoringTypeResource;
+use Modules\Apartment\Models\MonitoringType;
+use Modules\Apartment\Services\MonitoringService;
 use Modules\Water\Http\Resources\ProtocolOgohListResource;
 use Modules\Water\Http\Resources\ProtocolResource;
 use Modules\Water\Http\Resources\ProtocolStatusResource;
@@ -26,7 +31,8 @@ class InformationController extends BaseController
 {
 
     public function __construct(
-        protected ProtocolService $service
+        protected ProtocolService $service,
+        protected MonitoringService $monitoringService,
     ){
         parent::__construct();
     }
@@ -125,6 +131,27 @@ class InformationController extends BaseController
     {
         try {
             return $this->sendSuccess($this->service->history($id), 'Object History');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function monitoringCreate(MonitoringMyHomeRequest $request): JsonResponse
+    {
+        try {
+            $monitoring = $this->monitoringService->createBasic($request);
+            return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring created successfully.');
+        }catch (\Exception $exception) {
+            DB::rollBack();
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function monitoringType(): JsonResponse
+    {
+        try {
+            $types = MonitoringType::all();
+            return $this->sendSuccess(MonitoringTypeResource::collection($types), 'All types');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
