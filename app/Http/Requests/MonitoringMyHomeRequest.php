@@ -30,8 +30,8 @@ class MonitoringMyHomeRequest extends FormRequest
             'region_id' => 'required|integer|exists:regions,id',
             'district_id' => 'required|integer|exists:districts,id',
             'address_commit' => 'sometimes',
-            'lat' => 'required|string',
-            'long' => 'required|string',
+            'lat' => 'sometimes',
+            'long' => 'sometimes',
             'images' => 'required|array',
             'docs' => 'sometimes',
             'monitoring_status_id' => 'required|integer|exists:protocol_statuses,id',
@@ -44,6 +44,7 @@ class MonitoringMyHomeRequest extends FormRequest
     {
         $this->merge([
             'monitoring_status_id' => MonitoringStatusEnum::NEW->value,
+            'monitoring_type_id' => 6,
             'region_id' => Region::query()->where('soato', $this->region)->first()?->id,
             'district_id' => District::query()->where('soato', $this->district)->first()?->id,
             'step' => Step::ONE,
