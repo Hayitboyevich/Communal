@@ -9,7 +9,9 @@ use App\Http\Requests\MonitoringCreateSecondRequest;
 use App\Models\District;
 use App\Models\Region;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\URL;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
 use Modules\Apartment\Http\Requests\MonitoringChangeStatusRequest;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
@@ -18,6 +20,7 @@ use Modules\Apartment\Http\Resources\MonitoringResource;
 use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Services\MonitoringService;
 use Illuminate\Http\Request;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MonitoringController extends BaseController
 {
@@ -220,10 +223,18 @@ class MonitoringController extends BaseController
         }
     }
 
-    public function pdf():JsonResponse
+    public function pdf($id):JsonResponse
     {
         try {
+            $monitoring = Monitoring::find($id);
+            $domain = URL::to('/regulation-info').'/'.$id;
 
+            $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
+            $pdf = PDF::loadView('pdf.monitoring', compact('monitoring', 'qrImage'));
+            $pdfOutput = $pdf->output();
+            $pdfBase64 = base64_encode($pdfOutput);
+
+            return $this->sendSuccess($pdfBase64, 'PDF');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }

@@ -171,13 +171,32 @@
                 text-align: center;
               "
                 >
-                    {{ $monitoring->regulation->fish  ?? $monitoring->company->company_name}}
+                    {{ $monitoring?->regulation?->fish  ?? $monitoring?->company?->company_name}}
                 </p>
 {{--                <div style="font-size: 12px; text-align: center">--}}
 {{--                    (Tashkilot nomi)--}}
 {{--                </div>--}}
             </td>
         </tr>
+        @if($monitoring->regulation->organization_name)
+            <tr>
+                <td style="padding: 10px">
+                    <div style="font-weight: 500; margin-bottom: 5px">Korxona nomi:</div>
+                </td>
+                <td>
+                    <p
+                        style="
+                border-bottom: 1px solid #bfbfbf;
+                margin-bottom: 5px;
+                text-align: center;
+              "
+                    >
+                        {{ $monitoring->regulation->organization_name }}
+                    </p>
+                </td>
+            </tr>
+        @endif
+
         <tr>
             <td style="padding: 10px">
                 <div style="font-weight: 500; margin-bottom: 5px">
@@ -210,7 +229,11 @@
                 text-align: center;
               "
                 >
-                    {{ $monitoring->company->company_name }}
+                    @if($monitoring->bsk_type == 1) O'zini o'zi boshqaruvchi
+                    @elseif($monitoring->bsk_type == 2) Egasiz
+                    @else
+                        {{ $monitoring?->company?->company_name ?? null }}
+                    @endif
                 </p>
             </td>
         </tr>
@@ -228,7 +251,11 @@
                 text-align: center;
               "
                 >
-                    {{ $monitoring->apartment->home_name }}
+                    @if($monitoring->bsk_type)
+                        {{ $monitoring->address }}
+                    @else
+                        {{ $monitoring?->apartment?->home_name }}
+                    @endif
                 </p>
             </td>
         </tr>
@@ -383,7 +410,7 @@
                 <div
                     style="width: 100px; height: 100px; border: 1px solid #687196"
                 >
-                    <img src="data:image/png;base64, {{--{{$qrImage}}--}}" alt="" style="width: 100px; height: 100px;">
+                    <img src="data:image/png;base64, {{$qrImage}}" alt="" style="width: 100px; height: 100px;">
                 </div>
             </td>
         </tr>
