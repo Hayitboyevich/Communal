@@ -213,7 +213,8 @@ class MonitoringController extends BaseController
     public function attach(): JsonResponse
     {
         try {
-            return $this->service->attach(\request('user_id'), \request('monitoring_id'));
+            $monitoring = $this->service->attach(\request('user_id'), \request('monitoring_id'));
+            return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring attached successfully.');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
