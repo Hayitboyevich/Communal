@@ -84,6 +84,7 @@ class MonitoringService
         try {
             $monitoring = $this->repository->attach($userId, $monitoringId);
             $this->createHistory($monitoring, MonitoringHistoryType::ATTACH);
+            return $monitoring;
         }catch (\Exception $exception){
             throw  $exception;
         }
