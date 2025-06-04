@@ -21,6 +21,8 @@ class MonitoringHistoryType
     const DONE = 100;
     const HMQO = 10;
 
+    const ATTACH = 200;
+
     public static function getLabel($type): string
     {
         switch ($type) {
@@ -50,6 +52,8 @@ class MonitoringHistoryType
                 return 'Chora ko\'rildi';
             case self::HMQO:
                 return 'HMQOga yuborildi';
+            case self::ATTACH:
+                return 'Inspektor biriktirildi';
 
             default:
                 return 'Noma’lum tur';
