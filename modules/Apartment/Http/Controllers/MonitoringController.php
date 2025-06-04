@@ -209,6 +209,15 @@ class MonitoringController extends BaseController
         }
     }
 
+    public function attach(): JsonResponse
+    {
+        try {
+            return $this->service->attach(\request('user_id'), \request('monitoring_id'));
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
     public function rejectRegulation($id, Request $request): JsonResponse
     {
         try {

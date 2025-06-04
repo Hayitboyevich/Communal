@@ -19,4 +19,6 @@ interface MonitoringRepositoryInterface
     public function reject($id);
     public function createThird($id, $data);
     public function changeStatus($id, $status);
+
+    public function attach($userId, $monitoringId);
 }

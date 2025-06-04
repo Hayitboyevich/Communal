@@ -79,6 +79,15 @@ class MonitoringService
         }
     }
 
+    public function attach($userId, $monitoringId)
+    {
+        try {
+            return $this->repository->attach($userId, $monitoringId);
+        }catch (\Exception $exception){
+            throw  $exception;
+        }
+    }
+
     public function history($id)
     {
         try {

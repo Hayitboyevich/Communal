@@ -19,6 +19,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::get('/count', 'count');
         Route::get('/report/{id?}', 'report');
         Route::get('/history/{id}', 'history');
+        Route::post('/attach', 'attach');
         Route::get('/{id?}', 'index');
     });
 

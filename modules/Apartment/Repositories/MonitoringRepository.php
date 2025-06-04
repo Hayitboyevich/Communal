@@ -240,6 +240,20 @@ class MonitoringRepository implements MonitoringRepositoryInterface
         }
     }
 
+    public function attach($userId, $monitoringId)
+    {
+        try {
+           $monitoring = $this->findById($monitoringId);
+           $monitoring->update([
+               'user_id' => $userId,
+               'monitoring_status_id' => MonitoringStatusEnum::ENTER_RESULT->value
+           ]);
+           return $monitoring;
+        }catch (\Exception $exception){
+            throw $exception;
+        }
+    }
+
     public function changeStatus($id, $status)
     {
         try {
