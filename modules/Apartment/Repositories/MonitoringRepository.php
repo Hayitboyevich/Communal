@@ -284,7 +284,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
     {
         return $this->historyService->createHistory(
             guid: $monitoring->id,
-            status: $monitoring->monitoring_status_id,
+            status: $monitoring->monitoring_status_id->value,
             type: $type,
             date: null,
             comment: $comment,

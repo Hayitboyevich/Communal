@@ -220,6 +220,15 @@ class MonitoringController extends BaseController
         }
     }
 
+    public function pdf():JsonResponse
+    {
+        try {
+
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
     public function rejectRegulation($id, Request $request): JsonResponse
     {
         try {

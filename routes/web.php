@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Api\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PdfController;
+
+Route::get('monitoring-pdf/{id}', [PdfController::class, 'monitoringPdf']);
 
 Route::get('/', function () {
     return view('welcome');
