@@ -34,7 +34,7 @@ class MonitoringMyHomeRequest extends FormRequest
             'long' => 'sometimes',
             'images' => 'required|array',
             'docs' => 'sometimes',
-            'monitoring_status_id' => 'required|integer|exists:protocol_statuses,id',
+            'monitoring_status_id' => 'required|integer|exists:monitoring_statuses,id',
             'type' => 'required',
             'category' => 'required',
         ];
