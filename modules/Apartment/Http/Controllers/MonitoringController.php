@@ -139,6 +139,7 @@ class MonitoringController extends BaseController
         }
     }
 
+
     public function history($id): JsonResponse
     {
         try {

@@ -30,6 +30,10 @@ class UserRepository implements UserRepositoryInterface
                 return User::query()->whereHas('roles', function ($query) use ($user) {
                     $query->whereIn('role_id', [UserRoleEnum::INSPECTOR->value]);
                 });
+            case UserRoleEnum::APARTMENT_MANAGER->value:
+                return User::query()->whereHas('roles', function ($query) use ($user) {
+                    $query->whereIn('role_id', [UserRoleEnum::APARTMENT_INSPECTOR->value]);
+                });
 
             default:
                 return User::query()->whereRaw('1 = 0');
