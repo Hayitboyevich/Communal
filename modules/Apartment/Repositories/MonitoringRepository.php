@@ -52,6 +52,18 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                 })
                 ->when(isset($filters['type']), function ($query) use ($filters) {
                     $query->where('type', $filters['type']);
+                })
+                ->when(isset($filters['monitoring_type']), function ($query) use ($filters) {
+                    $query->where('monitoring_type_id', $filters['monitoring_type']);
+                })
+                ->when(isset($filters['id']), function ($query) use ($filters) {
+                    $query->where('id', $filters['id']);
+                })
+                ->when(isset($filters['district_id']), function ($query) use ($filters) {
+                    $query->where('district_id', $filters['district_id']);
+                })
+                ->when(isset($filters['region_id']), function ($query) use ($filters) {
+                    $query->where('region_id', $filters['region_id']);
                 });
         } catch (\Exception $exception) {
             throw $exception;
@@ -243,13 +255,13 @@ class MonitoringRepository implements MonitoringRepositoryInterface
     public function attach($userId, $monitoringId)
     {
         try {
-           $monitoring = $this->findById($monitoringId);
-           $monitoring->update([
-               'user_id' => $userId,
-               'monitoring_status_id' => MonitoringStatusEnum::ENTER_RESULT->value
-           ]);
-           return $monitoring;
-        }catch (\Exception $exception){
+            $monitoring = $this->findById($monitoringId);
+            $monitoring->update([
+                'user_id' => $userId,
+                'monitoring_status_id' => MonitoringStatusEnum::ENTER_RESULT->value
+            ]);
+            return $monitoring;
+        } catch (\Exception $exception) {
             throw $exception;
         }
     }
