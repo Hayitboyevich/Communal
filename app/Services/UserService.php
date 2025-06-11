@@ -141,7 +141,7 @@ class UserService
 
     public function getInspectors($user, $roleId, $filters)
     {
-        $query = $this->repository->all($user, $roleId)->whereHas('inspectors');
+        $query = $this->repository->all($user, $roleId);
         return  $this->repository->search($query, $filters);
     }
 
