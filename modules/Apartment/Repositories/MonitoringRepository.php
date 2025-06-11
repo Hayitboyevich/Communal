@@ -30,7 +30,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
         try {
             switch ($roleId) {
                 case UserRoleEnum::APARTMENT_INSPECTOR->value:
-                    return Monitoring::query()->where('user_id', $user->id);
+                    return Monitoring::query()->where('user_id', $user->id)->where('region_id', $user->region_id);
                 case UserRoleEnum::APARTMENT_VIEWER->value:
                     return Monitoring::query();
                 case UserRoleEnum::APARTMENT_MANAGER->value:

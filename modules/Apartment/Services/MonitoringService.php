@@ -249,7 +249,8 @@ class MonitoringService
     public function count($user, $roleId,$filters = [])
     {
         try {
-            $query = $this->repository->all($user, $roleId)->where('type', $filters['type']);
+            $data = $this->repository->all($user, $roleId);
+            $query = $this->repository->filter($data, $filters);
 
             if ($filters['type'] == 1){
                 return [
