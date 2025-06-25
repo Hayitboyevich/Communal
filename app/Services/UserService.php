@@ -39,25 +39,26 @@ class UserService
         DB::beginTransaction();
         try {
 
+            $user = User::query()->where('pin', $request['pin'])->first();
+            if (!$user){
+                $user = $this->repository->create($request->except(['role_id', 'image', 'images', 'docs']));
+                if ($request->hasFile('image')) {
+                    $path = $this->fileService->uploadImage($request->file('image'), 'user/images');
+                    $user->update(['image' => $path]);
+                }
 
-            $user = $this->repository->create($request->except(['role_id', 'image', 'images', 'docs']));
+                if ($request->images) {
+                    $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/images'), $request->images);
+                    $user->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+                }
+                if ($request->docs) {
+                    $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->docs);
+                    $user->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+                }
+            }
 
             foreach ($request->role_id as $role) {
                 $user->roles()->attach($user->id, ['role_id' => $role]);
-            }
-
-            if ($request->hasFile('image')) {
-                $path = $this->fileService->uploadImage($request->file('image'), 'user/images');
-                $user->update(['image' => $path]);
-            }
-
-            if ($request->images) {
-                $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/images'), $request->images);
-                $user->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
-            }
-            if ($request->docs) {
-                $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->docs);
-                $user->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
             }
 
             DB::commit();
