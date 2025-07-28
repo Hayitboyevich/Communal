@@ -4,9 +4,11 @@ namespace Modules\Water\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Modules\Water\Contracts\CardRepositoryInterface;
+use Modules\Water\Contracts\DecisionRepositoryInterface;
 use Modules\Water\Contracts\HistoryRepositoryInterface;
 use Modules\Water\Contracts\ProtocolRepositoryInterface;
 use Modules\Water\Repositories\CardRepository;
+use Modules\Water\Repositories\DecisionRepository;
 use Modules\Water\Repositories\HistoryRepository;
 use Modules\Water\Repositories\ProtocolRepository;
 
@@ -22,5 +24,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ProtocolRepositoryInterface::class,ProtocolRepository::class);
         $this->app->bind(CardRepositoryInterface::class,CardRepository::class);
         $this->app->bind(HistoryRepositoryInterface::class,HistoryRepository::class);
+        $this->app->bind(DecisionRepositoryInterface::class,DecisionRepository::class);
     }
 }
