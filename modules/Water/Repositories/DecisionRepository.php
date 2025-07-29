@@ -32,20 +32,18 @@ class DecisionRepository implements DecisionRepositoryInterface
             ->first();
     }
 
-    public function update(
-        string $series,
-        string $number,
-        array $data,
-    ): bool
+    public function update(?array $data)
     {
-        return $this->model->query()
-            ->where([
-                'series' => $series,
-                'number' => $number
-            ])
-            ->update(
-                values: $data
-            );
+        try {
+            $model = $this->get($data['series'], $data['number']);
+            if(!$model){
+                throw new \Exception('Bunday mamuriy mavjud emas');
+            }
+            return $model->update($data);
+        }catch (\Exception $exception){
+            throw $exception;
+        }
+
     }
 
     public function create(?array $data)

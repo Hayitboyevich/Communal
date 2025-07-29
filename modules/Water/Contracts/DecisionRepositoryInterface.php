@@ -9,11 +9,7 @@ interface DecisionRepositoryInterface
         string $number
     );
 
-    public function update(
-        string $series,
-        string $number,
-        array $data
-    );
+    public function update(?array $data);
 
     public function create(?array $data);
 }

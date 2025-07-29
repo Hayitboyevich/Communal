@@ -9,6 +9,7 @@ use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Contracts\DecisionRepositoryInterface;
 use Modules\Water\Contracts\HistoryRepositoryInterface;
 use Modules\Water\Http\Requests\FineCreateRequest;
+use Modules\Water\Http\Requests\FineUpdateRequest;
 use Modules\Water\Models\ProtocolHistory;
 use Modules\Water\Repositories\HistoryRepository;
 
@@ -47,6 +48,15 @@ class DecisionService
             throw $exception;
         }
 
+    }
+
+    public function update(FineUpdateRequest $request)
+    {
+        try {
+            return $this->repository->update($request->validated());
+        }catch (\Exception $exception){
+            throw $exception;
+        }
     }
 
     private function postDecisionFromApi(

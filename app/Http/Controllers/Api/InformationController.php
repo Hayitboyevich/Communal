@@ -19,12 +19,14 @@ use Modules\Apartment\Http\Resources\MonitoringResource;
 use Modules\Apartment\Http\Resources\MonitoringTypeResource;
 use Modules\Apartment\Models\MonitoringType;
 use Modules\Apartment\Services\MonitoringService;
+use Modules\Water\Http\Requests\FineUpdateRequest;
 use Modules\Water\Http\Resources\ProtocolOgohListResource;
 use Modules\Water\Http\Resources\ProtocolResource;
 use Modules\Water\Http\Resources\ProtocolStatusResource;
 use Modules\Water\Http\Resources\ProtocolTypeResource;
 use Modules\Water\Models\ProtocolStatus;
 use Modules\Water\Models\ProtocolType;
+use Modules\Water\Services\DecisionService;
 use Modules\Water\Services\ProtocolService;
 
 class InformationController extends BaseController
@@ -33,6 +35,7 @@ class InformationController extends BaseController
     public function __construct(
         protected ProtocolService $service,
         protected MonitoringService $monitoringService,
+        protected DecisionService $decisionService,
     ){
         parent::__construct();
     }
@@ -166,7 +169,13 @@ class InformationController extends BaseController
         }
     }
 
-
-
-
+    public function fineUpdate(FineUpdateRequest $request): JsonResponse
+    {
+        try {
+           $this->decisionService->update($request);
+           return $this->sendSuccess(true, 'Updated successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
 }
