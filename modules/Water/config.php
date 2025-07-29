@@ -15,4 +15,10 @@ return [
         'login' => 'suv_nazorat',
         'password' => 'Suv_nazorat@123####$$#',
     ],
+
+    'fine' => [
+        'url' => 'https://api-data.shaffofqurilish.uz/api',
+        'login' => 'COlaXTRoaCtu',
+        'password' => 'rthS[o@[1Mc3fJ15J79T',
+    ]
 ];

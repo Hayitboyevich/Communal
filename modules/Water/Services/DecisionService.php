@@ -50,14 +50,15 @@ class DecisionService
         string $number
     ): null|object
     {
-        $url = env('FINE_URL')."/decisions/callback";
-        $username = env('FINE_USERNAME');
-        $password = env('FINE_PASSWORD');
+        $url = config('water.fine.url')."/decisions/callback";
+        $username = config('water.fine.login');
+        $password = config('water.fine.password');
         $body = [
             "series" => $series,
             "number" => $number,
             "project_id" => 1,
         ];
+
 
         try {
             $response = Http::withBasicAuth(
@@ -85,9 +86,9 @@ class DecisionService
         string $number
     )
     {
-        $url = env('FINE_URL')."/decisions/search";
-        $username = env('FINE_USERNAME');
-        $password = env('FINE_PASSWORD');
+        $url = config('water.fine.url')."/decisions/search";
+        $username = config('water.fine.login');
+        $password = config('water.fine.password');
 
         $body = [
             "series" => $series,

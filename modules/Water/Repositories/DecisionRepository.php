@@ -50,6 +50,11 @@ class DecisionRepository implements DecisionRepositoryInterface
 
     public function create(?array $data)
     {
+        $model = $this->get($data['series'], $data['number']);
+        if ($model)
+        {
+            return $this->update($data['series'], $data['number'], $data);
+        }
         return $this->model->query()->create(attributes: $data);
     }
 }
