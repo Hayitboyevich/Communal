@@ -3,6 +3,7 @@
 namespace Modules\Water\Services;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Contracts\DecisionRepositoryInterface;
@@ -36,10 +37,13 @@ class DecisionService
 
     public function create(FineCreateRequest $request)
     {
+        DB::beginTransaction();
         try {
             $this->repository->create($request->all());
             $this->postDecisionFromApi($request->series, $request->number);
+            DB::commit();
         }catch (\Exception $exception){
+            DB::rollBack();
             throw $exception;
         }
 
