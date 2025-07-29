@@ -48,13 +48,8 @@ class DecisionRepository implements DecisionRepositoryInterface
             );
     }
 
-    public function create(
-        array $data
-    )
+    public function create(?array $data)
     {
-        return $this->model->query()
-            ->create(
-                attributes: $data
-            );
+        return $this->model->query()->create(attributes: $data);
     }
 }

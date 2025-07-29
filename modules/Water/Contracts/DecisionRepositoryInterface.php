@@ -15,7 +15,5 @@ interface DecisionRepositoryInterface
         array $data
     );
 
-    public function create(
-        array $data
-    );
+    public function create(?array $data);
 }

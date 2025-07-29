@@ -19,6 +19,7 @@ use Modules\Water\Enums\ProtocolStatusEnum;
 use Modules\Water\Http\Requests\ProtocolFirstStepRequest;
 use Modules\Water\Http\Requests\ProtocolSecondStepRequest;
 use Modules\Water\Http\Requests\ProtocolThirdStepRequest;
+use Modules\Water\Http\Resources\FineResource;
 use Modules\Water\Http\Resources\ProtocolListResource;
 use Modules\Water\Http\Resources\ProtocolResource;
 use Modules\Water\Models\Protocol;
@@ -280,5 +281,15 @@ class ProtocolController extends BaseController
             ->selectRaw("$selectRaw, COUNT(*) as count")
             ->groupBy(...$groupBy)
             ->get();
+    }
+
+    public function fine($id): JsonResponse
+    {
+        try {
+            $protocol = $this->service->findById($id);
+            return  $this->sendSuccess(FineResource::make($protocol->fine), 'Success');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
     }
 }

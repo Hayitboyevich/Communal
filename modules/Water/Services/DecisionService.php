@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Contracts\DecisionRepositoryInterface;
 use Modules\Water\Contracts\HistoryRepositoryInterface;
+use Modules\Water\Http\Requests\FineCreateRequest;
 use Modules\Water\Models\ProtocolHistory;
 use Modules\Water\Repositories\HistoryRepository;
 
@@ -22,85 +23,40 @@ class DecisionService
         $this->repository = $repository;
     }
 
-    public function handleSearchingDecision(
+    public function search(
         string $series,
         string $number
-    ): bool
+    )
     {
-        $decision = $this->repository->get(
+        return $this->searchDecisionFromApi(
             series: $series,
             number: $number
         );
-
-        if(!$decision) {
-            return false;
-        }
-
-        $data = $this->getDecisionFromApi(
-            series: $series,
-            number: $number
-        );
-
-        if(!$data) {
-            return false;
-        }
-
-        $result = $this->repository->create(
-            data: $data
-        );
-
-        if(!$result) {
-            return false;
-        }
-
-        return true;
     }
 
-    public function handleCreatingDecision(
-        string $series,
-        string $number
-    ): bool
+    public function create(FineCreateRequest $request)
     {
-        $decision = $this->repository->get(
-            series: $series,
-            number: $number
-        );
-
-        if(!$decision) {
-            return false;
+        try {
+            $this->repository->create($request->all());
+            $this->postDecisionFromApi($request->series, $request->number);
+        }catch (\Exception $exception){
+            throw $exception;
         }
 
-        $data = $this->getDecisionFromApi(
-            series: $series,
-            number: $number
-        );
-
-        if(!$data) {
-            return false;
-        }
-
-        $result = $this->repository->create(
-            data: $data
-        );
-
-        if(!$result) {
-           return false;
-        }
-
-        return true;
     }
 
-    private function getDecisionFromApi(
+    private function postDecisionFromApi(
         string $series,
         string $number
     ): null|object
     {
-        $url = env('API_DATA_URL')."/decisions/callback";
-        $username = env('API_DATA_USERNAME');
-        $password = env('API_DATA_PASSWORD');
+        $url = env('FINE_URL')."/decisions/callback";
+        $username = env('FINE_USERNAME');
+        $password = env('FINE_PASSWORD');
         $body = [
             "series" => $series,
             "number" => $number,
+            "project_id" => 1,
         ];
 
         try {
@@ -108,6 +64,7 @@ class DecisionService
                 username: $username,
                 password: $password
             )
+                ->withoutVerifying()
                 ->post(
                     url: $url,
                     data: $body
@@ -119,18 +76,19 @@ class DecisionService
 
             return $response->object()->result ?? null;
         } catch (\Exception $exception) {
-            return null;
+           throw $exception;
         }
     }
 
     private function searchDecisionFromApi(
         string $series,
         string $number
-    ): null|object
+    )
     {
-        $url = env('API_DATA_URL')."/decisions/search";
-        $username = env('API_DATA_USERNAME');
-        $password = env('API_DATA_PASSWORD');
+        $url = env('FINE_URL')."/decisions/search";
+        $username = env('FINE_USERNAME');
+        $password = env('FINE_PASSWORD');
+
         $body = [
             "series" => $series,
             "number" => $number,
@@ -141,9 +99,11 @@ class DecisionService
                 username: $username,
                 password: $password
             )
+                ->withoutVerifying()
                 ->post(
                     url: $url,
-                    data: $body
+                    data: $body,
+
                 );
 
             if(!$response->successful()) {

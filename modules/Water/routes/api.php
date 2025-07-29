@@ -5,6 +5,7 @@ use Modules\Water\Http\Controllers\ProtocolController;
 use Modules\Water\Http\Controllers\ProtocolStatusController;
 use Modules\Water\Http\Controllers\ProtocolTypeController;
 use Modules\Water\Http\Controllers\CardController;
+use Modules\Water\Http\Controllers\FineController;
 use App\Http\Controllers\Api\AuthController;
 
 
@@ -26,7 +27,14 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::post('/status/change/{id}', 'statusChange');
         Route::get('/history/{id}', 'history');
         Route::get('/pdf/{id}', 'pdf');
+        Route::get('/fine/{id}', 'fine');
         Route::get('/{id?}', 'index');
+    });
+
+    Route::controller(FineController::class)->prefix('fine')->group(function () {
+//        Route::get('/', 'index');
+        Route::get('/search', 'search');
+        Route::post('/create', 'create');
     });
 
     Route::controller(ProtocolStatusController::class)->prefix('protocol-status')->group(function () {
