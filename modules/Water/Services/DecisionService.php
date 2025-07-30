@@ -19,7 +19,8 @@ class DecisionService
     protected DecisionRepositoryInterface $repository;
 
     public function __construct(
-        DecisionRepositoryInterface $repository
+        DecisionRepositoryInterface $repository,
+        protected ProtocolService $protocolService
     )
     {
         $this->repository = $repository;
@@ -42,6 +43,7 @@ class DecisionService
         try {
             $this->repository->create($request->all());
             $this->postDecisionFromApi($request->series, $request->number);
+            $this->protocolService->fine($request['protocol_id']);
             DB::commit();
         }catch (\Exception $exception){
             DB::rollBack();

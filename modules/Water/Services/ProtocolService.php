@@ -93,6 +93,16 @@ class ProtocolService
         }
     }
 
+    public function fine($protocolId)
+    {
+        try {
+            $data['protocol_status_id'] = ProtocolStatusEnum::ADMINISTRATIVE->value;
+            $this->repository->update($protocolId, $data);
+        }catch (\Exception $exception){
+            throw  $exception;
+        }
+    }
+
     public function confirmDefect($user, $roleId, $id)
     {
         $protocol = $this->repository->confirmDefect($user, $roleId, $id);

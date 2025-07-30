@@ -67,7 +67,8 @@ class ProtocolResource extends JsonResource
             }),
             'created_at' => $this->created_at,
             'step' => $this->step,
-            'type' => $this->type
+            'type' => $this->type,
+            'fine' => $this->fine ? FineResource::make($this->fine) : null,
         ];
     }
 }

@@ -37,7 +37,7 @@ class DecisionRepository implements DecisionRepositoryInterface
         try {
             $model = $this->get($data['series'], $data['number']);
             if(!$model){
-                throw new \Exception('Bunday mamuriy mavjud emas');
+                throw new \Exception('Bunday jarima mavjud emas');
             }
             return $model->update($data);
         }catch (\Exception $exception){
