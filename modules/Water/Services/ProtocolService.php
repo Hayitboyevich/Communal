@@ -99,6 +99,8 @@ class ProtocolService
             $data['protocol_status_id'] = ProtocolStatusEnum::ADMINISTRATIVE->value;
             $data['is_administrative'] = true;
             $this->repository->update($protocolId, $data);
+            $protocol = $this->findById($protocolId);
+            $this->createHistory($protocol, ProtocolHistoryType::FINE);
         }catch (\Exception $exception){
             throw  $exception;
         }

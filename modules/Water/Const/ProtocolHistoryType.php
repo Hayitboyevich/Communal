@@ -17,6 +17,7 @@ class ProtocolHistoryType
     const REJECT_RESULT = 11;
     const SEND_HMQO = 12;
     const CONFIRMED = 13;
+    const FINE = 14;
 
     public static function getLabel($type): string
     {
@@ -47,6 +48,8 @@ class ProtocolHistoryType
                 return 'HMQOga yuborildi';
             case self::NOT_DEFECT:
                 return 'Kamchilik aniqlanmadi';
+            case self::FINE:
+                return 'Mamuriy qilindi';
             default:
                 return 'Noma’lum tur';
         }
