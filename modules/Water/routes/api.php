@@ -6,6 +6,7 @@ use Modules\Water\Http\Controllers\ProtocolStatusController;
 use Modules\Water\Http\Controllers\ProtocolTypeController;
 use Modules\Water\Http\Controllers\CardController;
 use Modules\Water\Http\Controllers\FineController;
+use Modules\Water\Http\Controllers\DefectController;
 
 
 
@@ -41,6 +42,10 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(ProtocolTypeController::class)->prefix('protocol-type')->group(function () {
         Route::get('/{id?}', 'index');
+    });
+
+    Route::controller(DefectController::class)->prefix('defect')->group(function () {
+        Route::get('/', 'index');
     });
 
     Route::controller(CardController::class)->prefix('card')->group(function () {

@@ -12,11 +12,12 @@ use Modules\Water\Models\ProtocolType;
 
 class DefectController extends BaseController
 {
-    public function index($id): JsonResponse
+    public function index(): JsonResponse
     {
         try {
-            $protocolType = ProtocolType::query()->findOrFail($id);
-            return $this->sendSuccess(DefectResource::collection($protocolType->defects), 'All protocol types');
+            $protocolTypeId = request('id');
+            $protocolType = ProtocolType::query()->findOrFail($protocolTypeId);
+            return $this->sendSuccess(DefectResource::collection($protocolType->defects), 'All defects');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
