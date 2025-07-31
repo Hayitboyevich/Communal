@@ -53,6 +53,8 @@ class ProtocolResource extends JsonResource
             'comment' => $this->comment,
             'deadline' => $this->deadline,
             'is_finished' => $this->is_finished,
+            'defect' => $this->defect ? DefectResource::make($this->defect) : null,
+            'defect_comment' => $this->defect_comment,
             'is_administrative' => $this->is_administrative,
             'files' =>  DocumentResource::collection($this->documents),
             'additional_files' => collect(json_decode($this->additional_files, true))->map(function ($file) {

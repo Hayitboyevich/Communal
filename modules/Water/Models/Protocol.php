@@ -77,4 +77,9 @@ class Protocol extends Model
     {
         return $this->hasOne(Decision::class, 'protocol_id');
     }
+
+    public function defect(): BelongsTo
+    {
+        return $this->belongsTo(Defect::class, 'defect_id');
+    }
 }

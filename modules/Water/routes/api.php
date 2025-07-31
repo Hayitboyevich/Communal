@@ -6,7 +6,6 @@ use Modules\Water\Http\Controllers\ProtocolStatusController;
 use Modules\Water\Http\Controllers\ProtocolTypeController;
 use Modules\Water\Http\Controllers\CardController;
 use Modules\Water\Http\Controllers\FineController;
-use App\Http\Controllers\Api\AuthController;
 
 
 
@@ -32,7 +31,6 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
     });
 
     Route::controller(FineController::class)->prefix('fine')->group(function () {
-//        Route::get('/', 'index');
         Route::get('/search', 'search');
         Route::post('/create', 'create');
     });

@@ -65,8 +65,7 @@ return [
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'UTC'),
-
+    'timezone' => 'Asia/Tashkent',
 
 
     'locale' => env('APP_LOCALE', 'en'),

@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            DefectSeeder::class
 //            RoleSeeder::class,
 //            RegionSeeder::class,
 //            UserSeeder::class,
@@ -23,10 +24,10 @@ class DatabaseSeeder extends Seeder
 //            ProtocolTypeSeeder::class,
 //            UserStatusSeeder::class,
 //            BasicUserSeeder::class,
-            MonitoringTypeSeeder::class,
-            MonitoringBaseSeeder::class,
-            PlaceSeeder::class,
-            ViolationTypeSeeder::class
+//            MonitoringTypeSeeder::class,
+//            MonitoringBaseSeeder::class,
+//            PlaceSeeder::class,
+//            ViolationTypeSeeder::class
         ]);
     }
 }

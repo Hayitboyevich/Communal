@@ -32,6 +32,8 @@ class ProtocolSecondStepRequest extends FormRequest
             'additional_files' => 'sometimes',
             'additional_comment' => 'sometimes',
             'is_finished' => 'sometimes',
+            'defect_id' => 'sometimes',
+            'defect_comment' => 'sometimes',
         ];
     }
 
