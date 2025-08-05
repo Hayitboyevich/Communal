@@ -16,7 +16,7 @@ class DefectResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'name' => ucfirst(strtolower($this->name)),
         ];
     }
 }
