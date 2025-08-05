@@ -9,6 +9,7 @@ class MonitoringHistoryType
     const REGULATION_FORMED = 3;
     const REJECT_DEFECT = 5;
     const REJECT = 7;
+    const FINE = 6;
     const CONFIRMED = 13;
     const VIOLATION_NOT_DETECTED = 20;
     const REJECT_VIOLATION_NOT_DETECTED = 21;
@@ -54,6 +55,8 @@ class MonitoringHistoryType
                 return 'HMQOga yuborildi';
             case self::ATTACH:
                 return 'Inspektor biriktirildi';
+            case self::FINE:
+                return 'Mamuriy qilindi';
 
             default:
                 return 'Noma’lum tur';

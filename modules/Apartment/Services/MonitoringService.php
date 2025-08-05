@@ -300,6 +300,15 @@ class MonitoringService
         }
     }
 
+    public function fine($monitoringId)
+    {
+        $data['monitoring_status_id'] = MonitoringStatusEnum::ADMINISTRATIVE->value;
+        $data['is_administrative'] = true;
+        $this->repository->update($monitoringId, $data);
+        $monitoring = $this->findById($monitoringId);
+        $this->createHistory($monitoring, MonitoringHistoryType::FINE);
+    }
+
     private function saveImages($model, ?array $images, $filePath)
     {
         $paths = array_map(fn($image) => $this->fileService->uploadImage($image, $filePath), $images);

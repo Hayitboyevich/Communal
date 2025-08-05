@@ -2,6 +2,7 @@
 
 namespace Modules\Water\Models;
 
+use App\Constants\FineType;
 use App\Models\District;
 use App\Models\Document;
 use App\Models\Image;
@@ -75,7 +76,7 @@ class Protocol extends Model
 
     public function fine(): HasOne
     {
-        return $this->hasOne(Decision::class, 'protocol_id');
+        return $this->hasOne(Decision::class, 'guid')->where('project_id', FineType::WATER);
     }
 
     public function defect(): BelongsTo

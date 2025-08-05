@@ -21,6 +21,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::get('/report/{id?}', 'report');
         Route::get('/history/{id}', 'history');
         Route::post('/attach', 'attach');
+        Route::post('/fine/{id}', 'attach');
         Route::get('/{id?}', 'index');
     });
 
@@ -36,7 +37,6 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::get('/company/{id?}', 'company');
         Route::get('monitoring-status/{id?}', 'monitoringStatus');
         Route::get('/apartment/{id?}', 'apartment');
-
     });
 
 });

@@ -19,7 +19,7 @@ class FineCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'protocol_id' => 'required|integer|exists:protocols,id',
+            'guid' => 'required|integer',
             'parent_id' => 'required|integer',
             'created_time' => 'required',
             'updated_time' => 'required',
@@ -50,7 +50,7 @@ class FineCreateRequest extends FormRequest
             'resolution_consider_info' => 'sometimes',
             'paid_amount' => 'sometimes',
             'decision_status' => 'sometimes',
-
+            'project_id' => 'required'
         ];
     }
 

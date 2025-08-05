@@ -24,7 +24,7 @@ class ProtocolService
 
     public function __construct(
         protected ProtocolRepositoryInterface $repository,
-        protected FileService                 $fileService
+        protected FileService                 $fileService,
     )
     {
         $this->historyService = new HistoryService('protocol_histories');

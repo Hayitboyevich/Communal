@@ -2,16 +2,13 @@
 
 namespace Modules\Water\Services;
 
-use Illuminate\Support\Facades\Auth;
+use App\Constants\FineType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Modules\Water\Const\ProtocolHistoryType;
+use Modules\Apartment\Services\MonitoringService;
 use Modules\Water\Contracts\DecisionRepositoryInterface;
-use Modules\Water\Contracts\HistoryRepositoryInterface;
 use Modules\Water\Http\Requests\FineCreateRequest;
 use Modules\Water\Http\Requests\FineUpdateRequest;
-use Modules\Water\Models\ProtocolHistory;
-use Modules\Water\Repositories\HistoryRepository;
 
 class DecisionService
 {
@@ -20,7 +17,8 @@ class DecisionService
 
     public function __construct(
         DecisionRepositoryInterface $repository,
-        protected ProtocolService $protocolService
+        protected ProtocolService $protocolService,
+        protected MonitoringService $monitoringService
     )
     {
         $this->repository = $repository;
@@ -42,8 +40,13 @@ class DecisionService
         DB::beginTransaction();
         try {
             $this->repository->create($request->all());
-            $this->postDecisionFromApi($request->series, $request->number);
-            $this->protocolService->fine($request['protocol_id']);
+            $this->postDecisionFromApi($request->series, $request->number, $request['project_id']);
+            if($request['project_id'] == FineType::WATER) {
+                $this->protocolService->fine($request['guid']);
+            }
+            if ($request['protocol_id'] == FineType::APARTMENT) {
+                $this->monitoringService->fine($request['guid']);
+            }
             DB::commit();
         }catch (\Exception $exception){
             DB::rollBack();
@@ -63,7 +66,8 @@ class DecisionService
 
     private function postDecisionFromApi(
         string $series,
-        string $number
+        string $number,
+        int $project_id
     ): null|object
     {
         $url = config('water.fine.url')."/decisions/callback";
@@ -72,7 +76,7 @@ class DecisionService
         $body = [
             "series" => $series,
             "number" => $number,
-            "project_id" => 1,
+            "project_id" => $project_id,
         ];
 
 

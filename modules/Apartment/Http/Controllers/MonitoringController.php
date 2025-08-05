@@ -20,6 +20,7 @@ use Modules\Apartment\Http\Resources\MonitoringResource;
 use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Services\MonitoringService;
 use Illuminate\Http\Request;
+use Modules\Water\Http\Resources\FineResource;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MonitoringController extends BaseController
@@ -179,6 +180,16 @@ class MonitoringController extends BaseController
             $this->service->createThird($id, $request);
             return $this->sendSuccess([], 'Monitoring violation successfully.');
         } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function fine($id): JsonResponse
+    {
+        try {
+            $monitoring = $this->service->findById($id);
+            return  $this->sendSuccess(FineResource::make($monitoring->fine), 'Success');
+        }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }

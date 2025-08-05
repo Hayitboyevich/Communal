@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('decisions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('protocol_id')->constrained()->cascadeOnDelete();
+            $table->string('project_id')->index()->comment('1-suv, 2-kop kavartira');
+            $table->foreignId('guid')->constrained()->cascadeOnDelete();
             $table->bigInteger('parent_id')->nullable()->index();
             $table->timestamp('created_time')->nullable();
             $table->timestamp('updated_time')->nullable();

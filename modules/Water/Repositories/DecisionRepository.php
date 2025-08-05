@@ -2,6 +2,7 @@
 
 namespace Modules\Water\Repositories;
 
+use App\Constants\FineType;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Modules\Water\Contracts\DecisionRepositoryInterface;
@@ -21,13 +22,15 @@ class DecisionRepository implements DecisionRepositoryInterface
 
     public function get(
         string $series,
-        string $number
+        string $number,
+        int $projectId
     )
     {
         return $this->model->query()
             ->where([
                 'series' => $series,
-                'number' => $number
+                'number' => $number,
+                'project_id' => $projectId
             ])
             ->first();
     }
@@ -35,7 +38,7 @@ class DecisionRepository implements DecisionRepositoryInterface
     public function update(?array $data)
     {
         try {
-            $model = $this->get($data['series'], $data['number']);
+            $model = $this->get($data['series'], $data['number'], $data['project_id']);
             if(!$model){
                 throw new \Exception('Bunday jarima mavjud emas');
             }
@@ -49,7 +52,7 @@ class DecisionRepository implements DecisionRepositoryInterface
     public function create(?array $data)
     {
         try {
-            $model = $this->get($data['series'], $data['number']);
+            $model = $this->get($data['series'], $data['number'], $data['project_id']);
             if ($model){
                 throw new \Exception('Mamuriy allaqachon qo\'shilgan');
             }

@@ -6,7 +6,8 @@ interface DecisionRepositoryInterface
 {
     public function get(
         string $series,
-        string $number
+        string $number,
+        int $projectId
     );
 
     public function update(?array $data);

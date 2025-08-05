@@ -2,6 +2,7 @@
 
 namespace Modules\Apartment\Models;
 
+use App\Constants\FineType;
 use App\Models\District;
 use App\Models\Document;
 use App\Models\Image;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
+use Modules\Water\Models\Decision;
 
 class Monitoring extends Model
 {
@@ -88,5 +90,10 @@ class Monitoring extends Model
     public function histories(): HasMany
     {
         return $this->hasMany(MonitoringHistory::class, 'guid');
+    }
+
+    public function fine(): HasOne
+    {
+        return $this->hasOne(Decision::class, 'guid')->where('project_id', FineType::APARTMENT);
     }
 }
