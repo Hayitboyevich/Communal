@@ -6,6 +6,7 @@ use App\Http\Resources\DocumentResource;
 use App\Http\Resources\ImageResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Water\Http\Resources\FineResource;
 
 class MonitoringResource extends JsonResource
 {
@@ -75,7 +76,8 @@ class MonitoringResource extends JsonResource
             'regulations' => $this->regulation ? RegulationResource::make($this->regulation) : null,
             'violations' => $this->violation ? ViolationResource::make($this->violation) : null,
             'images' => $this->images ? ImageResource::collection($this->images) : null,
-            'docs' => $this->documents ? DocumentResource::collection($this->documents) : null
+            'docs' => $this->documents ? DocumentResource::collection($this->documents) : null,
+            'fine' => $this->fine ? FineResource::make($this->fine) : null,
         ];
     }
 }

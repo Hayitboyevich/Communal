@@ -26,6 +26,7 @@ class FineResource extends JsonResource
             'number' => $this->number,
             'decision_series' => $this->decision_series,
             'decision_number' => $this->decision_number,
+            'status' => $this->status,
             'status_name' => $this->status_name,
             'last_name' => $this->last_name,
             'first_name' => $this->first_name,
