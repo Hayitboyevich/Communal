@@ -44,7 +44,7 @@ class DecisionService
             if($request['project_id'] == FineType::WATER) {
                 $this->protocolService->fine($request['guid']);
             }
-            if ($request['protocol_id'] == FineType::APARTMENT) {
+            if ($request['project_id'] == FineType::APARTMENT) {
                 $this->monitoringService->fine($request['guid']);
             }
             DB::commit();
