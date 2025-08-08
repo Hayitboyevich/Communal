@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\RoleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\InformationController;
+use App\Http\Controllers\Api\VersionController;
 
 
 Route::controller(AuthController::class)->group(function () {
@@ -29,6 +30,12 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::get('/inspector/{id?}', 'inspector');
         Route::post('/organization', 'organization');
     });
+
+    Route::controller(VersionController::class)->prefix('version')->group(function () {
+        Route::get('/{id?}', 'index');
+        Route::post('update/{id?}', 'update');
+    });
+
 
     Route::controller(ProfileController::class)->prefix('profile')->group(function () {
         Route::get('/', 'index');
