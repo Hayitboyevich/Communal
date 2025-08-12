@@ -50,7 +50,7 @@
             <td
                 style="width: 32%; text-align: center; text-transform: uppercase; font-weight:700; font-size:12px"
             >
-                {{ $monitoring?->region->name_uz }} Qurilish <br /> va
+                {{ $protocol?->region->name_uz }} Qurilish <br /> va
                 uy-joy kommunal  <br />xo'jaligi
                 sohasida <br />HUDUDIY NAZORAT
                 INSPEKSIYASI
@@ -68,7 +68,7 @@
                 Территориальная контрольная <br />
                 инспекция в сфере строительства <br />
                 и жилищно-коммунального <br />
-                хозяйства {{ getRegionName($monitoring->region_id) }}
+                хозяйства {{ getRegionName($protocol->region_id) }}
             </td>
         </tr>
         <tr>
@@ -144,13 +144,13 @@
             <td style="width: 50%">
                 <div style="padding: 0 10px">
                     <span style="color: #8c8c8c">Sana:</span>
-                    <span>{{ $monitoring->created_at ? date('d-m-Y', strtotime($monitoring->created_at)) : '' }} yil</span>
+                    <span>{{ $protocol->created_at ? date('d-m-Y', strtotime($protocol->created_at)) : '' }} yil</span>
                 </div>
             </td>
             <td style="width: 50%">
                 <div style="text-align: right; padding: 0 10px">
                     <span style="color: #8c8c8c">№:</span>
-                    <span>{{ $monitoring?->regulation?->id }}</span>
+                    <span>{{ $protocol?->regulation?->id }}</span>
                 </div>
             </td>
         </tr>
@@ -171,14 +171,14 @@
                 text-align: center;
               "
                 >
-                    {{ $monitoring?->regulation?->fish  ?? $monitoring?->company?->company_name}}
+                    {{ $protocol?->regulation?->fish  ?? $protocol?->company?->company_name}}
                 </p>
                 {{--                <div style="font-size: 12px; text-align: center">--}}
                 {{--                    (Tashkilot nomi)--}}
                 {{--                </div>--}}
             </td>
         </tr>
-        @if($monitoring->regulation->organization_name)
+        @if($protocol->regulation->organization_name)
             <tr>
                 <td style="padding: 10px">
                     <div style="font-weight: 500; margin-bottom: 5px">Korxona nomi:</div>
@@ -191,7 +191,7 @@
                 text-align: center;
               "
                     >
-                        {{ $monitoring->regulation->organization_name }}
+                        {{ $protocol->regulation->organization_name }}
                     </p>
                 </td>
             </tr>
@@ -211,7 +211,7 @@
                 text-align: center;
               "
                 >
-                    {{ $monitoring->district->name_uz }}
+                    {{ $protocol->district->name_uz }}
                 </p>
             </td>
         </tr>
@@ -229,10 +229,10 @@
                 text-align: center;
               "
                 >
-                    @if($monitoring->bsk_type == 1) O'zini o'zi boshqaruvchi
-                    @elseif($monitoring->bsk_type == 2) Egasiz
+                    @if($protocol->bsk_type == 1) O'zini o'zi boshqaruvchi
+                    @elseif($protocol->bsk_type == 2) Egasiz
                     @else
-                        {{ $monitoring?->company?->company_name ?? null }}
+                        {{ $protocol?->company?->company_name ?? null }}
                     @endif
                 </p>
             </td>
@@ -251,10 +251,10 @@
                 text-align: center;
               "
                 >
-                    @if($monitoring->bsk_type)
-                        {{ $monitoring->address }}
+                    @if($protocol->bsk_type)
+                        {{ $protocol->address }}
                     @else
-                        {{ $monitoring?->apartment?->home_name }}
+                        {{ $protocol?->apartment?->home_name }}
                     @endif
                 </p>
             </td>
@@ -273,7 +273,7 @@
                 text-align: center;
               "
                 >
-                    {{ $monitoring->address_commit }}
+                    {{ $protocol->address_commit }}
                 </p>
             </td>
         </tr>
