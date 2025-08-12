@@ -15,6 +15,10 @@ class UserRepository implements UserRepositoryInterface
                 return User::query()->whereHas('roles', function ($query) use ($user) {
                     $query->whereIn('role_id', [UserRoleEnum::INSPECTOR->value, UserRoleEnum::MANAGER->value]);
                 });
+            case UserRoleEnum::CADASTR_HR->value:
+                return User::query()->whereHas('roles', function ($query) use ($user) {
+                    $query->whereIn('role_id', [UserRoleEnum::CADASTR_USER->value]);
+                });
             case UserRoleEnum::APARTMENT_HR->value:
                 return User::query()->whereHas('roles', function ($query) use ($user) {
                     $query->whereIn('role_id', [UserRoleEnum::APARTMENT_INSPECTOR->value, UserRoleEnum::APARTMENT_MANAGER->value]);

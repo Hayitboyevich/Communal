@@ -15,6 +15,8 @@ enum UserRoleEnum: int
     case APARTMENT_INSPECTOR = 8;
     case APARTMENT_MANAGER = 9;
     case APARTMENT_VIEWER = 11;
+    case CADASTR_HR = 12;
+    case CADASTR_USER = 13;
 
     case OGOH = 101;
 }
