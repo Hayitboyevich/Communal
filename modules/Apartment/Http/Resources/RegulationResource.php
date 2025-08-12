@@ -26,6 +26,7 @@ class RegulationResource extends JsonResource
             'fish' => $this->fish,
             'phone' => $this->phone,
             'images' => $this->images ? ImageResource::collection($this->images) : null,
+            'address' => $this->address
         ];
     }
 }
