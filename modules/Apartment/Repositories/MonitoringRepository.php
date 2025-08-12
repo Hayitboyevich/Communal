@@ -140,6 +140,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'user_type' => $item['user_type'],
                             'pin' => $item['pin'] ?? null,
                             'inn' => $item['inn'] ?? null,
+                            'address' => $item['address'] ?? null,
                             'organization_name' => $item['organization_name'] ?? null,
                             'company_id' => $item['company_id'] ?? null,
                             'birth_date' => $item['birth_date'] ?? null,

@@ -29,7 +29,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
     Route::controller(MonitoringStatusController::class)->prefix('monitoring')->group(function () {
         Route::get('/status/{id?}', 'index');
     });
-    
+
     Route::controller(ClaimController::class)->prefix('claim')->group(function () {
         Route::get('/{id?}', 'index');
         Route::get('/count', 'count');

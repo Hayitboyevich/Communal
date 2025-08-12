@@ -304,6 +304,7 @@ class MonitoringService
     {
         $data['monitoring_status_id'] = MonitoringStatusEnum::ADMINISTRATIVE->value;
         $data['is_administrative'] = true;
+        $data['type'] = 2;
         $this->repository->update($monitoringId, $data);
         $monitoring = $this->findById($monitoringId);
         $this->createHistory($monitoring, MonitoringHistoryType::FINE);
