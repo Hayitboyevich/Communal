@@ -184,6 +184,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
             if ($data['protocol_status_id'] == ProtocolStatusEnum::HMQO->value) {
                 $protocol->update([
                     'is_administrative' => true,
+                    'category' => 2,
                 ]);
             }
             $protocol->update([
