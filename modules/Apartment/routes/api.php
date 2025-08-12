@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Apartment\Http\Controllers\MonitoringController;
 use Modules\Apartment\Http\Controllers\MonitoringStatusController;
 use Modules\Apartment\Http\Controllers\InformationController;
+use Modules\Apartment\Http\Controllers\ClaimController;
 
 Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
@@ -27,6 +28,13 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(MonitoringStatusController::class)->prefix('monitoring')->group(function () {
         Route::get('/status/{id?}', 'index');
+    });
+    
+    Route::controller(ClaimController::class)->prefix('claim')->group(function () {
+        Route::get('/{id?}', 'index');
+        Route::get('/count', 'count');
+        Route::post('/update/{id}', 'update');
+        Route::post('/create', 'create');
     });
 
     Route::controller(InformationController::class)->prefix('info')->group(function () {
