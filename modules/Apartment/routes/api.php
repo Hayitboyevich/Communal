@@ -32,9 +32,11 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(ClaimController::class)->prefix('claim')->group(function () {
         Route::get('/count', 'count');
+        Route::get('/cadastr', 'cadastr');
         Route::post('/update/{id}', 'update');
         Route::post('/create', 'create');
         Route::get('/{id?}', 'index');
+
 
     });
 
