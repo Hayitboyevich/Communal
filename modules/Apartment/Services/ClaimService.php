@@ -36,10 +36,10 @@ class ClaimService
         return $claim;
     }
 
-    public function count(): array
+    public function count($user, $roleId, $filters): array
     {
         try {
-            $query = $this->repository->all();
+            $query = $this->repository->all($user, $roleId, $filters);
             return [
                 'all' => $query->clone()->count(),
                 'new' => $query->clone()->where('status', 1)->count(),

@@ -67,7 +67,8 @@ class ClaimController extends BaseController
     public function count(): JsonResponse
     {
         try {
-            return  $this->sendSuccess($this->service->count(), 'count');
+            $filters = request()->only(['status']);
+            return  $this->sendSuccess($this->service->count($this->user, $this->roleId, $filters), 'count');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
