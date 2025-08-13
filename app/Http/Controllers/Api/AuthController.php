@@ -67,14 +67,19 @@ class AuthController extends BaseController
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             $token = JWTAuth::claims(['role_id' => $request->role_id])->fromUser($user);
-            $meta['name'] = $user->name;
-            $meta['surname'] = $user->surname;
-            $meta['middle_name'] = $user->middle_name;
-            $meta['phone'] = $user->phone;
-            $meta['token'] = $token;
-            $meta['role'] = RoleResource::make(Role::query()->find($request->role_id));
+            $role = Role::query()->find($request->role_id);
+            $success['token'] = $token;
+            $success['id'] = $user->id;
+            $success['name'] = $user->name;
+            $success['middle_name'] = $user->middle_name;
+            $success['surname'] = $user->surname;
+            $success['pin'] = $user->pin;
+            $success['role'] = new RoleResource($role);
+            $success['region'] = $user->region_id ? new RegionResource($user->region) : null;
+            $success['district'] = $user->district_id ?  new DistrictResource($user->district) : null;
+            $success['image'] = $user->image ?  Storage::disk('public')->url($user->image): null;
 
-            return $this->sendSuccess($meta, 'User logged in successfully.');
+            return $this->sendSuccess($success, 'User logged in successfully.');
         }else{
             return response()->json(['error' => 'Unauthorized'], 401);
         }
