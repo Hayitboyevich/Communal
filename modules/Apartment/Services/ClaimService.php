@@ -14,9 +14,9 @@ class ClaimService
         protected FileService $fileService
     ){}
 
-    public function all()
+    public function all($user, $roleId, $filters)
     {
-        return $this->repository->all();
+        return $this->repository->all($user, $roleId, $filters);
     }
 
     public function findById($id)

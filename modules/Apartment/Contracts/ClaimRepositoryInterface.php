@@ -6,7 +6,7 @@ interface ClaimRepositoryInterface
 {
     public function findById($id);
 
-    public function all();
+    public function all($user, $roleId, $filters);
 
     public function create($data);
 

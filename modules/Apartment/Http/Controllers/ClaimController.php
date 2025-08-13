@@ -25,10 +25,10 @@ class ClaimController extends BaseController
     public function index($id = null): JsonResponse
     {
         try {
-            $filters = request()->only(['status', 'type','category', 'region_id', 'district_id', 'id','monitoring_type']);
+            $filters = request()->only(['status']);
             $claims = $id
                 ? $this->service->findById($id)
-                : $this->service->all()->paginate(request('per_page', 15));
+                : $this->service->all($this->user, $this->roleId, $filters)->paginate(request('per_page', 15));
 
             $resource = $id
                 ? ClaimResource::make($claims)
