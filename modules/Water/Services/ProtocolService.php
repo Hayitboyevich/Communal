@@ -201,8 +201,12 @@ class ProtocolService
 
     public function saveImages(Protocol $protocol, ?array $images)
     {
-        $paths = array_map(fn($image) => $this->fileService->uploadImage($image, 'protocol/images'), $images);
-        $protocol->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+        if (!empty($images))
+        {
+            $paths = array_map(fn($image) => $this->fileService->uploadImage($image, 'protocol/images'), $images);
+            $protocol->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+        }
+
     }
 
     public function saveFiles(Protocol $protocol, ?array $files)
