@@ -20,7 +20,7 @@ class ClaimResource extends JsonResource
             'responsible' => $this->responsible ? UserResource::make($this->responsible) : null,
             'inspector' => $this->inspector ? UserResource::make($this->inspector) : null,
             'address' => $this->address,
-            'commit' => $this->commit,
+            'comment' => $this->comment,
             'cadastral_number' => $this->cadastral_number,
             'full_name' => $this->full_name,
             'pin' => $this->responsible_pin,
