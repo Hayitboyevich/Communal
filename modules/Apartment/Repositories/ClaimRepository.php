@@ -26,7 +26,10 @@ class ClaimRepository implements ClaimRepositoryInterface
             });
         switch ($roleId) {
             case UserRoleEnum::CADASTR_USER->value:
-                return $query->where('user_id', $user)->orWhere('district_id', $user->district_id);
+                return $query->where(function ($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                        ->orWhere('district_id', $user->district_id);
+                });
             case  UserRoleEnum::APARTMENT_INSPECTOR->value:
                 return $query->where('inspector_id', $user->id);
             default:
