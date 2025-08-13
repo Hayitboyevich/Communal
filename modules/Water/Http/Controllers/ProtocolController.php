@@ -87,8 +87,9 @@ class ProtocolController extends BaseController
     {
         DB::beginTransaction();
         try {
-            $protocol = $this->service->update($this->user, $this->roleId,$id, $request->except('files', 'additional_files'), ProtocolHistoryType::CREATE_SECOND);
+            $protocol = $this->service->update($this->user, $this->roleId,$id, $request->except('files', 'additional_files', 'images'), ProtocolHistoryType::CREATE_SECOND);
             $this->service->saveFiles($protocol, $request['files']);
+            $this->service->saveImages($protocol, $request['images']);
             $this->service->uploadFiles($protocol, 'additional_files', $request['additional_files']);
             DB::commit();
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol created successfully.');
