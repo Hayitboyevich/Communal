@@ -297,8 +297,12 @@ class MonitoringRepository implements MonitoringRepositoryInterface
 
     private function saveVideos(Regulation $regulation, ?array $videos)
     {
-        $paths = array_map(fn($video) => $this->fileService->uploadImage($video, 'regulation/videos'), $videos);
-        $regulation->videos()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+        if (!empty($videos))
+        {
+            $paths = array_map(fn($video) => $this->fileService->uploadImage($video, 'regulation/videos'), $videos);
+            $regulation->videos()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+        }
+
     }
 
     private function uploadFiles(Monitoring $monitoring, string $column, ?array $files, $filePath)
