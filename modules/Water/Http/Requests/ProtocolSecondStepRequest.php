@@ -28,6 +28,7 @@ class ProtocolSecondStepRequest extends FormRequest
             'participant_name' => 'sometimes',
             'files' => 'sometimes',
             'images' => 'sometimes',
+            'videos' => 'sometimes',
             'protocol_status_id' => 'sometimes',
             'step' => 'required|integer',
             'additional_files' => 'sometimes',

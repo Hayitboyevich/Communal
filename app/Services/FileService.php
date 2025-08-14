@@ -18,6 +18,11 @@ class FileService
         return $file->store($path, 'public');
     }
 
+    public function uploadVideo(UploadedFile $file, string $path): string
+    {
+        return $file->store($path, 'public');
+    }
+
 
     private function generateUniqueFileName(UploadedFile $file): string
     {

@@ -149,6 +149,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                         ]);
 
                         $this->saveImages($regulation, $item['images']);
+                        $this->saveVideos($regulation, $item['videos']);
                         $this->createHistory($originalMonitoring, MonitoringHistoryType::VIOLATION_DETECTED);
 
 
@@ -173,6 +174,12 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             $newDocument->save();
                         }
 
+                        foreach ($originalMonitoring->videos as $video) {
+                            $newVideo = $video->replicate();
+                            $newVideo->videoable_id = $newMonitoring->id;
+                            $newVideo->save();
+                        }
+
                         $regulation = Regulation::create([
                             'monitoring_id' => $newMonitoring->id,
                             'place_id' => $item['place_id'],
@@ -190,6 +197,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                         $this->createHistory($newMonitoring, MonitoringHistoryType::VIOLATION_DETECTED);
 
                         $this->saveImages($regulation, $item['images']);
+                        $this->saveVideos($regulation, $item['videos']);
                         $results[] = $newMonitoring;
                     }
                 }
@@ -285,6 +293,12 @@ class MonitoringRepository implements MonitoringRepositoryInterface
     {
         $paths = array_map(fn($image) => $this->fileService->uploadImage($image, 'regulation/images'), $images);
         $regulation->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+    }
+
+    private function saveVideos(Regulation $regulation, ?array $videos)
+    {
+        $paths = array_map(fn($video) => $this->fileService->uploadImage($video, 'regulation/videos'), $videos);
+        $regulation->videos()->createMany(array_map(fn($path) => ['url' => $path], $paths));
     }
 
     private function uploadFiles(Monitoring $monitoring, string $column, ?array $files, $filePath)

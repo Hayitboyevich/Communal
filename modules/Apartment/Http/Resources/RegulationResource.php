@@ -4,6 +4,7 @@ namespace Modules\Apartment\Http\Resources;
 
 use App\Http\Resources\DocumentResource;
 use App\Http\Resources\ImageResource;
+use App\Http\Resources\VideoResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -26,6 +27,7 @@ class RegulationResource extends JsonResource
             'fish' => $this->fish,
             'phone' => $this->phone,
             'images' => $this->images ? ImageResource::collection($this->images) : null,
+            'videos' => $this->videos ? VideoResource::collection($this->videos) : null,
             'address' => $this->address
         ];
     }

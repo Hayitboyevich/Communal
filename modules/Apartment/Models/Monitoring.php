@@ -9,6 +9,7 @@ use App\Models\Image;
 use App\Models\Region;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Video;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -34,6 +35,10 @@ class Monitoring extends Model
         return $this->morphMany(Image::class, 'imageable');
     }
 
+    public function videos(): MorphMany
+    {
+        return $this->morphMany(Video::class, 'videoable');
+    }
     public function monitoringType(): BelongsTo
     {
        return $this->belongsTo(MonitoringType::class, 'monitoring_type_id');

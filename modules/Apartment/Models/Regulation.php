@@ -5,6 +5,7 @@ namespace Modules\Apartment\Models;
 use App\Models\Document;
 use App\Models\Image;
 use App\Models\Place;
+use App\Models\Video;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -21,6 +22,11 @@ class Regulation extends Model
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');
+    }
+
+    public function videos(): MorphMany
+    {
+        return $this->morphMany(Video::class, 'videoable');
     }
 
     public function place(): BelongsTo

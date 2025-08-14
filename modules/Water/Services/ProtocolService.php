@@ -217,6 +217,14 @@ class ProtocolService
         }
     }
 
+    public function saveVideo(Protocol $protocol, ?array $videos)
+    {
+        if (!empty($videos)) {
+            $paths = array_map(fn($file) => $this->fileService->uploadVideo($file, 'protocol/video'), $videos);
+            $protocol->videos()->createMany(array_map(fn($path) => ['url' => $path], $paths));
+        }
+    }
+
     public function createHistoryFiles($id, $files)
     {
         $history = ProtocolHistory::query()->findOrFail($id);

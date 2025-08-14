@@ -6,6 +6,7 @@ use App\Http\Resources\DistrictResource;
 use App\Http\Resources\DocumentResource;
 use App\Http\Resources\ImageResource;
 use App\Http\Resources\RegionResource;
+use App\Http\Resources\VideoResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -56,7 +57,8 @@ class ProtocolResource extends JsonResource
             'defect' => $this->defect ? DefectResource::make($this->defect) : null,
             'defect_comment' => $this->defect_comment,
             'is_administrative' => $this->is_administrative,
-            'files' =>  DocumentResource::collection($this->documents),
+            'files' =>  $this->documents ? DocumentResource::collection($this->documents) : null,
+            'videos' => $this->videos ?  VideoResource::collection($this->videos) : null,
             'additional_files' => collect(json_decode($this->additional_files, true))->map(function ($file) {
                 return [
                     'url' => url('storage/'.$file['url']),
