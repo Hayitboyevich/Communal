@@ -147,9 +147,13 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'fish' => $item['fish'] ?? null,
                             'phone' => $item['phone'] ?? null,
                         ]);
+                        if (isset($item['images'])){
+                            $this->saveImages($regulation, $item['images']);
+                        }
+                        if (isset($item['videos'])){
+                            $this->saveImages($regulation, $item['videos']);
+                        }
 
-                        $this->saveImages($regulation, $item['images']);
-                        $this->saveVideos($regulation, $item['videos']);
                         $this->createHistory($originalMonitoring, MonitoringHistoryType::VIOLATION_DETECTED);
 
 
@@ -195,9 +199,12 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'company_id' => $item['company_id'] ?? null,
                         ]);
                         $this->createHistory($newMonitoring, MonitoringHistoryType::VIOLATION_DETECTED);
-
-                        $this->saveImages($regulation, $item['images']);
-                        $this->saveVideos($regulation, $item['videos']);
+                        if (isset($item['images'])){
+                            $this->saveImages($regulation, $item['images']);
+                        }
+                        if (isset($item['videos'])){
+                            $this->saveImages($regulation, $item['videos']);
+                        }
                         $results[] = $newMonitoring;
                     }
                 }
@@ -302,7 +309,6 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $paths = array_map(fn($video) => $this->fileService->uploadImage($video, 'regulation/videos'), $videos);
             $regulation->videos()->createMany(array_map(fn($path) => ['url' => $path], $paths));
         }
-
     }
 
     private function uploadFiles(Monitoring $monitoring, string $column, ?array $files, $filePath)
