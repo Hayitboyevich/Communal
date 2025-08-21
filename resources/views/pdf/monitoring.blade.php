@@ -178,25 +178,6 @@
 {{--                </div>--}}
             </td>
         </tr>
-        @if($monitoring->regulation->organization_name)
-            <tr>
-                <td style="padding: 10px">
-                    <div style="font-weight: 500; margin-bottom: 5px">Korxona nomi:</div>
-                </td>
-                <td>
-                    <p
-                        style="
-                border-bottom: 1px solid #bfbfbf;
-                margin-bottom: 5px;
-                text-align: center;
-              "
-                    >
-                        {{ $monitoring->regulation->organization_name }}
-                    </p>
-                </td>
-            </tr>
-        @endif
-
         <tr>
             <td style="padding: 10px">
                 <div style="font-weight: 500; margin-bottom: 5px">
@@ -215,6 +196,62 @@
                 </p>
             </td>
         </tr>
+
+        @if($monitoring->regulation->organization_name)
+            <tr>
+                <td style="padding: 10px">
+                    <div style="font-weight: 500; margin-bottom: 5px">Korxona nomi:</div>
+                </td>
+                <td>
+                    <p
+                        style="
+                border-bottom: 1px solid #bfbfbf;
+                margin-bottom: 5px;
+                text-align: center;
+              "
+                    >
+                        {{ $monitoring->regulation->organization_name }}
+                    </p>
+                </td>
+            </tr>
+        @endif
+        <tr>
+            <td style="padding: 10px">
+                <div style="font-weight: 500; margin-bottom: 5px">
+                    Javobgar shaxs telefon raqami:
+                </div>
+            </td>
+            <td>
+                <p
+                    style="
+                border-bottom: 1px solid #bfbfbf;
+                margin-bottom: 5px;
+                text-align: center;
+              "
+                >
+                    {{ $monitoring?->regulation?->phone }}
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 10px">
+                <div style="font-weight: 500; margin-bottom: 5px">
+                    Javobgar shaxs manzili:
+                </div>
+            </td>
+            <td>
+                <p
+                    style="
+                border-bottom: 1px solid #bfbfbf;
+                margin-bottom: 5px;
+                text-align: center;
+              "
+                >
+                    {{ $monitoring?->regulation?->address }}
+                </p>
+            </td>
+        </tr>
+
         <tr>
             <td style="padding: 10px">
                 <div style="font-weight: 500; margin-bottom: 5px">
@@ -237,6 +274,8 @@
                 </p>
             </td>
         </tr>
+
+
         <tr>
             <td style="padding: 10px">
                 <div style="font-weight: 500; margin-bottom: 5px">

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PdfController;
 
 Route::get('monitoring-pdf/{id}', [PdfController::class, 'monitoringPdf']);
+Route::get('protocol-pdf/{id}', [PdfController::class, 'protocolPdf']);
 
 Route::get('/', function () {
     return view('welcome');

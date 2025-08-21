@@ -113,9 +113,9 @@
         <tr>
             <td style="text-align: center; font-weight: 500;">
                 <div style="margin-bottom: 8px;  font-size: 16px">
-                    Ko‘p kvartirali uylarni boshqarish  va saqlash qoidalariga hamda issiqlik ta'minotidan
-                    foydalanishda normativ-huquqiy hujjatlar talablariga rioya etilishi yuzasidan o‘tkazilgan
-                    nazorat tadbiri jarayonida aniqlangan qonunbuzilish holatlarini bartaraf etish bo‘yicha
+                    Ichimlik suvi ta'minoti va oqova suvlarni chiqarib yuborish
+                    xizmatlarini ko‘rsatishda aniqlangan kamchiliklarni bartaraf
+                    qilish bo‘yicha bajarilishi majburiy bo‘lgan
                 </div>
                 <div
                     style="
@@ -124,7 +124,7 @@
                 font-size: 18px;
               "
                 >
-                    Majburiy Ko'rsatma
+                    Yozma Ko'rsatma
                 </div>
             </td>
         </tr>
@@ -150,7 +150,7 @@
             <td style="width: 50%">
                 <div style="text-align: right; padding: 0 10px">
                     <span style="color: #8c8c8c">№:</span>
-                    <span>{{ $protocol?->regulation?->id }}</span>
+                    <span>{{ $protocol?->id }}</span>
                 </div>
             </td>
         </tr>
@@ -171,14 +171,14 @@
                 text-align: center;
               "
                 >
-                    {{ $protocol?->regulation?->fish  ?? $protocol?->company?->company_name}}
+                    {{ $protocol?->functionary_name  ?? $protocol?->enterprise_name}}
                 </p>
                 {{--                <div style="font-size: 12px; text-align: center">--}}
                 {{--                    (Tashkilot nomi)--}}
                 {{--                </div>--}}
             </td>
         </tr>
-        @if($protocol->regulation->organization_name)
+        @if($protocol->enterprise_name)
             <tr>
                 <td style="padding: 10px">
                     <div style="font-weight: 500; margin-bottom: 5px">Korxona nomi:</div>
@@ -191,7 +191,7 @@
                 text-align: center;
               "
                     >
-                        {{ $protocol->regulation->organization_name }}
+                        {{ $protocol->enterprise_name }}
                     </p>
                 </td>
             </tr>
@@ -218,7 +218,7 @@
         <tr>
             <td style="padding: 10px">
                 <div style="font-weight: 500; margin-bottom: 5px">
-                    Boshqaruv organi:
+                    Mahalla, Ko'cha, Uy:
                 </div>
             </td>
             <td>
@@ -229,18 +229,14 @@
                 text-align: center;
               "
                 >
-                    @if($protocol->bsk_type == 1) O'zini o'zi boshqaruvchi
-                    @elseif($protocol->bsk_type == 2) Egasiz
-                    @else
-                        {{ $protocol?->company?->company_name ?? null }}
-                    @endif
+                    {{ $protocol->address }}
                 </p>
             </td>
         </tr>
         <tr>
             <td style="padding: 10px">
                 <div style="font-weight: 500; margin-bottom: 5px">
-                    Boshqaruvdagi uy:
+                    O'rganish turi:
                 </div>
             </td>
             <td>
@@ -251,29 +247,7 @@
                 text-align: center;
               "
                 >
-                    @if($protocol->bsk_type)
-                        {{ $protocol->address }}
-                    @else
-                        {{ $protocol?->apartment?->home_name }}
-                    @endif
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 10px">
-                <div style="font-weight: 500; margin-bottom: 5px">
-                    Xonadon raqami(kvartira):
-                </div>
-            </td>
-            <td>
-                <p
-                    style="
-                border-bottom: 1px solid #bfbfbf;
-                margin-bottom: 5px;
-                text-align: center;
-              "
-                >
-                    {{ $protocol->address_commit }}
+                    {{ $protocol->protocolType->name }}
                 </p>
             </td>
         </tr>
@@ -291,9 +265,9 @@
         <thead>
         <tr>
             <th style="border: 1px solid #bfbfbf; padding: 10px">№</th>
-            <th style="border: 1px solid #bfbfbf; padding: 10px">O'rganilgan joy:</th>
+            <th style="border: 1px solid #bfbfbf; padding: 10px">Kamchilik turi:</th>
             <th style="border: 1px solid #bfbfbf; padding: 10px">
-                Aniqlangan qoidabuzarlik:
+                Aniqlangan kamchilik:
             </th>
             <th style="border: 1px solid #bfbfbf; padding: 10px">Berilgan ko'rsatma:</th>
             <th style="border: 1px solid #bfbfbf; padding: 10px">
@@ -323,7 +297,7 @@
               padding: 10px;
             "
             >
-                {{ $monitoring->regulation->place->name }}
+                {{ $protocol?->defect?->name }}
             </td>
             <td
                 style="
@@ -332,7 +306,7 @@
                   padding: 10px;
             "
             >
-                {{ $monitoring->regulation->violationType->name }}
+                {{ $protocol?->defect_information}}
 
             </td>
             <td
@@ -342,7 +316,7 @@
               padding: 10px;
             "
             >
-                {{ $monitoring?->violation?->desc }}
+                {{ $protocol?->comment }}
             </td>
             <td
                 style="
@@ -351,7 +325,7 @@
               padding: 10px;
             "
             >
-                {{ $monitoring?->violation?->deadline }}
+                {{ date('Y-m-d', strtotime($protocol?->deadline)) }}
             </td>
             <td
                 style="
@@ -360,7 +334,7 @@
               padding: 10px;
             "
             >
-                {{ $monitoring->status->name }}
+                {{ $protocol?->status->name }}
             </td>
         </tr>
         </tbody>
@@ -378,13 +352,7 @@
         <tr>
             <td style="width: 60px; vertical-align: top">Izoh:</td>
             <td>
-                Ko‘p kvartirali uylarni boshqarish va saqlash, ulardan texnik foydalanish,
-                umum foydalanadigan joylarni sanitariya holatida saqlash qoidalari, tutash
-                yer uchastkalarini saqlash talablari buzilganligi hamda issiqlik taʼminotidan
-                foydalanishda normativ-huquqiy hujjatlar talablariga rioya etilmaganligi bo‘yicha
-                berilayotgan ijro etilishi majburiy bo‘lgan ko‘rsatma talablari belgilangan muddatda
-                bajarilmagan taqdirda, Siz Maʼmuriy javobgarlik to‘g‘risidagi kodeksining tegishli
-                moddalari (101-moddaning 1-qismi  va 159-modda)da nazarda tutilgan javobgarlikka tortilasiz.
+                Ko'rsatilgan kamchiliklar bartaraf etilgach, Inspeksiyaga rasmiy ravishda xabar berilishi shart.
             </td>
         </tr>
         </tbody>
@@ -392,7 +360,7 @@
 
     <table
         style="
-        margin-bottom: 10px;
+        margin-bottom: 4px;
         width: 100%;
         border: none;
         border-collapse: collapse;
@@ -403,7 +371,7 @@
             <td style="padding: 10px 10px 10px 0">
                 <div style="font-weight: 600; margin-bottom: 5px">Inspektor</div>
                 <p style="margin: 0">
-                    {{ $monitoring->user->full_name }}
+                    {{ $protocol?->inspector?->full_name }}
                 </p>
             </td>
             <td rowspan="2">
@@ -419,7 +387,7 @@
 
     <table
         style="
-        margin-bottom: 10px;
+        margin-bottom: 4px;
         width: 100%;
         border: none;
         border-collapse: collapse;

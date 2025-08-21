@@ -25,6 +25,9 @@ class ClaimRepository implements ClaimRepositoryInterface
                 $q->where('status', $filters['status']);
             });
         switch ($roleId) {
+            case UserRoleEnum::CADASTR_VIEWER->value:
+            case UserRoleEnum::APARTMENT_VIEWER->value:
+                return $query;
             case UserRoleEnum::CADASTR_USER->value:
                 return $query->where(function ($q) use ($user) {
                     $q->where('user_id', $user->id)

@@ -14,6 +14,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Enums\ProtocolStatusEnum;
 use Modules\Water\Http\Requests\ProtocolFirstStepRequest;
@@ -24,6 +25,7 @@ use Modules\Water\Http\Resources\ProtocolListResource;
 use Modules\Water\Http\Resources\ProtocolResource;
 use Modules\Water\Models\Protocol;
 use Modules\Water\Services\ProtocolService;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ProtocolController extends BaseController
 {
@@ -200,8 +202,11 @@ class ProtocolController extends BaseController
     {
         try {
             $protocol = Protocol::query()->findOrFail($id);
+            $domain = URL::to('/regulation-info').'/'.$id;
+
+            $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
             $pdf = Pdf::loadView('pdf.protocol', compact(
-                'protocol'
+                'protocol', 'qrImage'
             ));
             $pdfOutput = $pdf->output();
             $pdfBase64 = base64_encode($pdfOutput);
