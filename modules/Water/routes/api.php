@@ -28,6 +28,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::get('/history/{id}', 'history');
         Route::get('/pdf/{id}', 'pdf');
         Route::get('/fine/{id}', 'fine');
+        Route::get('/excel/{id}', 'excel');
         Route::get('/{id?}', 'index');
     });
 

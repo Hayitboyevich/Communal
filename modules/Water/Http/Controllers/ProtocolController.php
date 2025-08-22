@@ -5,6 +5,8 @@ namespace Modules\Water\Http\Controllers;
 use App\Constants\ErrorMessage;
 use App\Enums\ObjectStatusEnum;
 use App\Enums\UserRoleEnum;
+use App\Exports\ProtocolExport;
+use App\Exports\RegulationExport;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\ProtocolChangeRequest;
 use App\Models\District;
@@ -15,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
+use Maatwebsite\Excel\Facades\Excel;
 use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Enums\ProtocolStatusEnum;
 use Modules\Water\Http\Requests\ProtocolFirstStepRequest;
@@ -55,6 +58,15 @@ class ProtocolController extends BaseController
             );
 
         } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
+        }
+    }
+
+    public function excel($id)
+    {
+        try {
+            return Excel::download(new ProtocolExport($id), 'protocol.xlsx');
+        }catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
         }
     }
@@ -239,7 +251,7 @@ class ProtocolController extends BaseController
             $protocolCounts = $this->getGroupedCounts(
                 query: Protocol::query(),
                 selectRaw: $group,
-                groupBy: [$group, 'protocol_status_id', 'type', 'category'], // category ham qo‘shildi
+                groupBy: [$group, 'protocol_status_id', 'type', 'category'],
                 startDate: $startDate,
                 endDate: $endDate
             )->groupBy($group);

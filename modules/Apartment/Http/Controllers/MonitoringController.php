@@ -66,13 +66,25 @@ class MonitoringController extends BaseController
         }
     }
 
+    private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
+    {
+        if ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        return $query
+            ->selectRaw("$selectRaw, monitoring_status_id, COUNT(*) as count")
+            ->groupBy(...$groupBy)
+            ->get();
+    }
+
     public function report($regionId = null): JsonResponse
     {
         try {
             $startDate = request('date_from');
-            $endDate = request('date_to');
+            $endDate   = request('date_to');
 
-            $regionId = request('region_id');
+            $regionId  = request('region_id');
 
             $regions = $regionId
                 ? District::query()->where('region_id', $regionId)->get(['id', 'name_uz'])
@@ -81,9 +93,9 @@ class MonitoringController extends BaseController
             $group = $regionId ? 'district_id' : 'region_id';
 
             $userCounts = User::query()
-                ->selectRaw($group . ', COUNT(*) as count')
-                ->leftJoin('user_roles', 'user_roles.user_id', '=', 'users.id')
+                ->join('user_roles', 'user_roles.user_id', '=', 'users.id')
                 ->where('user_roles.role_id', UserRoleEnum::APARTMENT_INSPECTOR->value)
+                ->selectRaw("$group, COUNT(users.id) as count")
                 ->groupBy($group)
                 ->pluck('count', $group);
 
@@ -93,46 +105,43 @@ class MonitoringController extends BaseController
                 groupBy: [$group, 'monitoring_status_id'],
                 startDate: $startDate,
                 endDate: $endDate
-            )
-                ->groupBy($group);
-
-
+            )->groupBy($group);
 
             $data = $regions->map(function ($region) use ($userCounts, $protocolCounts) {
-                $regionId = $region->id;
-                $regionProtocols = collect($protocolCounts->get($regionId, []));
+                $regionId        = $region->id;
+                $regionProtocols = $protocolCounts->get($regionId, collect());
 
                 $sumByStatus = fn($statuses) =>
                 $regionProtocols->whereIn('monitoring_status_id', (array)$statuses)->sum('count');
 
                 return [
-                    'id' => $region->id,
-                    'name' => $region->name_uz,
-                    'inspector_count' => $userCounts->get($regionId, 0),
-                    'all_monitorings' => $regionProtocols->sum('count'),
-                    'all_defect_count' => $sumByStatus([
-                        MonitoringStatusEnum::DEFECT->value,
-                        MonitoringStatusEnum::DONE->value,
-                        MonitoringStatusEnum::COURT->value,
-                        MonitoringStatusEnum::MIB->value,
-                        MonitoringStatusEnum::FIXED->value,
-                        MonitoringStatusEnum::ADMINISTRATIVE->value,
-                        MonitoringStatusEnum::CONFIRM_RESULT->value,
+                    'id'                => $region->id,
+                    'name'              => $region->name_uz,
+                    'inspector_count'   => $userCounts->get($regionId, 0),
+                    'all_monitorings'   => $regionProtocols->sum('count'),
+                    'all_defect_count'  => $sumByStatus([
+                        MonitoringStatusEnum::DEFECT,
+                        MonitoringStatusEnum::DONE,
+                        MonitoringStatusEnum::COURT,
+                        MonitoringStatusEnum::MIB,
+                        MonitoringStatusEnum::FIXED,
+                        MonitoringStatusEnum::ADMINISTRATIVE,
+                        MonitoringStatusEnum::CONFIRM_RESULT,
                     ]),
-                    'all_fix' => $sumByStatus([
-                        MonitoringStatusEnum::DONE->value,
-                        MonitoringStatusEnum::ADMINISTRATIVE->value,
-                        MonitoringStatusEnum::COURT->value,
-                        MonitoringStatusEnum::MIB->value,
-                        MonitoringStatusEnum::HMQO->value,
-                        MonitoringStatusEnum::FIXED->value,
+                    'all_fix'           => $sumByStatus([
+                        MonitoringStatusEnum::DONE,
+                        MonitoringStatusEnum::ADMINISTRATIVE,
+                        MonitoringStatusEnum::COURT,
+                        MonitoringStatusEnum::MIB,
+                        MonitoringStatusEnum::HMQO,
+                        MonitoringStatusEnum::FIXED,
                     ]),
-                    'fix_done' => $sumByStatus(MonitoringStatusEnum::DONE->value),
-                    'fix_administrative' => $sumByStatus(MonitoringStatusEnum::ADMINISTRATIVE->value),
-                    'fix_court' => $sumByStatus(MonitoringStatusEnum::COURT->value),
-                    'fix_mib' => $sumByStatus(MonitoringStatusEnum::MIB->value),
-                    'fix_hmqo' => $sumByStatus(MonitoringStatusEnum::HMQO->value),
-                    'fixed' => $sumByStatus(MonitoringStatusEnum::FIXED->value),
+                    'fix_done'          => $sumByStatus([MonitoringStatusEnum::DONE]),
+                    'fix_administrative'=> $sumByStatus([MonitoringStatusEnum::ADMINISTRATIVE]),
+                    'fix_court'         => $sumByStatus([MonitoringStatusEnum::COURT]),
+                    'fix_mib'           => $sumByStatus([MonitoringStatusEnum::MIB]),
+                    'fix_hmqo'          => $sumByStatus([MonitoringStatusEnum::HMQO]),
+                    'fixed'             => $sumByStatus([MonitoringStatusEnum::FIXED]),
                 ];
             });
 
@@ -142,6 +151,7 @@ class MonitoringController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
 
 
     public function history($id): JsonResponse
@@ -269,18 +279,6 @@ class MonitoringController extends BaseController
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
-    }
-
-    private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
-    {
-        if ($startDate && $endDate) {
-            $query->whereBetween('created_at', [$startDate, $endDate]);
-        }
-
-        return $query
-            ->selectRaw("$selectRaw, monitoring_status_id,  COUNT(*) as count")
-            ->groupBy(...$groupBy)
-            ->get();
     }
 
 
