@@ -3,6 +3,7 @@
 namespace Modules\Water\Http\Controllers;
 
 use App\Constants\ErrorMessage;
+use App\Constants\FineType;
 use App\Enums\ObjectStatusEnum;
 use App\Enums\UserRoleEnum;
 use App\Exports\ProtocolExport;
@@ -275,7 +276,13 @@ class ProtocolController extends BaseController
                     'remedy_count'       => $regionProtocols->where('category', 2)->sum('count'),
                     'confirmed_count'    => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED->value)->sum('count'),
                     'administrative_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::ADMINISTRATIVE->value)->sum('count'),
+                    'confirm_result_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRM_RESULT->value)->sum('count'),
                     'hmqo_count'         => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::HMQO->value)->sum('count'),
+                    'decision_count'  => $regionProtocols->sum('decision_count'),
+                    'paid_count'      => $regionProtocols->sum('paid_count'),
+                    'unpaid_count'    => $regionProtocols->sum('unpaid_count'),
+                    'total_amount'    => $regionProtocols->sum('total_amount'),
+
                 ];
             });
 
@@ -286,96 +293,61 @@ class ProtocolController extends BaseController
         }
     }
 
-
     private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
     {
         if ($startDate && $endDate) {
-            $query->whereBetween('created_at', [$startDate, $endDate]);
+            $query->whereBetween('protocols.created_at', [$startDate, $endDate]);
         }
 
         if (request('program_id')) {
-            $query->where('program_id', request('program_id'));
+            $query->where('protocols.program_id', request('program_id'));
         }
 
         return $query
-            ->selectRaw("$selectRaw, protocol_status_id, type, category, COUNT(*) as count")
+            ->leftJoin('decisions', function ($join) {
+                $join->on('decisions.guid', '=', 'protocols.id')
+                ->where('decisions.project_id', FineType::WATER);
+            })
+            ->selectRaw("
+            $selectRaw,
+            protocol_status_id,
+            type,
+            category,
+            COUNT(protocols.id) as count,
+
+            COUNT(decisions.id) as decision_count,
+
+            SUM(CASE WHEN decisions.decision_status = 12 THEN 1 ELSE 0 END) as paid_count,
+            SUM(CASE WHEN decisions.decision_status != 12 OR decisions.decision_status IS NULL THEN 1 ELSE 0 END) as unpaid_count,
+
+            SUM(decisions.main_punishment_amount) as total_amount,
+
+        ")
             ->groupBy(...$groupBy)
             ->get();
     }
 
 
-//    public function protocolReport($regionId = null): JsonResponse
-//    {
-//        try {
-//            $startDate = request('date_from');
-//            $endDate = request('date_to');
-//
-//            $regionId = request('region_id');
-//
-//            $regions = $regionId
-//                ? District::query()->where('region_id', $regionId)->get(['id', 'name_uz'])
-//                : Region::all(['id', 'name_uz']);
-//
-//            $group = $regionId ? 'district_id' : 'region_id';
-//
-//            $userCounts = User::query()
-//                ->selectRaw($group . ', COUNT(*) as count')
-//                ->leftJoin('user_roles', 'user_roles.user_id', '=', 'users.id')
-//                ->where('user_roles.role_id', UserRoleEnum::INSPECTOR->value)
-//                ->groupBy($group)
-//                ->pluck('count', $group);
-//
-//            $protocolCounts = $this->getGroupedCounts(
-//                query: Protocol::query(),
-//                selectRaw:$group,
-//                groupBy:[$group, 'protocol_status_id', 'type'],
-//                startDate: $startDate,
-//                endDate: $endDate
-//            )->groupBy($group);
-//
-//            $data = $regions->map(function ($region) use (
-//                $userCounts,
-//                $protocolCounts,
-//
-//            ) {
-//                $regionId = $region->id;
-//                $regionProtocols = $protocolCounts->get($regionId, collect());
-//
-//                return [
-//                    'id' => $region->id,
-//                    'name' => $region->name_uz,
-//                    'inspector_count' => $userCounts->get($regionId, 0),
-//                    'all_protocols' => $regionProtocols->sum('count'),
-//                    'defect_count' => $regionProtocols->whereNotIn('protocol_status_id', [ProtocolStatusEnum::ENTER_RESULT->value,ProtocolStatusEnum::NOT_DEFECT->value, ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value, ProtocolStatusEnum::REJECTED->value])->sum('count'),
-//                    'remedy_count' => $regionProtocols->where('category', 2)->sum('count'),
-//                    'confirmed_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED->value)->sum('count'),
-//                    'administrative_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::ADMINISTRATIVE->value)->sum('count'),
-//                    'hmqo_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::HMQO->value)->sum('count'),
-//
-//                ];
-//            });
-//
-//            return $this->sendSuccess($data->values(), 'Data retrieved successfully');
-//
-//        }catch (\Exception $exception){
-//            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
-//        }
-//    }
-//
+
+
+
+
 //    private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
 //    {
 //        if ($startDate && $endDate) {
 //            $query->whereBetween('created_at', [$startDate, $endDate]);
 //        }
-//        if (\request('program_id')) {
-//            $query->where('program_id', \request('program_id'));
+//
+//        if (request('program_id')) {
+//            $query->where('program_id', request('program_id'));
 //        }
 //
 //        return $query
-//            ->selectRaw("$selectRaw, COUNT(*) as count")
+//            ->selectRaw("$selectRaw, protocol_status_id, type, category, COUNT(*) as count")
 //            ->groupBy(...$groupBy)
 //            ->get();
 //    }
+
 
     public function fine($id): JsonResponse
     {
