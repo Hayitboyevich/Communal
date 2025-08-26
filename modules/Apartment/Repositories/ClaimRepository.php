@@ -23,7 +23,17 @@ class ClaimRepository implements ClaimRepositoryInterface
         $query = $this->model->query()
             ->when(isset($filters['status']), function ($q) use ($filters) {
                 $q->where('status', $filters['status']);
+            })
+            ->when(isset($filters['region_id']), function ($q) use ($filters) {
+                $q->where('region_id', $filters['region_id']);
+            })
+            ->when(isset($filters['district_id']), function ($q) use ($filters) {
+                $q->where('district_id', $filters['district_id']);
+            })
+            ->when(isset($filters['cadastral_number']), function ($q) use ($filters) {
+                $q->where('cadastral_number', $filters['cadastral_number']);
             });
+
         switch ($roleId) {
             case UserRoleEnum::CADASTR_VIEWER->value:
             case UserRoleEnum::APARTMENT_VIEWER->value:
