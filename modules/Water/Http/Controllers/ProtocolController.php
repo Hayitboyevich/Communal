@@ -242,6 +242,7 @@ class ProtocolController extends BaseController
                 : Region::all(['id', 'name_uz']);
 
             $group = $regionId ? 'district_id' : 'region_id';
+
             $userCounts = User::query()
                 ->join('user_roles', 'user_roles.user_id', '=', 'users.id')
                 ->where('user_roles.role_id', UserRoleEnum::INSPECTOR->value)
@@ -262,36 +263,36 @@ class ProtocolController extends BaseController
                 $regionProtocols = $protocolCounts->get($regionId, collect());
 
                 return [
-                    'id'                 => $region->id,
-                    'name'               => $region->name_uz,
-                    'inspector_count'    => $userCounts->get($regionId, 0),
-                    'all_protocols'      => $regionProtocols->sum('count'),
-                    'defect_count'       => $regionProtocols
+                    'id'                   => $region->id,
+                    'name'                 => $region->name_uz,
+                    'inspector_count'      => $userCounts->get($regionId, 0),
+                    'all_protocols'        => $regionProtocols->sum('count'),
+                    'defect_count'         => $regionProtocols
                         ->whereNotIn('protocol_status_id', [
                             ProtocolStatusEnum::ENTER_RESULT->value,
                             ProtocolStatusEnum::NOT_DEFECT->value,
                             ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value,
                             ProtocolStatusEnum::REJECTED->value
                         ])->sum('count'),
-                    'remedy_count'       => $regionProtocols->where('category', 2)->sum('count'),
-                    'confirmed_count'    => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED->value)->sum('count'),
+                    'remedy_count'         => $regionProtocols->where('category', 2)->sum('count'),
+                    'confirmed_count'      => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED->value)->sum('count'),
                     'administrative_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::ADMINISTRATIVE->value)->sum('count'),
                     'confirm_result_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRM_RESULT->value)->sum('count'),
-                    'hmqo_count'         => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::HMQO->value)->sum('count'),
-                    'decision_count'  => $regionProtocols->sum('decision_count'),
-                    'paid_count'      => $regionProtocols->sum('paid_count'),
-                    'unpaid_count'    => $regionProtocols->sum('unpaid_count'),
-                    'total_amount'    => $regionProtocols->sum('total_amount'),
+                    'hmqo_count'           => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::HMQO->value)->sum('count'),
 
+                    'decision_count'       => $regionProtocols->sum('decision_count'),
+                    'paid_count'           => $regionProtocols->sum('paid_count'),
+                    'unpaid_count'         => $regionProtocols->sum('unpaid_count'),
+                    'total_amount'         => $regionProtocols->sum('total_amount'),
                 ];
             });
 
             return $this->sendSuccess($data->values(), 'Data retrieved successfully');
-
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
 
     private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
     {
@@ -306,7 +307,7 @@ class ProtocolController extends BaseController
         return $query
             ->leftJoin('decisions', function ($join) {
                 $join->on('decisions.guid', '=', 'protocols.id')
-                ->where('decisions.project_id', FineType::WATER);
+                    ->where('decisions.project_id', FineType::WATER);
             })
             ->selectRaw("
             $selectRaw,
@@ -314,14 +315,10 @@ class ProtocolController extends BaseController
             type,
             category,
             COUNT(protocols.id) as count,
-
             COUNT(decisions.id) as decision_count,
-
             SUM(CASE WHEN decisions.decision_status = 12 THEN 1 ELSE 0 END) as paid_count,
             SUM(CASE WHEN decisions.decision_status != 12 OR decisions.decision_status IS NULL THEN 1 ELSE 0 END) as unpaid_count,
-
-            SUM(decisions.main_punishment_amount) as total_amount,
-
+            SUM(decisions.main_punishment_amount) as total_amount
         ")
             ->groupBy(...$groupBy)
             ->get();
