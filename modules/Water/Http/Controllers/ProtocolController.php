@@ -234,33 +234,29 @@ class ProtocolController extends BaseController
         try {
             $startDate = request('date_from');
             $endDate   = request('date_to');
-
-            $regionId = $regionId ?? request('region_id');
+            $regionId  = $regionId ?? request('region_id');
 
             $regions = $regionId
                 ? District::query()->where('region_id', $regionId)->get(['id', 'name_uz'])
                 : Region::all(['id', 'name_uz']);
 
-            // Group darajasi: agar region bo‘yicha bo‘lsa -> region_id, agar district bo‘yicha bo‘lsa -> district_id
-            $group = $regionId ? 'district_id' : 'region_id';
+            $group = $regionId ? 'protocols.district_id' : 'protocols.region_id';
 
-            // 👮 Inspectorlar soni
             $userCounts = User::query()
                 ->join('user_roles', 'user_roles.user_id', '=', 'users.id')
                 ->where('user_roles.role_id', UserRoleEnum::INSPECTOR->value)
-                ->selectRaw("users.$group, COUNT(users.id) as count")
-                ->groupBy("users.$group")
-                ->pluck('count', $group);
+                ->selectRaw(($regionId ? 'users.district_id' : 'users.region_id') . ' as group_id, COUNT(users.id) as count')
+                ->groupBy('group_id')
+                ->pluck('count', 'group_id');
 
-            // 📊 Protocol counts
             $protocolCounts = $this->getGroupedCounts(
                 query: Protocol::query(),
-                groupColumn: "protocols.$group",
+                selectRaw: $group . ' as group_id',
+                groupBy: [$group, 'protocols.protocol_status_id', 'protocols.type', 'protocols.category'],
                 startDate: $startDate,
                 endDate: $endDate
-            )->groupBy($group);
+            )->groupBy('group_id');
 
-            // 🗂️ Region/district kesimida data
             $data = $regions->map(function ($region) use ($userCounts, $protocolCounts) {
                 $regionId        = $region->id;
                 $regionProtocols = $protocolCounts->get($regionId, collect());
@@ -270,35 +266,38 @@ class ProtocolController extends BaseController
                     'name'                 => $region->name_uz,
                     'inspector_count'      => $userCounts->get($regionId, 0),
                     'all_protocols'        => $regionProtocols->sum('count'),
-                    'defect_count'         => $regionProtocols
-                        ->whereNotIn('protocol_status_id', [
-                            ProtocolStatusEnum::ENTER_RESULT->value,
-                            ProtocolStatusEnum::NOT_DEFECT->value,
-                            ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value,
-                            ProtocolStatusEnum::REJECTED->value
-                        ])->sum('count'),
+                    'defect_count'         => $regionProtocols->whereNotIn('protocol_status_id', [
+                        ProtocolStatusEnum::ENTER_RESULT->value,
+                        ProtocolStatusEnum::NOT_DEFECT->value,
+                        ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value,
+                        ProtocolStatusEnum::REJECTED->value
+                    ])->sum('count'),
                     'remedy_count'         => $regionProtocols->where('category', 2)->sum('count'),
                     'confirmed_count'      => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED->value)->sum('count'),
                     'administrative_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::ADMINISTRATIVE->value)->sum('count'),
                     'confirm_result_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRM_RESULT->value)->sum('count'),
                     'hmqo_count'           => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::HMQO->value)->sum('count'),
 
-                    // decisionlar bo‘yicha
                     'decision_count'       => $regionProtocols->sum('decision_count'),
                     'paid_count'           => $regionProtocols->sum('paid_count'),
                     'unpaid_count'         => $regionProtocols->sum('unpaid_count'),
+
                     'total_amount'         => $regionProtocols->sum('total_amount'),
+                    'paid_amount'          => $regionProtocols->sum('paid_amount'),
+                    'unpaid_amount'        => $regionProtocols->sum('unpaid_amount'),
                 ];
             });
 
             return $this->sendSuccess($data->values(), 'Data retrieved successfully');
+
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
 
-    private function getGroupedCounts($query, string $groupColumn, $startDate = null, $endDate = null)
+
+    private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
     {
         if ($startDate && $endDate) {
             $query->whereBetween('protocols.created_at', [$startDate, $endDate]);
@@ -314,41 +313,25 @@ class ProtocolController extends BaseController
                     ->where('decisions.project_id', FineType::WATER);
             })
             ->selectRaw("
-            $groupColumn as $groupColumn,
+            $selectRaw,
             protocols.protocol_status_id,
             protocols.type,
             protocols.category,
             COUNT(protocols.id) as count,
+
             COUNT(decisions.id) as decision_count,
+
             SUM(CASE WHEN decisions.decision_status = 12 THEN 1 ELSE 0 END) as paid_count,
             SUM(CASE WHEN decisions.decision_status != 12 OR decisions.decision_status IS NULL THEN 1 ELSE 0 END) as unpaid_count,
-            SUM(decisions.main_punishment_amount::numeric) as total_amount
+
+            SUM(decisions.main_punishment_amount::numeric) as total_amount,
+            SUM(CASE WHEN decisions.decision_status = 12 THEN decisions.main_punishment_amount::numeric ELSE 0 END) as paid_amount,
+            SUM(CASE WHEN decisions.decision_status != 12 OR decisions.decision_status IS NULL THEN decisions.main_punishment_amount::numeric ELSE 0 END) as unpaid_amount
         ")
-            ->groupBy($groupColumn, 'protocols.protocol_status_id', 'protocols.type', 'protocols.category')
+            ->groupBy(...$groupBy)
             ->get();
     }
 
-
-
-
-
-
-
-//    private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
-//    {
-//        if ($startDate && $endDate) {
-//            $query->whereBetween('created_at', [$startDate, $endDate]);
-//        }
-//
-//        if (request('program_id')) {
-//            $query->where('program_id', request('program_id'));
-//        }
-//
-//        return $query
-//            ->selectRaw("$selectRaw, protocol_status_id, type, category, COUNT(*) as count")
-//            ->groupBy(...$groupBy)
-//            ->get();
-//    }
 
 
     public function fine($id): JsonResponse
