@@ -47,6 +47,11 @@ class ProtocolExport implements FromCollection, WithHeadings
                     $protocol->defect_information ?? '',
                     $protocol->defect_comment ?? '',
                     $protocol->comment ?? '',
+                    $protocol->fine ? $protocol->fine->series .''.$protocol->fine->number : '',
+                    $protocol->fine ? $protocol->fine->decision_series .''.$protocol->fine->decision_number : '',
+                    $protocol->fine ? $protocol->fine->status_name : '',
+                    $protocol->fine ? $protocol->fine->main_punishment_amount : '',
+                    $protocol->fine ? $protocol->fine->paid_amount : '',
                 ];
             });
     }
@@ -73,6 +78,11 @@ class ProtocolExport implements FromCollection, WithHeadings
             'Kamchilik haqida ma\'lumot',
             'Kamchilik izoh',
             'Izoh',
+            'Bayonnoma seriya va raqami',
+            'Qaror seriya va raqami',
+            'Mamuriy holati',
+            'Jarima miqdori',
+            'To\'langan miqdor'
         ];
     }
 }
