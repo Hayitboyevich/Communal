@@ -259,7 +259,9 @@ class ProtocolController extends BaseController
 
             $data = $regions->map(function ($region) use ($userCounts, $protocolCounts) {
                 $regionId        = $region->id;
-                $regionProtocols = $protocolCounts->get($regionId, collect());
+//                $regionProtocols = $protocolCounts->get($regionId, collect());
+                $regionProtocols = collect($protocolCounts->get($regionId, []));
+
 
                 return [
                     'id'                   => $region->id,
