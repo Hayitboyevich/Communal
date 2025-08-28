@@ -60,6 +60,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 Route::group(['middleware' => ['basic']], function () {
     Route::controller(InformationController::class)->prefix('info')->group(function () {
         Route::get('/types', 'types');
+        Route::get('/defects/{id}', 'defects');
         Route::get('/region/{id?}', 'region');
         Route::get('/district', 'district');
         Route::post('/protocol-water', 'protocolWater');

@@ -50,6 +50,8 @@ class ProtocolWaterRequest extends FormRequest
             'inspector_name' => 'sometimes',
             'participant_name' => 'sometimes',
             'files' => 'sometimes',
+            'defect_id' => 'sometimes',
+            'defect_comment' => 'sometimes',
         ];
     }
 

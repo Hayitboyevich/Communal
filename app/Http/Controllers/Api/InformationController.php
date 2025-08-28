@@ -20,10 +20,12 @@ use Modules\Apartment\Http\Resources\MonitoringTypeResource;
 use Modules\Apartment\Models\MonitoringType;
 use Modules\Apartment\Services\MonitoringService;
 use Modules\Water\Http\Requests\FineUpdateRequest;
+use Modules\Water\Http\Resources\DefectResource;
 use Modules\Water\Http\Resources\ProtocolOgohListResource;
 use Modules\Water\Http\Resources\ProtocolResource;
 use Modules\Water\Http\Resources\ProtocolStatusResource;
 use Modules\Water\Http\Resources\ProtocolTypeResource;
+use Modules\Water\Models\Defect;
 use Modules\Water\Models\ProtocolStatus;
 use Modules\Water\Models\ProtocolType;
 use Modules\Water\Services\DecisionService;
@@ -42,7 +44,37 @@ class InformationController extends BaseController
     public function types(): JsonResponse
     {
         try {
-           return $this->sendSuccess(ProtocolTypeResource::collection(ProtocolType::all()), 'All types');
+            $type = request('type');
+
+            if ($type == 'water')
+            {
+                $types = ProtocolType::query()->where('send_water', 1)->get();
+                return $this->sendSuccess(ProtocolTypeResource::collection($types), 'All types');
+            }
+            if ($type == 'ogoh'){
+                $types = ProtocolType::query()->where('send_ogoh', 1)->get();
+                return $this->sendSuccess(ProtocolTypeResource::collection($types), 'All types');
+            }
+           return $this->sendSuccess([], 'All types');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function defects($id): JsonResponse
+    {
+        try {
+            $type = request('type');
+            if ($type == 'water')
+            {
+                $defects = Defect::query()->where('protocol_type_id', $id)->where('send_water', 1)->get();
+                return $this->sendSuccess(DefectResource::collection($defects), 'All defects');
+            }
+            if ($type == 'ogoh'){
+                $defects = Defect::query()->where('protocol_type_id', $id)->where('send_ogoh', 1)->get();
+                return $this->sendSuccess(DefectResource::collection($defects), 'All defects');
+            }
+            return $this->sendSuccess([], 'All defects');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }

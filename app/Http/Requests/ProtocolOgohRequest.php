@@ -38,6 +38,8 @@ class ProtocolOgohRequest extends FormRequest
             'role_id' => 'sometimes',
             'fish'=> 'required|string',
             'phone_number'=> 'required|string',
+            'defect_id' => 'sometimes',
+            'defect_comment' => 'sometimes',
         ];
     }
 
