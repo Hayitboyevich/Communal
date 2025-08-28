@@ -259,9 +259,7 @@ class ProtocolController extends BaseController
 
             $data = $regions->map(function ($region) use ($userCounts, $protocolCounts) {
                 $regionId        = $region->id;
-//                $regionProtocols = $protocolCounts->get($regionId, collect());
-                $regionProtocols = collect($protocolCounts->get($regionId, []));
-
+                $regionProtocols = $protocolCounts->get($regionId, collect());
 
                 return [
                     'id'                   => $region->id,
@@ -277,9 +275,7 @@ class ProtocolController extends BaseController
                     'remedy_count'         => $regionProtocols->where('category', 2)->sum('count'),
                     'confirmed_count'      => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED->value)->sum('count'),
                     'administrative_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::ADMINISTRATIVE->value)->sum('count'),
-                    'confirm_result_count' => $regionProtocols
-                        ->whereIn('protocol_status_id', [(int) ProtocolStatusEnum::FORMED->value, (int) ProtocolStatusEnum::CONFIRM_RESULT->value])
-                        ->sum('count'),
+                    'confirm_result_count' => $regionProtocols->where('protocol_status_id',  ProtocolStatusEnum::FORMED->value)->sum('count'),
                     'hmqo_count'           => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::HMQO->value)->sum('count'),
 
                     'decision_count'       => $regionProtocols->sum('decision_count'),
