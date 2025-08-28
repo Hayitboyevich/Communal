@@ -30,7 +30,7 @@ class ProtocolExport implements FromCollection, WithHeadings
                 return [
                     $protocol?->district?->name_uz ?? '',
                     $protocol?->status?->name ?? '',
-                    $protocol?->inpector?->full_name ?? '',
+                    $protocol?->inpector?->surname.' '. $protocol?->inpector?->name .' '.$protocol?->inpector?->middle_name ?? '',
                     $protocol?->protocolType?->name ?? '',
                     $protocol?->defect?->name ?? '',
                     date_format($protocol->created_at, 'Y-m-d') ?? '',
