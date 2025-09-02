@@ -3,6 +3,7 @@
 namespace Modules\Apartment\Http\Controllers;
 
 use App\Constants\ErrorMessage;
+use App\Constants\FineType;
 use App\Enums\UserRoleEnum;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\MonitoringCreateSecondRequest;
@@ -69,13 +70,30 @@ class MonitoringController extends BaseController
     private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
     {
         if ($startDate && $endDate) {
-            $query->whereBetween('created_at', [$startDate, $endDate]);
+            $query->whereBetween('monitorings.created_at', [$startDate, $endDate]);
         }
-
         return $query
-            ->selectRaw("$selectRaw, monitoring_status_id, COUNT(*) as count")
+            ->leftJoin('decisions', function ($join) {
+                $join->on('decisions.guid', '=', 'monitorings.id')
+                    ->where('decisions.project_id', FineType::APARTMENT);
+            })
+            ->selectRaw("
+            $selectRaw,
+            monitorings.monitoring_status_id,
+            COUNT(monitorings.id) as count,
+
+            COUNT(decisions.id) as decision_count,
+
+            SUM(CASE WHEN decisions.decision_status = 12 THEN 1 ELSE 0 END) as paid_count,
+            SUM(CASE WHEN decisions.decision_status != 12 OR decisions.decision_status IS NULL THEN 1 ELSE 0 END) as unpaid_count,
+
+            SUM(decisions.main_punishment_amount::numeric) as total_amount,
+            SUM(CASE WHEN decisions.decision_status = 12 THEN decisions.main_punishment_amount::numeric ELSE 0 END) as paid_amount,
+            SUM(CASE WHEN decisions.decision_status != 12 OR decisions.decision_status IS NULL THEN decisions.main_punishment_amount::numeric ELSE 0 END) as unpaid_amount
+        ")
             ->groupBy(...$groupBy)
             ->get();
+
     }
 
     public function report($regionId = null): JsonResponse
@@ -101,11 +119,12 @@ class MonitoringController extends BaseController
 
             $protocolCounts = $this->getGroupedCounts(
                 query: Monitoring::query(),
-                selectRaw: $group,
-                groupBy: [$group, 'monitoring_status_id'],
+                selectRaw: $group . 'as group_id',
+                groupBy: [$group, 'monitorings.monitoring_status_id'],
                 startDate: $startDate,
                 endDate: $endDate
-            )->groupBy($group);
+            )->groupBy('group_id');
+
 
             $data = $regions->map(function ($region) use ($userCounts, $protocolCounts) {
                 $regionId        = $region->id;
@@ -142,6 +161,13 @@ class MonitoringController extends BaseController
                     'fix_mib'           => $sumByStatus([MonitoringStatusEnum::MIB]),
                     'fix_hmqo'          => $sumByStatus([MonitoringStatusEnum::HMQO]),
                     'fixed'             => $sumByStatus([MonitoringStatusEnum::FIXED]),
+                    'decision_count'       => $regionProtocols->sum('decision_count'),
+                    'paid_count'           => $regionProtocols->sum('paid_count'),
+                    'unpaid_count'         => $regionProtocols->sum('unpaid_count'),
+
+                    'total_amount'         => $regionProtocols->sum('total_amount'),
+                    'paid_amount'          => $regionProtocols->sum('paid_amount'),
+                    'unpaid_amount'        => $regionProtocols->sum('unpaid_amount'),
                 ];
             });
 

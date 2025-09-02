@@ -8,7 +8,7 @@ enum MonitoringStatusEnum: int
     case CONFIRM_DEFECT = 2; // TAsdiqlashda
     case NOT_DEFECT = 3; // Qoidabuzarlik aniqlanmadi
     case DEFECT = 4; //Qoidabuzarlik aniqlandi
-    case FORMED = 5; //Qoidabuzarlik aniqlandi
+    case FORMED = 5; //Korsatma shakllantirildi
     case ADMINISTRATIVE = 6; // Mamuriy qilindi
     case DONE = 7; //Korsatma bajarildi
     case HMQO = 8; // HMQOga yuborildi
