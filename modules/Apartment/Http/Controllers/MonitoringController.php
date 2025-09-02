@@ -110,12 +110,19 @@ class MonitoringController extends BaseController
 
             $group = $regionId ? 'district_id' : 'region_id';
 
+//            $userCounts = User::query()
+//                ->join('user_roles', 'user_roles.user_id', '=', 'users.id')
+//                ->where('user_roles.role_id', UserRoleEnum::APARTMENT_INSPECTOR->value)
+//                ->selectRaw("$group, COUNT(users.id) as count")
+//                ->groupBy($group)
+//                ->pluck('count', $group);
+
             $userCounts = User::query()
                 ->join('user_roles', 'user_roles.user_id', '=', 'users.id')
                 ->where('user_roles.role_id', UserRoleEnum::APARTMENT_INSPECTOR->value)
-                ->selectRaw("$group, COUNT(users.id) as count")
-                ->groupBy($group)
-                ->pluck('count', $group);
+                ->selectRaw(($regionId ? 'users.district_id' : 'users.region_id') . ' as group_id, COUNT(users.id) as count')
+                ->groupBy('group_id')
+                ->pluck('count', 'group_id');
 
             $protocolCounts = $this->getGroupedCounts(
                 query: Monitoring::query(),
