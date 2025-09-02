@@ -67,11 +67,14 @@ class MonitoringController extends BaseController
         }
     }
 
+  
+
     private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
     {
         if ($startDate && $endDate) {
             $query->whereBetween('monitorings.created_at', [$startDate, $endDate]);
         }
+
         return $query
             ->leftJoin('decisions', function ($join) {
                 $join->on('decisions.guid', '=', 'monitorings.id')
@@ -93,7 +96,6 @@ class MonitoringController extends BaseController
         ")
             ->groupBy(...$groupBy)
             ->get();
-
     }
 
     public function report($regionId = null): JsonResponse
@@ -108,14 +110,7 @@ class MonitoringController extends BaseController
                 ? District::query()->where('region_id', $regionId)->get(['id', 'name_uz'])
                 : Region::all(['id', 'name_uz']);
 
-            $group = $regionId ? 'district_id' : 'region_id';
-
-//            $userCounts = User::query()
-//                ->join('user_roles', 'user_roles.user_id', '=', 'users.id')
-//                ->where('user_roles.role_id', UserRoleEnum::APARTMENT_INSPECTOR->value)
-//                ->selectRaw("$group, COUNT(users.id) as count")
-//                ->groupBy($group)
-//                ->pluck('count', $group);
+            $group = $regionId ? 'monitorings.district_id' : 'monitorings.region_id';
 
             $userCounts = User::query()
                 ->join('user_roles', 'user_roles.user_id', '=', 'users.id')
@@ -132,7 +127,6 @@ class MonitoringController extends BaseController
                 endDate: $endDate
             )->groupBy('group_id');
 
-
             $data = $regions->map(function ($region) use ($userCounts, $protocolCounts) {
                 $regionId        = $region->id;
                 $regionProtocols = $protocolCounts->get($regionId, collect());
@@ -141,11 +135,11 @@ class MonitoringController extends BaseController
                 $regionProtocols->whereIn('monitoring_status_id', (array)$statuses)->sum('count');
 
                 return [
-                    'id'                => $region->id,
-                    'name'              => $region->name_uz,
-                    'inspector_count'   => $userCounts->get($regionId, 0),
-                    'all_monitorings'   => $regionProtocols->sum('count'),
-                    'all_defect_count'  => $sumByStatus([
+                    'id'                  => $region->id,
+                    'name'                => $region->name_uz,
+                    'inspector_count'     => $userCounts->get($regionId, 0),
+                    'all_monitorings'     => $regionProtocols->sum('count'),
+                    'all_defect_count'    => $sumByStatus([
                         MonitoringStatusEnum::DEFECT,
                         MonitoringStatusEnum::DONE,
                         MonitoringStatusEnum::COURT,
@@ -154,7 +148,7 @@ class MonitoringController extends BaseController
                         MonitoringStatusEnum::ADMINISTRATIVE,
                         MonitoringStatusEnum::CONFIRM_RESULT,
                     ]),
-                    'all_fix'           => $sumByStatus([
+                    'all_fix'             => $sumByStatus([
                         MonitoringStatusEnum::DONE,
                         MonitoringStatusEnum::ADMINISTRATIVE,
                         MonitoringStatusEnum::COURT,
@@ -162,19 +156,20 @@ class MonitoringController extends BaseController
                         MonitoringStatusEnum::HMQO,
                         MonitoringStatusEnum::FIXED,
                     ]),
-                    'fix_done'          => $sumByStatus([MonitoringStatusEnum::DONE]),
-                    'fix_administrative'=> $sumByStatus([MonitoringStatusEnum::ADMINISTRATIVE]),
-                    'fix_court'         => $sumByStatus([MonitoringStatusEnum::COURT]),
-                    'fix_mib'           => $sumByStatus([MonitoringStatusEnum::MIB]),
-                    'fix_hmqo'          => $sumByStatus([MonitoringStatusEnum::HMQO]),
-                    'fixed'             => $sumByStatus([MonitoringStatusEnum::FIXED]),
-                    'decision_count'       => $regionProtocols->sum('decision_count'),
-                    'paid_count'           => $regionProtocols->sum('paid_count'),
-                    'unpaid_count'         => $regionProtocols->sum('unpaid_count'),
+                    'fix_done'            => $sumByStatus([MonitoringStatusEnum::DONE]),
+                    'fix_administrative'  => $sumByStatus([MonitoringStatusEnum::ADMINISTRATIVE]),
+                    'fix_court'           => $sumByStatus([MonitoringStatusEnum::COURT]),
+                    'fix_mib'             => $sumByStatus([MonitoringStatusEnum::MIB]),
+                    'fix_hmqo'            => $sumByStatus([MonitoringStatusEnum::HMQO]),
+                    'fixed'               => $sumByStatus([MonitoringStatusEnum::FIXED]),
 
-                    'total_amount'         => $regionProtocols->sum('total_amount'),
-                    'paid_amount'          => $regionProtocols->sum('paid_amount'),
-                    'unpaid_amount'        => $regionProtocols->sum('unpaid_amount'),
+                    'decision_count'      => $regionProtocols->sum('decision_count'),
+                    'paid_count'          => $regionProtocols->sum('paid_count'),
+                    'unpaid_count'        => $regionProtocols->sum('unpaid_count'),
+
+                    'total_amount'        => $regionProtocols->sum('total_amount'),
+                    'paid_amount'         => $regionProtocols->sum('paid_amount'),
+                    'unpaid_amount'       => $regionProtocols->sum('unpaid_amount'),
                 ];
             });
 
@@ -184,6 +179,7 @@ class MonitoringController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
 
 
 
