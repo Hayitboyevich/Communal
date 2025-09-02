@@ -119,7 +119,7 @@ class MonitoringController extends BaseController
 
             $protocolCounts = $this->getGroupedCounts(
                 query: Monitoring::query(),
-                selectRaw: $group . 'as group_id',
+                selectRaw: $group . ' as group_id',
                 groupBy: [$group, 'monitorings.monitoring_status_id'],
                 startDate: $startDate,
                 endDate: $endDate
