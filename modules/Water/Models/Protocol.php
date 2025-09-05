@@ -80,9 +80,9 @@ class Protocol extends Model
         return $this->hasMany(ProtocolHistory::class, 'guid');
     }
 
-    public function fine(): HasOne
+    public function fine(): BelongsTo
     {
-        return $this->hasOne(Decision::class, 'guid')->where('project_id', FineType::WATER);
+        return $this->belongsTo(Decision::class, 'decision_id');
     }
 
     public function defect(): BelongsTo

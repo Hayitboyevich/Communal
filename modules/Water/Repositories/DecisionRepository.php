@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Water\Contracts\DecisionRepositoryInterface;
 use Modules\Water\Contracts\HistoryRepositoryInterface;
 use Modules\Water\Models\Decision;
+use Modules\Water\Models\Protocol;
 
 class DecisionRepository implements DecisionRepositoryInterface
 {
@@ -52,14 +53,20 @@ class DecisionRepository implements DecisionRepositoryInterface
     public function create(?array $data)
     {
         try {
-            $model = $this->get($data['series'], $data['number'], $data['project_id']);
-            if ($model){
-                throw new \Exception('Mamuriy allaqachon qo\'shilgan');
-            }
-            return $this->model->query()->create(attributes: $data);
-        }catch (\Exception $exception){
-            throw  $exception;
-        }
+            $protocol = Protocol::query()->findOrFail($data['guid']);
 
+            $model = $this->get($data['series'], $data['number'], $data['project_id']);
+
+            if (! $model) {
+                $model = $this->model->query()->create($data);
+            }
+
+            $protocol->update(['decision_id' => $model->id]);
+
+            return $model;
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
     }
+
 }
