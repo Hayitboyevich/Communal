@@ -15,7 +15,7 @@ class DefectSeeder extends Seeder
     public function run(): void
     {
         Defect::query()->truncate();
-        $types = storage_path() . "/excel/defect.xlsx";
+        $types = storage_path() . "/excel/def.xlsx";
         Excel::import(new DefectImport(), $types);
     }
 }

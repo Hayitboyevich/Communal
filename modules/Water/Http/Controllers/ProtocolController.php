@@ -7,7 +7,6 @@ use App\Constants\FineType;
 use App\Enums\ObjectStatusEnum;
 use App\Enums\UserRoleEnum;
 use App\Exports\ProtocolExport;
-use App\Exports\RegulationExport;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\ProtocolChangeRequest;
 use App\Models\District;
@@ -331,8 +330,6 @@ class ProtocolController extends BaseController
             ->groupBy(...$groupBy)
             ->get();
     }
-
-
 
     public function fine($id): JsonResponse
     {

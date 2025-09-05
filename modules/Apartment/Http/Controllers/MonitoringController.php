@@ -5,6 +5,7 @@ namespace Modules\Apartment\Http\Controllers;
 use App\Constants\ErrorMessage;
 use App\Constants\FineType;
 use App\Enums\UserRoleEnum;
+use App\Exports\MonitoringExport;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\MonitoringCreateSecondRequest;
 use App\Models\District;
@@ -13,6 +14,7 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\URL;
+use Maatwebsite\Excel\Facades\Excel;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
 use Modules\Apartment\Http\Requests\MonitoringChangeStatusRequest;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
@@ -67,7 +69,7 @@ class MonitoringController extends BaseController
         }
     }
 
-  
+
 
     private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
     {
@@ -177,6 +179,15 @@ class MonitoringController extends BaseController
 
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function excel($id)
+    {
+        try {
+            return Excel::download(new MonitoringExport($id), 'protocol.xlsx');
+        }catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
         }
     }
 

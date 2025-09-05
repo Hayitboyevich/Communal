@@ -17,7 +17,7 @@ class DefectController extends BaseController
         try {
             $protocolTypeId = request('id');
             $protocolType = ProtocolType::query()->findOrFail($protocolTypeId);
-            return $this->sendSuccess(DefectResource::collection($protocolType->defects), 'All defects');
+            return $this->sendSuccess(DefectResource::collection($protocolType->defects()->where('send_inspector', 1)->get()), 'All defects');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }

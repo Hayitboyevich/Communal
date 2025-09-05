@@ -14,6 +14,9 @@ class DefectImport implements ToModel, WithHeadingRow
         return new Defect([
             'protocol_type_id' => $row['parentid'],
             'name' => $row['name'],
+            'send_ogoh' => $row['send_ogoh'],
+            'send_water' => $row['send_water'],
+            'send_inspector' => $row['send_inspector'],
         ]);
     }
 }
