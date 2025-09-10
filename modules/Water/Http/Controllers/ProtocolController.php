@@ -308,7 +308,7 @@ class ProtocolController extends BaseController
 
         return $query
             ->leftJoin('decisions', function ($join) {
-                $join->on('decisions.guid', '=', 'protocols.id')
+                $join->on('protocols.decision_id', '=', 'decisions.id')
                     ->where('decisions.project_id', FineType::WATER);
             })
             ->selectRaw("
@@ -321,10 +321,10 @@ class ProtocolController extends BaseController
             protocols.category,
             COUNT(protocols.id) as count,
 
-            COUNT(decisions.id) as decision_count,
+          COUNT(DISTINCT decisions.id) as decision_count,
 
-            SUM(CASE WHEN decisions.decision_status = 12 THEN 1 ELSE 0 END) as paid_count,
-            SUM(CASE WHEN decisions.decision_status != 12 OR decisions.decision_status IS NULL THEN 1 ELSE 0 END) as unpaid_count,
+            COUNT(DISTINCT CASE WHEN decisions.decision_status = 12 THEN decisions.id END) as paid_count,
+            COUNT(DISTINCT CASE WHEN decisions.decision_status != 12 THEN decisions.id END) as unpaid_count,
 
             SUM(decisions.main_punishment_amount::numeric) as total_amount,
             SUM(CASE WHEN decisions.decision_status = 12 THEN decisions.main_punishment_amount::numeric ELSE 0 END) as paid_amount,
