@@ -251,9 +251,9 @@ class ProtocolController extends BaseController
             $protocolCounts = $this->getGroupedCounts(
                 query: Protocol::query(),
                 selectRaw: $group . ' as group_id',
-                groupBy: [$group, 'protocols.protocol_status_id', 'protocols.type', 'protocols.category'],
+                groupBy: [$group, 'protocols.protocol_status_id', 'protocols.type', 'protocols.deadline', 'protocols.category'],
                 startDate: $startDate,
-                endDate: $endDate
+                endDate: $endDate,
             )->groupBy('group_id');
 
             $data = $regions->map(function ($region) use ($userCounts, $protocolCounts) {
@@ -314,6 +314,7 @@ class ProtocolController extends BaseController
             ->selectRaw("
             $selectRaw,
             protocols.protocol_status_id,
+            protocols.deadline,
             protocols.type,
             protocols.category,
             COUNT(protocols.id) as count,
