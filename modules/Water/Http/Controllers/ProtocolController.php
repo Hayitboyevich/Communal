@@ -272,7 +272,7 @@ class ProtocolController extends BaseController
                         ProtocolStatusEnum::REJECTED->value
                     ])->sum('count'),
                     'remedy_count'         => $regionProtocols->where('category', 2)->sum('count'),
-                    'confirmed_count'      => $regionProtocols->whereNot('protocol_status_id', ProtocolStatusEnum::NOT_DEFECT->value)->where('is_finished', true)->sum('count'),
+                    'confirmed_count'      => $regionProtocols->where('protocol_status_id', '!=', ProtocolStatusEnum::NOT_DEFECT->value)->where('is_finished', true)->sum('count'),
                     'administrative_count' => $regionProtocols->whereNotNull('decision_id')->sum('count'),
                     'confirm_result_count' => $regionProtocols->whereNotNull('deadline')->sum('count'),
                     'hmqo_count'           => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::HMQO->value)->sum('count'),
@@ -315,6 +315,8 @@ class ProtocolController extends BaseController
             $selectRaw,
             protocols.protocol_status_id,
             protocols.deadline,
+            protocols.is_finished,
+            protocols.decision_id,
             protocols.type,
             protocols.category,
             COUNT(protocols.id) as count,
