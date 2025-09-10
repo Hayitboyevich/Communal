@@ -251,7 +251,7 @@ class ProtocolController extends BaseController
             $protocolCounts = $this->getGroupedCounts(
                 query: Protocol::query(),
                 selectRaw: $group . ' as group_id',
-                groupBy: [$group, 'protocols.protocol_status_id', 'protocols.type', 'protocols.deadline', 'protocols.category'],
+                groupBy: [$group, 'protocols.protocol_status_id', 'protocols.is_finished', 'protocols.decision_id', 'protocols.type', 'protocols.deadline', 'protocols.category'],
                 startDate: $startDate,
                 endDate: $endDate,
             )->groupBy('group_id');
@@ -272,8 +272,8 @@ class ProtocolController extends BaseController
                         ProtocolStatusEnum::REJECTED->value
                     ])->sum('count'),
                     'remedy_count'         => $regionProtocols->where('category', 2)->sum('count'),
-                    'confirmed_count'      => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED->value)->sum('count'),
-                    'administrative_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::ADMINISTRATIVE->value)->sum('count'),
+                    'confirmed_count'      => $regionProtocols->whereNot('protocol_status_id', ProtocolStatusEnum::NOT_DEFECT->value)->where('is_finished', true)->sum('count'),
+                    'administrative_count' => $regionProtocols->whereNotNull('decision_id')->sum('count'),
                     'confirm_result_count' => $regionProtocols->whereNotNull('deadline')->sum('count'),
                     'hmqo_count'           => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::HMQO->value)->sum('count'),
 
