@@ -6,6 +6,7 @@ use App\Http\Controllers\PdfController;
 
 Route::get('monitoring-pdf/{id}', [PdfController::class, 'monitoringPdf']);
 Route::get('protocol-pdf/{id}', [PdfController::class, 'protocolPdf']);
+Route::get('presentation-pdf/{id}', [PdfController::class, 'presentationPdf']);
 
 Route::get('/', function () {
     return view('welcome');

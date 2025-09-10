@@ -40,4 +40,6 @@ class PdfController extends Controller
             return $exception->getMessage();
         }
     }
+
+
 }

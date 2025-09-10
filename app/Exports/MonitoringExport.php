@@ -55,7 +55,22 @@ class MonitoringExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
-
+            'Tuman',
+            'Holati',
+            'Fish',
+            'Turi',
+            'Sana',
+            'Asos',
+            'Korxona',
+            'Turar joy',
+            'Manzil',
+            'Manzil',
+            'Qoshimcha malumot',
+            'Bayonnoma seriya va raqami',
+            'Qaror seriya va raqami',
+            'Mamuriy holati',
+            'Jarima miqdori',
+            'To\'langan miqdor'
         ];
     }
 }
