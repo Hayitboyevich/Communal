@@ -91,6 +91,7 @@ class MonitoringController extends BaseController
             })
             ->selectRaw("
             $group as group_id,
+            monitorings.monitoring_status_id,
             COUNT(DISTINCT monitorings.id) AS count,
 
             COALESCE(SUM(vio.has_deadline), 0) AS fix_formed,
@@ -100,7 +101,7 @@ class MonitoringController extends BaseController
             SUM(CASE WHEN monitorings.send_mib = TRUE THEN 1 ELSE 0 END) AS fix_mib,
             SUM(CASE WHEN monitorings.send_chora = TRUE THEN 1 ELSE 0 END) AS fixed
         ")
-            ->groupBy($group)
+            ->groupBy($group, 'monitorings.monitoring_status_id')
             ->get();
     }
     private function getDecisionCounts($query, $group, $startDate = null, $endDate = null)
@@ -167,7 +168,7 @@ class MonitoringController extends BaseController
                 $regionMonitoring = $monitoringCounts->get($regionId, collect());
                 $regionDecision   = $decisionCounts->get($regionId);
                 $sumByStatus = fn($statuses) =>
-                $regionMonitoring->whereIn('status_id', (array)$statuses)->sum('count');
+                $regionMonitoring->whereIn('monitoring_status_id', (array)$statuses)->sum('count');
 
                 return [
                     'id'                  => $region->id,
