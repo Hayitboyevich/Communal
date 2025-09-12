@@ -141,7 +141,6 @@ class MonitoringController extends BaseController
 
             $group = $regionId ? 'monitorings.district_id' : 'monitorings.region_id';
 
-            // 👮‍♂️ inspektorlar soni
             $userCounts = User::query()
                 ->join('user_roles', 'user_roles.user_id', '=', 'users.id')
                 ->where('user_roles.role_id', UserRoleEnum::APARTMENT_INSPECTOR->value)
@@ -149,7 +148,6 @@ class MonitoringController extends BaseController
                 ->groupBy('group_id')
                 ->pluck('count', 'group_id');
 
-            // 📊 Monitoringga bog‘liq hisoblar
             $monitoringCounts = $this->getMonitoringCounts(
                 Monitoring::query(),
                 $group,
@@ -157,7 +155,6 @@ class MonitoringController extends BaseController
                 $endDate
             )->groupBy('group_id');
 
-            // 📊 Decisionlarga bog‘liq hisoblar (distinct qilib)
             $decisionCounts = $this->getDecisionCounts(
                 Monitoring::query(),
                 $group,
@@ -165,19 +162,38 @@ class MonitoringController extends BaseController
                 $endDate
             )->pluck(null, 'group_id'); // key => row
 
-            // 📝 Natija yig‘amiz
             $data = $regions->map(function ($region) use ($userCounts, $monitoringCounts, $decisionCounts) {
                 $regionId = $region->id;
                 $regionMonitoring = $monitoringCounts->get($regionId, collect());
                 $regionDecision   = $decisionCounts->get($regionId);
+                $sumByStatus = fn($statuses) =>
+                $regionMonitoring->whereIn('status_id', (array)$statuses)->sum('count');
 
                 return [
                     'id'                  => $region->id,
                     'name'                => $region->name_uz,
                     'inspector_count'     => $userCounts->get($regionId, 0),
 
-                    // monitoringga oid
                     'all_monitorings'     => $regionMonitoring->sum('count'),
+                    'all_defect_count'    => $sumByStatus([
+                        MonitoringStatusEnum::DEFECT,
+                        MonitoringStatusEnum::DONE,
+                        MonitoringStatusEnum::COURT,
+                        MonitoringStatusEnum::MIB,
+                        MonitoringStatusEnum::FIXED,
+                        MonitoringStatusEnum::FORMED,
+                        MonitoringStatusEnum::ADMINISTRATIVE,
+                        MonitoringStatusEnum::CONFIRM_RESULT,
+                    ]),
+                    'all_fix'             => $sumByStatus([
+                        MonitoringStatusEnum::FORMED,
+                        MonitoringStatusEnum::DONE,
+                        MonitoringStatusEnum::ADMINISTRATIVE,
+                        MonitoringStatusEnum::COURT,
+                        MonitoringStatusEnum::MIB,
+                        MonitoringStatusEnum::HMQO,
+                        MonitoringStatusEnum::FIXED,
+                    ]),
                     'fix_formed'          => $regionMonitoring->sum('fix_formed'),
                     'fix_done'            => $regionMonitoring->sum('fix_done'),
                     'fix_administrative'  => $regionMonitoring->sum('fix_administrative'),
@@ -185,7 +201,6 @@ class MonitoringController extends BaseController
                     'fix_mib'             => $regionMonitoring->sum('fix_mib'),
                     'fixed'               => $regionMonitoring->sum('fixed'),
 
-                    // decisionga oid
                     'decision_count'      => $regionDecision->decision_count ?? 0,
                     'paid_count'          => $regionDecision->paid_count ?? 0,
                     'unpaid_count'        => $regionDecision->unpaid_count ?? 0,
