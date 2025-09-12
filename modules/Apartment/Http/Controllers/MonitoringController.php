@@ -147,6 +147,7 @@ class MonitoringController extends BaseController
                         MonitoringStatusEnum::COURT,
                         MonitoringStatusEnum::MIB,
                         MonitoringStatusEnum::FIXED,
+                        MonitoringStatusEnum::FORMED,
                         MonitoringStatusEnum::ADMINISTRATIVE,
                         MonitoringStatusEnum::CONFIRM_RESULT,
                     ]),
