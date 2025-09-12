@@ -40,7 +40,7 @@ class MonitoringController extends BaseController
     public function index($id = null): JsonResponse
     {
         try {
-            $filters = request()->only(['status', 'type','category', 'region_id', 'district_id', 'id','monitoring_type']);
+            $filters = request()->only(['status', 'type', 'category', 'region_id', 'district_id', 'id', 'monitoring_type']);
             $monitorings = $id
                 ? $this->service->findById($id)
                 : $this->service->getAll($this->user, $this->roleId, $filters)->paginate(request('per_page', 15));
@@ -63,7 +63,7 @@ class MonitoringController extends BaseController
     public function count(): JsonResponse
     {
         try {
-            $filters = request()->only(['status', 'type','category', 'region_id', 'district_id', 'id','monitoring_type']);
+            $filters = request()->only(['status', 'type', 'category', 'region_id', 'district_id', 'id', 'monitoring_type']);
             $data = $this->service->count($this->user, $this->roleId, $filters);
             return $this->sendSuccess($data, 'Count');
         } catch (\Exception $exception) {
@@ -72,22 +72,8 @@ class MonitoringController extends BaseController
     }
 
 
-
-    private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
+    private function getMonitoringCounts($query, $group, $startDate = null, $endDate = null)
     {
-        $decisionsSub = DB::table('decisions')
-            ->selectRaw("
-            id,
-            COUNT(*) AS decision_count,
-            SUM(CASE WHEN decision_status = 12 THEN 1 ELSE 0 END) AS paid_count,
-            SUM(CASE WHEN decision_status != 12 OR decision_status IS NULL THEN 1 ELSE 0 END) AS unpaid_count,
-            SUM(main_punishment_amount::numeric) AS total_amount,
-            SUM(CASE WHEN decision_status = 12 THEN main_punishment_amount::numeric ELSE 0 END) AS paid_amount,
-            SUM(CASE WHEN decision_status != 12 OR decision_status IS NULL THEN main_punishment_amount::numeric ELSE 0 END) AS unpaid_amount
-        ")
-            ->where('project_id', FineType::APARTMENT)
-            ->groupBy('id'); // ✅ endi id bo‘yicha group
-
         $violationsSub = DB::table('violations')
             ->selectRaw("
             monitoring_id,
@@ -100,24 +86,12 @@ class MonitoringController extends BaseController
         }
 
         return $query
-            ->leftJoinSub($decisionsSub, 'dec', function ($join) {
-                $join->on('monitorings.decision_id', '=', 'dec.id'); // ✅ belongsTo
-            })
             ->leftJoinSub($violationsSub, 'vio', function ($join) {
                 $join->on('vio.monitoring_id', '=', 'monitorings.id');
             })
             ->selectRaw("
-            $selectRaw,
-            monitorings.monitoring_status_id,
-
+            $group as group_id,
             COUNT(DISTINCT monitorings.id) AS count,
-
-            COALESCE(SUM(dec.decision_count), 0) AS decision_count,
-            COALESCE(SUM(dec.paid_count), 0) AS paid_count,
-            COALESCE(SUM(dec.unpaid_count), 0) AS unpaid_count,
-            COALESCE(SUM(dec.total_amount), 0) AS total_amount,
-            COALESCE(SUM(dec.paid_amount), 0) AS paid_amount,
-            COALESCE(SUM(dec.unpaid_amount), 0) AS unpaid_amount,
 
             COALESCE(SUM(vio.has_deadline), 0) AS fix_formed,
             SUM(CASE WHEN monitorings.step = 4 THEN 1 ELSE 0 END) AS fix_done,
@@ -126,15 +100,39 @@ class MonitoringController extends BaseController
             SUM(CASE WHEN monitorings.send_mib = TRUE THEN 1 ELSE 0 END) AS fix_mib,
             SUM(CASE WHEN monitorings.send_chora = TRUE THEN 1 ELSE 0 END) AS fixed
         ")
-            ->groupBy(...$groupBy)
+            ->groupBy($group)
             ->get();
     }
+    private function getDecisionCounts($query, $group, $startDate = null, $endDate = null)
+    {
+        if ($startDate && $endDate) {
+            $query->whereBetween('monitorings.created_at', [$startDate, $endDate]);
+        }
+
+        return $query
+            ->join('decisions', 'decisions.id', '=', 'monitorings.decision_id')
+            ->where('decisions.project_id', FineType::APARTMENT)
+            ->selectRaw("
+            $group as group_id,
+            COUNT(decisions.id) AS decision_count,
+            COUNT(decisions.id) FILTER (WHERE decisions.decision_status = 12) AS paid_count,
+            COUNT(decisions.id) FILTER (WHERE decisions.decision_status != 12 OR decisions.decision_status IS NULL) AS unpaid_count,
+
+            SUM(DISTINCT CASE WHEN decisions.decision_status IS NOT NULL THEN decisions.main_punishment_amount::numeric ELSE 0 END) AS total_amount,
+            SUM(DISTINCT CASE WHEN decisions.decision_status = 12 THEN decisions.main_punishment_amount::numeric ELSE 0 END) AS paid_amount,
+            SUM(DISTINCT CASE WHEN decisions.decision_status != 12 OR decisions.decision_status IS NULL THEN decisions.main_punishment_amount::numeric ELSE 0 END) AS unpaid_amount
+        ")
+            ->groupBy($group)
+            ->get();
+    }
+
+
+
     public function report($regionId = null): JsonResponse
     {
         try {
             $startDate = request('date_from');
             $endDate   = request('date_to');
-
             $regionId  = request('region_id');
 
             $regions = $regionId
@@ -143,6 +141,7 @@ class MonitoringController extends BaseController
 
             $group = $regionId ? 'monitorings.district_id' : 'monitorings.region_id';
 
+            // 👮‍♂️ inspektorlar soni
             $userCounts = User::query()
                 ->join('user_roles', 'user_roles.user_id', '=', 'users.id')
                 ->where('user_roles.role_id', UserRoleEnum::APARTMENT_INSPECTOR->value)
@@ -150,59 +149,49 @@ class MonitoringController extends BaseController
                 ->groupBy('group_id')
                 ->pluck('count', 'group_id');
 
-            $protocolCounts = $this->getGroupedCounts(
-                query: Monitoring::query(),
-                selectRaw: $group . ' as group_id',
-                groupBy: [$group, 'monitorings.monitoring_status_id'],
-                startDate: $startDate,
-                endDate: $endDate
+            // 📊 Monitoringga bog‘liq hisoblar
+            $monitoringCounts = $this->getMonitoringCounts(
+                Monitoring::query(),
+                $group,
+                $startDate,
+                $endDate
             )->groupBy('group_id');
 
-            $data = $regions->map(function ($region) use ($userCounts, $protocolCounts) {
-                $regionId        = $region->id;
-                $regionProtocols = $protocolCounts->get($regionId, collect());
+            // 📊 Decisionlarga bog‘liq hisoblar (distinct qilib)
+            $decisionCounts = $this->getDecisionCounts(
+                Monitoring::query(),
+                $group,
+                $startDate,
+                $endDate
+            )->pluck(null, 'group_id'); // key => row
 
-                $sumByStatus = fn($statuses) =>
-                $regionProtocols->whereIn('monitoring_status_id', (array)$statuses)->sum('count');
+            // 📝 Natija yig‘amiz
+            $data = $regions->map(function ($region) use ($userCounts, $monitoringCounts, $decisionCounts) {
+                $regionId = $region->id;
+                $regionMonitoring = $monitoringCounts->get($regionId, collect());
+                $regionDecision   = $decisionCounts->get($regionId);
 
                 return [
                     'id'                  => $region->id,
                     'name'                => $region->name_uz,
                     'inspector_count'     => $userCounts->get($regionId, 0),
-                    'all_monitorings'     => $regionProtocols->sum('count'),
-                    'all_defect_count'    => $sumByStatus([
-                        MonitoringStatusEnum::DEFECT,
-                        MonitoringStatusEnum::DONE,
-                        MonitoringStatusEnum::COURT,
-                        MonitoringStatusEnum::MIB,
-                        MonitoringStatusEnum::FIXED,
-                        MonitoringStatusEnum::FORMED,
-                        MonitoringStatusEnum::ADMINISTRATIVE,
-                        MonitoringStatusEnum::CONFIRM_RESULT,
-                    ]),
-                    'all_fix'             => $sumByStatus([
-                        MonitoringStatusEnum::FORMED,
-                        MonitoringStatusEnum::DONE,
-                        MonitoringStatusEnum::ADMINISTRATIVE,
-                        MonitoringStatusEnum::COURT,
-                        MonitoringStatusEnum::MIB,
-                        MonitoringStatusEnum::HMQO,
-                        MonitoringStatusEnum::FIXED,
-                    ]),
-                    'fix_formed'          => $regionProtocols->sum('fix_formed'),        // violations.deadline IS NOT NULL
-                    'fix_done'            => $regionProtocols->sum('fix_done'),          // step = 4
-                    'fix_administrative'  => $regionProtocols->sum('fix_administrative'),// is_administrative = true
-                    'fix_court'           => $regionProtocols->sum('fix_court'),         // send_court = true
-                    'fix_mib'             => $regionProtocols->sum('fix_mib'),           // send_mib = true
-                    'fixed'               => $regionProtocols->sum('fixed'),             // send_chora = true
 
-                    'decision_count'      => $regionProtocols->sum('decision_count'),
-                    'paid_count'          => $regionProtocols->sum('paid_count'),
-                    'unpaid_count'        => $regionProtocols->sum('unpaid_count'),
+                    // monitoringga oid
+                    'all_monitorings'     => $regionMonitoring->sum('count'),
+                    'fix_formed'          => $regionMonitoring->sum('fix_formed'),
+                    'fix_done'            => $regionMonitoring->sum('fix_done'),
+                    'fix_administrative'  => $regionMonitoring->sum('fix_administrative'),
+                    'fix_court'           => $regionMonitoring->sum('fix_court'),
+                    'fix_mib'             => $regionMonitoring->sum('fix_mib'),
+                    'fixed'               => $regionMonitoring->sum('fixed'),
 
-                    'total_amount'        => $regionProtocols->sum('total_amount'),
-                    'paid_amount'         => $regionProtocols->sum('paid_amount'),
-                    'unpaid_amount'       => $regionProtocols->sum('unpaid_amount'),
+                    // decisionga oid
+                    'decision_count'      => $regionDecision->decision_count ?? 0,
+                    'paid_count'          => $regionDecision->paid_count ?? 0,
+                    'unpaid_count'        => $regionDecision->unpaid_count ?? 0,
+                    'total_amount'        => $regionDecision->total_amount ?? 0,
+                    'paid_amount'         => $regionDecision->paid_amount ?? 0,
+                    'unpaid_amount'       => $regionDecision->unpaid_amount ?? 0,
                 ];
             });
 
@@ -213,16 +202,15 @@ class MonitoringController extends BaseController
         }
     }
 
+
     public function excel($id)
     {
         try {
             return Excel::download(new MonitoringExport($id), 'protocol.xlsx');
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
         }
     }
-
-
 
 
     public function history($id): JsonResponse
@@ -269,8 +257,8 @@ class MonitoringController extends BaseController
     {
         try {
             $monitoring = $this->service->findById($id);
-            return  $this->sendSuccess(FineResource::make($monitoring->fine), 'Success');
-        }catch (\Exception $exception){
+            return $this->sendSuccess(FineResource::make($monitoring->fine), 'Success');
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -310,16 +298,16 @@ class MonitoringController extends BaseController
         try {
             $monitoring = $this->service->attach(\request('user_id'), \request('monitoring_id'));
             return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring attached successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
-    public function pdf($id):JsonResponse
+    public function pdf($id): JsonResponse
     {
         try {
             $monitoring = Monitoring::find($id);
-            $domain = URL::to('/regulation-info').'/'.$id;
+            $domain = URL::to('/regulation-info') . '/' . $id;
 
             $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
             $pdf = PDF::loadView('pdf.monitoring', compact('monitoring', 'qrImage'));
@@ -327,7 +315,7 @@ class MonitoringController extends BaseController
             $pdfBase64 = base64_encode($pdfOutput);
 
             return $this->sendSuccess($pdfBase64, 'PDF');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
