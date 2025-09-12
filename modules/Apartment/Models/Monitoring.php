@@ -97,8 +97,8 @@ class Monitoring extends Model
         return $this->hasMany(MonitoringHistory::class, 'guid');
     }
 
-    public function fine(): HasOne
+    public function fine(): BelongsTo
     {
-        return $this->hasOne(Decision::class, 'guid')->where('project_id', FineType::APARTMENT);
+        return $this->belongsTo(Decision::class, 'decision_id');
     }
 }

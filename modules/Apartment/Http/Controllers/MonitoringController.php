@@ -13,6 +13,7 @@ use App\Models\Region;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Maatwebsite\Excel\Facades\Excel;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
@@ -23,6 +24,7 @@ use Modules\Apartment\Http\Resources\MonitoringResource;
 use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Services\MonitoringService;
 use Illuminate\Http\Request;
+use Modules\Water\Const\Step;
 use Modules\Water\Http\Resources\FineResource;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -73,33 +75,60 @@ class MonitoringController extends BaseController
 
     private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
     {
+        $decisionsSub = DB::table('decisions')
+            ->selectRaw("
+            id,
+            COUNT(*) AS decision_count,
+            SUM(CASE WHEN decision_status = 12 THEN 1 ELSE 0 END) AS paid_count,
+            SUM(CASE WHEN decision_status != 12 OR decision_status IS NULL THEN 1 ELSE 0 END) AS unpaid_count,
+            SUM(main_punishment_amount::numeric) AS total_amount,
+            SUM(CASE WHEN decision_status = 12 THEN main_punishment_amount::numeric ELSE 0 END) AS paid_amount,
+            SUM(CASE WHEN decision_status != 12 OR decision_status IS NULL THEN main_punishment_amount::numeric ELSE 0 END) AS unpaid_amount
+        ")
+            ->where('project_id', FineType::APARTMENT)
+            ->groupBy('id'); // ✅ endi id bo‘yicha group
+
+        $violationsSub = DB::table('violations')
+            ->selectRaw("
+            monitoring_id,
+            MAX(CASE WHEN deadline IS NOT NULL THEN 1 ELSE 0 END) AS has_deadline
+        ")
+            ->groupBy('monitoring_id');
+
         if ($startDate && $endDate) {
             $query->whereBetween('monitorings.created_at', [$startDate, $endDate]);
         }
 
         return $query
-            ->leftJoin('decisions', function ($join) {
-                $join->on('decisions.guid', '=', 'monitorings.id')
-                    ->where('decisions.project_id', FineType::APARTMENT);
+            ->leftJoinSub($decisionsSub, 'dec', function ($join) {
+                $join->on('monitorings.decision_id', '=', 'dec.id'); // ✅ belongsTo
+            })
+            ->leftJoinSub($violationsSub, 'vio', function ($join) {
+                $join->on('vio.monitoring_id', '=', 'monitorings.id');
             })
             ->selectRaw("
             $selectRaw,
             monitorings.monitoring_status_id,
-            COUNT(monitorings.id) as count,
 
-            COUNT(decisions.id) as decision_count,
+            COUNT(DISTINCT monitorings.id) AS count,
 
-            SUM(CASE WHEN decisions.decision_status = 12 THEN 1 ELSE 0 END) as paid_count,
-            SUM(CASE WHEN decisions.decision_status != 12 OR decisions.decision_status IS NULL THEN 1 ELSE 0 END) as unpaid_count,
+            COALESCE(SUM(dec.decision_count), 0) AS decision_count,
+            COALESCE(SUM(dec.paid_count), 0) AS paid_count,
+            COALESCE(SUM(dec.unpaid_count), 0) AS unpaid_count,
+            COALESCE(SUM(dec.total_amount), 0) AS total_amount,
+            COALESCE(SUM(dec.paid_amount), 0) AS paid_amount,
+            COALESCE(SUM(dec.unpaid_amount), 0) AS unpaid_amount,
 
-            SUM(decisions.main_punishment_amount::numeric) as total_amount,
-            SUM(CASE WHEN decisions.decision_status = 12 THEN decisions.main_punishment_amount::numeric ELSE 0 END) as paid_amount,
-            SUM(CASE WHEN decisions.decision_status != 12 OR decisions.decision_status IS NULL THEN decisions.main_punishment_amount::numeric ELSE 0 END) as unpaid_amount
+            COALESCE(SUM(vio.has_deadline), 0) AS fix_formed,
+            SUM(CASE WHEN monitorings.step = 4 THEN 1 ELSE 0 END) AS fix_done,
+            SUM(CASE WHEN monitorings.is_administrative = TRUE THEN 1 ELSE 0 END) AS fix_administrative,
+            SUM(CASE WHEN monitorings.send_court = TRUE THEN 1 ELSE 0 END) AS fix_court,
+            SUM(CASE WHEN monitorings.send_mib = TRUE THEN 1 ELSE 0 END) AS fix_mib,
+            SUM(CASE WHEN monitorings.send_chora = TRUE THEN 1 ELSE 0 END) AS fixed
         ")
             ->groupBy(...$groupBy)
             ->get();
     }
-
     public function report($regionId = null): JsonResponse
     {
         try {
@@ -152,6 +181,7 @@ class MonitoringController extends BaseController
                         MonitoringStatusEnum::CONFIRM_RESULT,
                     ]),
                     'all_fix'             => $sumByStatus([
+                        MonitoringStatusEnum::FORMED,
                         MonitoringStatusEnum::DONE,
                         MonitoringStatusEnum::ADMINISTRATIVE,
                         MonitoringStatusEnum::COURT,
@@ -159,12 +189,12 @@ class MonitoringController extends BaseController
                         MonitoringStatusEnum::HMQO,
                         MonitoringStatusEnum::FIXED,
                     ]),
-                    'fix_done'            => $sumByStatus([MonitoringStatusEnum::DONE]),
-                    'fix_administrative'  => $sumByStatus([MonitoringStatusEnum::ADMINISTRATIVE]),
-                    'fix_court'           => $sumByStatus([MonitoringStatusEnum::COURT]),
-                    'fix_mib'             => $sumByStatus([MonitoringStatusEnum::MIB]),
-                    'fix_hmqo'            => $sumByStatus([MonitoringStatusEnum::HMQO]),
-                    'fixed'               => $sumByStatus([MonitoringStatusEnum::FIXED]),
+                    'fix_formed'          => $regionProtocols->sum('fix_formed'),        // violations.deadline IS NOT NULL
+                    'fix_done'            => $regionProtocols->sum('fix_done'),          // step = 4
+                    'fix_administrative'  => $regionProtocols->sum('fix_administrative'),// is_administrative = true
+                    'fix_court'           => $regionProtocols->sum('fix_court'),         // send_court = true
+                    'fix_mib'             => $regionProtocols->sum('fix_mib'),           // send_mib = true
+                    'fixed'               => $regionProtocols->sum('fixed'),             // send_chora = true
 
                     'decision_count'      => $regionProtocols->sum('decision_count'),
                     'paid_count'          => $regionProtocols->sum('paid_count'),

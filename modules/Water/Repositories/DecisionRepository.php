@@ -5,6 +5,7 @@ namespace Modules\Water\Repositories;
 use App\Constants\FineType;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Modules\Apartment\Models\Monitoring;
 use Modules\Water\Contracts\DecisionRepositoryInterface;
 use Modules\Water\Contracts\HistoryRepositoryInterface;
 use Modules\Water\Models\Decision;
@@ -53,16 +54,19 @@ class DecisionRepository implements DecisionRepositoryInterface
     public function create(?array $data)
     {
         try {
-            $protocol = Protocol::query()->findOrFail($data['guid']);
-
             $model = $this->get($data['series'], $data['number'], $data['project_id']);
 
             if (! $model) {
                 $model = $this->model->query()->create($data);
             }
 
-            $protocol->update(['decision_id' => $model->id]);
-
+            if ($data['project_id'] == FineType::APARTMENT) {
+                $monitoring = Monitoring::query()->findOrFail($data['guid']);
+                $monitoring->update(['decision_id' => $model->id]);
+            }else{
+                $protocol = Protocol::query()->findOrFail($data['guid']);
+                $protocol->update(['decision_id' => $model->id]);
+            }
             return $model;
         } catch (\Exception $exception) {
             throw $exception;
