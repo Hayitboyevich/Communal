@@ -37,6 +37,7 @@ class MonitoringMyHomeRequest extends FormRequest
             'monitoring_status_id' => 'required|integer|exists:monitoring_statuses,id',
             'type' => 'required',
             'category' => 'required',
+            'file_path' => 'sometimes',
         ];
     }
 
