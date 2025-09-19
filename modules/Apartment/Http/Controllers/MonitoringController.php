@@ -89,10 +89,12 @@ class MonitoringController extends BaseController
             ->leftJoinSub($violationsSub, 'vio', function ($join) {
                 $join->on('vio.monitoring_id', '=', 'monitorings.id');
             })
+            ->leftJoin('regulations', 'regulations.monitoring_id', '=', 'monitorings.id')
             ->selectRaw("
             $group as group_id,
             monitorings.monitoring_status_id,
             COUNT(DISTINCT monitorings.id) AS count,
+            COUNT(DISTINCT regulations.id) as defect_count,
 
             COALESCE(SUM(vio.has_deadline), 0) AS fix_formed,
             SUM(CASE WHEN monitorings.step = 4 THEN 1 ELSE 0 END) AS fix_done,
@@ -161,7 +163,7 @@ class MonitoringController extends BaseController
                 $group,
                 $startDate,
                 $endDate
-            )->pluck(null, 'group_id'); // key => row
+            )->pluck(null, 'group_id');
 
             $data = $regions->map(function ($region) use ($userCounts, $monitoringCounts, $decisionCounts) {
                 $regionId = $region->id;
@@ -176,16 +178,7 @@ class MonitoringController extends BaseController
                     'inspector_count'     => $userCounts->get($regionId, 0),
 
                     'all_monitorings'     => $regionMonitoring->sum('count'),
-                    'all_defect_count'    => $sumByStatus([
-                        MonitoringStatusEnum::DEFECT,
-                        MonitoringStatusEnum::DONE,
-                        MonitoringStatusEnum::COURT,
-                        MonitoringStatusEnum::MIB,
-                        MonitoringStatusEnum::FIXED,
-                        MonitoringStatusEnum::FORMED,
-                        MonitoringStatusEnum::ADMINISTRATIVE,
-                        MonitoringStatusEnum::CONFIRM_RESULT,
-                    ]),
+                    'all_defect_count'    => $regionMonitoring->sum('defect_count'),
                     'all_fix'             => $sumByStatus([
                         MonitoringStatusEnum::FORMED,
                         MonitoringStatusEnum::DONE,
