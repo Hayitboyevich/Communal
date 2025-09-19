@@ -251,7 +251,7 @@ class ProtocolController extends BaseController
             $protocolCounts = $this->getGroupedCounts(
                 query: Protocol::query(),
                 selectRaw: $group . ' as group_id',
-                groupBy: [$group, 'protocols.protocol_status_id', 'protocols.is_finished', 'protocols.decision_id', 'protocols.type', 'protocols.deadline', 'protocols.category'],
+                groupBy: [$group, 'protocols.protocol_status_id', 'protocols.is_finished', 'protocols.defect_id', 'protocols.defect_comment', 'protocols.decision_id', 'protocols.type',  'protocols.deadline', 'protocols.category'],
                 startDate: $startDate,
                 endDate: $endDate,
             )->groupBy('group_id');
