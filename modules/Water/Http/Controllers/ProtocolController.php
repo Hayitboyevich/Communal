@@ -265,10 +265,9 @@ class ProtocolController extends BaseController
                     'name'                 => $region->name_uz,
                     'inspector_count'      => $userCounts->get($regionId, 0),
                     'all_protocols'        => $regionProtocols->sum('count'),
-                    'defect_count'         => $regionProtocols->where(function($q) {
-                                                        $q->whereNotNull('defect_id')
-                                                            ->orWhereNotNull('defect_comment');
-                                                    })->sum('count'),
+                    'defect_count' => $regionProtocols
+                        ->filter(fn($item) => !is_null($item->defect_id) || !is_null($item->defect_comment))
+                        ->sum('count'),
                     'remedy_count'         => $regionProtocols->where('category', 2)->sum('count'),
                     'confirmed_count'      => $regionProtocols->where('protocol_status_id', '!=', ProtocolStatusEnum::NOT_DEFECT->value)->where('is_finished', true)->sum('count'),
                     'administrative_count' => $regionProtocols->whereNotNull('decision_id')->sum('count'),
