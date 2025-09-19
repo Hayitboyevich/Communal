@@ -58,7 +58,7 @@ class UserService
             }
 
             foreach ($request->role_id as $role) {
-                $user->roles()->attach($user->id, ['role_id' => $role]);
+                $user->roles()->syncWithoutDetaching([$role]);
             }
 
             DB::commit();
