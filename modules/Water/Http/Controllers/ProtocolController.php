@@ -314,6 +314,8 @@ class ProtocolController extends BaseController
             protocols.protocol_status_id,
             protocols.deadline,
             protocols.is_finished,
+            protocols.defect_id,
+            protocols.defect_comment,
             protocols.decision_id,
             protocols.type,
             protocols.category,
