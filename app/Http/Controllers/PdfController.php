@@ -11,31 +11,34 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PdfController extends Controller
 {
-    public function monitoringPdf($id)
+
+    public function protocolPdf($id)
     {
         try {
-            $monitoring = Monitoring::find($id);
-            $domain = URL::to('/regulation-info').'/'.$id;
+            $protocol = Protocol::query()->findOrFail($id);
+            $domain = URL::to('/protocol-pdf').'/'.$id;
 
             $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
-            $pdf = PDF::loadView('pdf.monitoring', compact('monitoring', 'qrImage'));
+            $pdf = Pdf::loadView('pdf.protocol', compact(
+                'protocol', 'qrImage'
+            ));
 
-            return $pdf->stream('monitoring');
+            return $pdf->download('protocol.pdf');
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }
     }
 
-    public function protocolPdf($id)
+    public function monitoringPdf($id)
     {
         try {
-            $protocol = Protocol::find($id);
-            $domain = URL::to('/regulation-info').'/'.$id;
+            $monitoring = Monitoring::find($id);
+            $domain = URL::to('/monitoring-pdf') . '/' . $id;
 
             $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
-            $pdf = PDF::loadView('pdf.protocol', compact('protocol', 'qrImage'));
+            $pdf = PDF::loadView('pdf.monitoring', compact('monitoring', 'qrImage'));
 
-            return $pdf->stream('protocol');
+            return $pdf->download('monitoring.pdf');
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }

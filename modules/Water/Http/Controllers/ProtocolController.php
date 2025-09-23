@@ -214,7 +214,7 @@ class ProtocolController extends BaseController
     {
         try {
             $protocol = Protocol::query()->findOrFail($id);
-            $domain = URL::to('/regulation-info').'/'.$id;
+            $domain = URL::to('/protocol-pdf').'/'.$id;
 
             $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
             $pdf = Pdf::loadView('pdf.protocol', compact(

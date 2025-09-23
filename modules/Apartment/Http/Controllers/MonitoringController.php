@@ -316,7 +316,7 @@ class MonitoringController extends BaseController
     {
         try {
             $monitoring = Monitoring::find($id);
-            $domain = URL::to('/regulation-info') . '/' . $id;
+            $domain = URL::to('/monitoring-pdf') . '/' . $id;
 
             $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
             $pdf = PDF::loadView('pdf.monitoring', compact('monitoring', 'qrImage'));
