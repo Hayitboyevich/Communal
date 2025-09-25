@@ -67,7 +67,7 @@ class ProtocolController extends BaseController
         try {
             return Excel::download(new ProtocolExport($id), 'protocol.xlsx');
         }catch (\Exception $exception) {
-            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 

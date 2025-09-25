@@ -47,7 +47,7 @@ class ProtocolExport implements FromCollection, WithHeadings
                     $protocol->defect_information ?? '',
                     $protocol->defect_comment ?? '',
                     $protocol->comment ?? '',
-                    $protocol->fine ? $protocol->fine->series .''.$protocol->fine->number : '',
+                    $protocol->fine ? $protocol->fine?->series .''.$protocol->fine->number : '',
                     $protocol->fine ? $protocol->fine->decision_series .''.$protocol->fine->decision_number : '',
                     $protocol->fine ? $protocol->fine->status_name : '',
                     $protocol->fine ? $protocol->fine->main_punishment_amount : '',

@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\MonitoringExport;
+use App\Exports\ProtocolExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
+use Maatwebsite\Excel\Facades\Excel;
 use Modules\Apartment\Models\Monitoring;
 use Modules\Water\Models\Protocol;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -43,6 +46,24 @@ class PdfController extends Controller
             return $exception->getMessage();
         }
     }
+
+    public function monitoringExcel($id)
+    {
+        try {
+            return Excel::download(new MonitoringExport($id), 'monitoring.xlsx');
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+    }
+    public function protocolExcel($id)
+    {
+        try {
+            return Excel::download(new ProtocolExport($id), 'protocol.xlsx');
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+    }
+
 
 
 }

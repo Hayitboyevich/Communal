@@ -32,14 +32,17 @@ class MonitoringExport implements FromCollection, WithHeadings
             ->get()
             ->map(function ($monitoring) {
                 return [
+                    $monitoring->id,
                     $monitoring?->district?->name_uz ?? '',
                     $monitoring?->status?->name ?? '',
                     $monitoring?->user?->full_name ?? '',
                     $monitoring?->monitoringType?->name ?? '',
+                    $monitoring?->place?->name ?? '',
+                    $monitoring?->violation?->name ?? '',
                     date_format($monitoring->created_at, 'Y-m-d') ?? '',
                     $monitoring?->base?->name ?? '',
                     $monitoring?->company?->company_name ?? '',
-                    $monitoring?->apartment?->street_name .' '. $monitoring?->apartment->home_name ?? '',
+                    $monitoring?->apartment?->street_name .' '. $monitoring?->apartment?->home_name ?? '',
                     $monitoring->address_commit ?? '',
                     $monitoring->address ?? '',
                     $monitoring->additional_comment ?? '',
@@ -55,16 +58,19 @@ class MonitoringExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
+            'ID',
             'Tuman',
             'Holati',
             'Fish',
-            'Turi',
+            'O\'rganish turi',
+            'O\'rganilgan joy',
+            'Aniqlangan qoidabuzarlik',
             'Sana',
             'Asos',
             'Korxona',
             'Turar joy',
             'Manzil',
-            'Manzil',
+            'Xonadon',
             'Qoshimcha malumot',
             'Bayonnoma seriya va raqami',
             'Qaror seriya va raqami',
