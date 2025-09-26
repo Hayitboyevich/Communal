@@ -76,7 +76,7 @@ class UserService
 
             $user = $this->repository->update($id, $request->except(['role_id', 'image', 'images', 'docs']));
 
-            $user->roles()->sync($request->role_id);
+            $user->roles()->syncWithoutDetaching($request->role_id);
 
             if (!empty($request->image)) {
                 $path = $this->fileService->uploadImage($request->image, 'user/images');
