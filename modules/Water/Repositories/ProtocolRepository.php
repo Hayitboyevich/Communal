@@ -76,7 +76,10 @@ class ProtocolRepository implements ProtocolRepositoryInterface
             })
             ->when(isset($filters['protocol_type']), function ($query) use ($filters) {
                 $query->where('protocol_type_id', $filters['protocol_type']);
-            });
+            })
+            ->when(isset($filters['is_administrative']), function ($query) use ($filters) {
+            $query->where('is_administrative', true);
+        });
 
 
     }

@@ -184,7 +184,22 @@ class ProtocolService
                 'confirm_result' => $query->clone()->where('category', CategoryType::REGULATION)->where('protocol_status_id', ProtocolStatusEnum::CONFIRM_RESULT->value)->count(),
                 'confirmed' => $query->clone()->where('category', CategoryType::REGULATION)->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED->value)->count(),
             ];
-        } else {
+        }
+        elseif ($filters['is_administrative']){
+            return [
+                'all' => $query->clone()->where('is_administrative', true)->count(),
+                'paid' => $query->clone()
+                    ->where('is_administrative', true)
+                    ->whereHas('fine', fn($q) => $q->where('status', 12))
+                    ->count(),
+                'unpaid' => $query->clone()
+                    ->where('is_administrative', true)
+                    ->whereHas('fine', fn($q) => $q->where('status', '<>', 12)->orWhereNull('status'))
+                    ->count(),
+            ];
+        }
+
+        else {
             return [
                 'all' => 0
             ];
