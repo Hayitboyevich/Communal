@@ -167,7 +167,7 @@ class ProtocolService
     public function count($user, $roleId, $filters = []): array
     {
         $query = $this->repository->all($user, $roleId)->where('type', $filters['type']);
-        if ($filters['category'] == CategoryType::MONITORING) {
+        if (isset($filters['category']) && $filters['category'] == CategoryType::MONITORING) {
             return [
                 'all' => $query->clone()->where('category', CategoryType::MONITORING)->count(),
                 'enter_result' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::ENTER_RESULT->value)->count(),
@@ -175,7 +175,7 @@ class ProtocolService
                 'forming' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::FORMING->value)->count(),
                 'not_defect' => $query->clone()->where('category', CategoryType::MONITORING)->where('protocol_status_id', ProtocolStatusEnum::NOT_DEFECT->value)->count(),
             ];
-        } elseif ($filters['category'] == CategoryType::REGULATION) {
+        } elseif (isset($filters['category']) && $filters['category'] == CategoryType::REGULATION) {
             return [
                 'all' => $query->clone()->where('category', CategoryType::REGULATION)->count(),
                 'formed' => $query->clone()->where('category', CategoryType::REGULATION)->where('protocol_status_id', ProtocolStatusEnum::FORMED->value)->count(),
@@ -185,7 +185,7 @@ class ProtocolService
                 'confirmed' => $query->clone()->where('category', CategoryType::REGULATION)->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED->value)->count(),
             ];
         }
-        elseif ($filters['is_administrative']){
+        elseif (isset($filters['is_administrative'])){
             return [
                 'all' => $query->clone()->where('is_administrative', true)->count(),
                 'paid' => $query->clone()
