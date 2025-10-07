@@ -56,6 +56,7 @@ class ProtocolListResource extends JsonResource
             'is_finished' => $this->is_finished,
             'is_administrative' => $this->is_administrative,
             'files' =>  DocumentResource::collection($this->documents),
+            'fine' => $this->fine ? FineResource::make($this->fine) : null,
             'additional_files' => collect(json_decode($this->additional_files, true))->map(function ($file) {
                 return [
                     'url' => url('storage/'.$file['url']),
