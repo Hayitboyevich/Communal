@@ -68,8 +68,12 @@ class MonitoringService
         DB::beginTransaction();
         try {
             $monitoring = $this->repository->create($request->except('images', 'docs', 'region', 'district'));
-            $this->saveImages($monitoring, $request['images'], 'monitoring/images');
-            $this->saveFiles($monitoring, $request['docs'], 'monitoring/files');
+            if ($request['images']) {
+                $this->saveImages($monitoring, $request['images'], 'monitoring/images');
+            }
+            if ($request['docs']) {
+                $this->saveFiles($monitoring, $request['docs'], 'monitoring/files');
+            }
             $this->createHistory($monitoring, MonitoringHistoryType::CREATE_FIRST);
             DB::commit();
             return $monitoring;
