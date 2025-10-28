@@ -1,7 +1,7 @@
 @php
 $image1 = null;
 $image2 = null;
-if ($monitoring?->regulation?->images[0]){
+if (!empty($monitoring?->regulation?->images[0])){
     $path = public_path('storage/' . $monitoring->regulation->images[0]->url);
 
     if (file_exists($path)) {
@@ -11,7 +11,7 @@ if ($monitoring?->regulation?->images[0]){
     }
 }
 
-if ($monitoring?->regulation?->images[1]){
+if (!empty($monitoring?->regulation?->images[1])){
     $path = public_path('storage/' . $monitoring->regulation->images[1]->url);
 
     if (file_exists($path)) {
@@ -21,7 +21,6 @@ if ($monitoring?->regulation?->images[1]){
     }
 }
 
-$image1 = $monitoring?->regulation->images[0]->url
 @endphp
 <!DOCTYPE html>
 <html lang="en">
