@@ -1,3 +1,28 @@
+@php
+$image1 = null;
+$image2 = null;
+if ($monitoring?->regulation?->images[0]){
+    $path = public_path('storage/' . $monitoring->regulation->images[0]->url);
+
+    if (file_exists($path)) {
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = file_get_contents($path);
+        $image1 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    }
+}
+
+if ($monitoring?->regulation?->images[1]){
+    $path = public_path('storage/' . $monitoring->regulation->images[1]->url);
+
+    if (file_exists($path)) {
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = file_get_contents($path);
+        $image2 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    }
+}
+
+$image1 = $monitoring?->regulation->images[0]->url
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,6 +57,10 @@
         .custom-table * {
             font-size: 8px;
             color: #080b22;
+        }
+
+        .indent {
+            text-indent: 30px;
         }
     </style>
 </head>
@@ -98,6 +127,7 @@
                 ></div>
             </td>
         </tr>
+
         </tbody>
     </table>
 
@@ -110,8 +140,10 @@
       "
     >
         <tbody>
+
         <tr>
             <td style="text-align: center; font-weight: 500;">
+                <p style="color: #8c8c8c">{{ $monitoring?->region->address }}</p>
                 <div style="margin-bottom: 8px;  font-size: 16px">
                     Ko‘p kvartirali uylarni boshqarish  va saqlash qoidalariga hamda issiqlik ta'minotidan
                     foydalanishda normativ-huquqiy hujjatlar talablariga rioya etilishi yuzasidan o‘tkazilgan
@@ -338,9 +370,6 @@
             <th style="border: 1px solid #bfbfbf; padding: 10px">
                 Bajarilish muddati
             </th>
-            <th style="border: 1px solid #bfbfbf; padding: 10px">
-                Bajarilishi haqida belgilar (holati)
-            </th>
         </tr>
         </thead>
         <tbody>
@@ -371,7 +400,7 @@
                   padding: 10px;
             "
                 >
-                    {{ $monitoring->regulation->violationType->name }}
+                    {{ $monitoring?->regulation->violationType->name }}
 
                 </td>
                 <td
@@ -392,16 +421,44 @@
                 >
                     {{ $monitoring?->violation?->deadline }}
                 </td>
-                <td
-                    style="
-              border: 1px solid #bfbfbf;
-              text-align: center;
-              padding: 10px;
-            "
-                >
-                    {{ $monitoring->status->name }}
-                </td>
             </tr>
+        </tbody>
+    </table>
+    <div class="indent">
+        <b>MJtKning 101-moddasi.Elektr, issiqlik energiyasi, gazdan foydalanish qoidalarini buzish </b>
+        Umumiy foydalanishdagi elektr, issiqlik, gaz tarmoqlariga oʻzboshimchalik bilan ulanish yoki ulardan foydalanish qoidalarini boshqacha tarzda buzish yoxud elektr, issiqlik energiyasi, tabiiy gazni hisobga olish asboblariga shu jumladan ularning plombalariga qasddan shikast yetkazish yoki bunday hisobga olish asboblarining koʻrsatkichlarini oʻzgartirish maqsadida ularga tashqaridan aralashish,
+        fuqarolarga bazaviy hisoblash miqdorining oʻn baravaridan oʻn besh baravarigacha, mansabdor shaxslarga esa — yigirma baravaridan yigirma besh baravarigacha miqdorda jarima solishga sabab boʻladi.
+    </div>
+    <div class="indent">
+        <b>MJtKning 159-moddasi. Turar joylarni saqlash va ulardan foydalanish qoidalarini, uy-joy fondidan texnik foydalanish qoidalari va normalarini, koʻp kvartirali uylarni boshqarish qoidalarini buzish </b>
+        <div class="indent">Turar joylarni saqlash va ulardan foydalanish, umum foydalanadigan joylarni sanitariya holatida saqlash qoidalarini buzish, uy-joy fondidan texnik foydalanish qoidalari va normalarini buzish - fuqarolarga bazaviy hisoblash miqdorining besh baravaridan oʻn baravarigacha, mansabdor shaxslarga esa — oʻn baravaridan oʻn besh baravarigacha miqdorda jarima solishga sabab boʻladi.</div>
+        <div class="indent">Koʻp kvartirali uylarni boshqarish qoidalarini buzish - mansabdor shaxslarga bazaviy hisoblash miqdorining oʻn besh baravari miqdorida jarima solishga sabab boʻladi.</div>
+        Koʻp kvartirali uylardagi tayanch va (yoki) toʻsiq konstruksiyalarni qonunchilikni hamda texnik jihatdan tartibga solish sohasidagi normativ hujjatlarni buzgan holda oʻzgartirish va (yoki) rekonstruksiya qilish, shu jumladan koʻp kvartirali uylarda va koʻp kvartirali uylarga tutash yer uchastkalarida oʻzboshimchalik bilan imoratlar (inshootlar) qurish ishlarini amalga oshirish -fuqarolarga bazaviy hisoblash miqdorining ellik baravari, mansabdor shaxslarga esa — yuz baravari miqdorda jarima solishga sabab boʻladi.
+        <div class="indent">Ushbu moddaning uchinchi qismida nazarda tutilgan huquqbuzarlikni (toʻsiq konstruksiyalarga oid qismida) birinchi marta sodir etgan shaxs, agar u koʻp kvartirali uydagi toʻsiq konstruksiyalarning amalga oshirilgan oʻzgartirilishini yoki ularni rekonstruksiya qilish tufayli yoʻl qoʻyilgan buzilishlarni, koʻp kvartirali uyga tutash yer uchastkasida oʻzboshimchalik bilan qurilgan imoratlarni (inshootlarni), shuningdek ularning oqibatlarini ixtiyoriy ravishda bartaraf etsa, javobgarlikdan ozod etiladi.</div>
+       <div class="indent"> <b> Jinoyat Kodeksining 2293-moddasi. </b> Koʻp kvartirali uylardagi tayanch konstruksiyalarni qonunchilikni hamda texnik jihatdan tartibga solish sohasidagi normativ hujjatlarni buzgan holda oʻzgartirish va (yoki) rekonstruksiya qilish, shunday harakatlar uchun maʼmuriy jazo qoʻllanilganidan keyin sodir etilgan boʻlsa, —
+           uch yilgacha axloq tuzatish ishlari yoki ikki yildan uch yilgacha ozodlikni cheklash yoxud ikki yildan uch yilgacha ozodlikdan mahrum qilish bilan jazolanadi.</div>
+        <div class="indent">Koʻp kvartirali uylardagi buzilgan tayanch konstruksiyasini loyiha smeta hujjatlariga asosan mustahkamlash ishlarini amalaga oshirilgan holda bartaraf etilib avvalgi holatiga qaytarilishi shart.</div>
+    </div>
+    <table
+        style="
+        margin-bottom: 10px;
+        width: 100%;
+        border: none;
+        border-collapse: collapse;
+      "
+    >
+        <tbody>
+        <tr>
+           <td>
+
+           </td>
+
+        </tr>
+        <tr>
+            <td>
+                <b>Mazkur majburiy koʻrsatma talablari belgilangan muddatda bajarilmagan taqdirda, oʻrnatilgan tartibda tegishli sud organlariga daʼvo arizasi kiritilishi toʻg’risida ogohlantiramiz.</b>
+            </td>
+        </tr>
         </tbody>
     </table>
 
@@ -415,16 +472,15 @@
     >
         <tbody>
         <tr>
-            <td style="width: 60px; vertical-align: top">Izoh:</td>
-            <td>
-                Ko‘p kvartirali uylarni boshqarish va saqlash, ulardan texnik foydalanish,
-                umum foydalanadigan joylarni sanitariya holatida saqlash qoidalari, tutash
-                yer uchastkalarini saqlash talablari buzilganligi hamda issiqlik taʼminotidan
-                foydalanishda normativ-huquqiy hujjatlar talablariga rioya etilmaganligi bo‘yicha
-                berilayotgan ijro etilishi majburiy bo‘lgan ko‘rsatma talablari belgilangan muddatda
-                bajarilmagan taqdirda, Siz Maʼmuriy javobgarlik to‘g‘risidagi kodeksining tegishli
-                moddalari (101-moddaning 1-qismi  va 159-modda)da nazarda tutilgan javobgarlikka tortilasiz.
-            </td>
+            @if($image1)
+                <td style="width: 50%">
+                    <img src="{{ $image1 }}" alt="" style="width:200px; height:200px;">
+                </td>
+            @elseif($image2)
+                <td style="width: 50%">
+                    <img src="{{ $image2 }}" alt="" style="width:200px; height:200px;">
+                </td>
+            @endif
         </tr>
         </tbody>
     </table>
