@@ -25,14 +25,12 @@ class DecisionRepository implements DecisionRepositoryInterface
     public function get(
         string $series,
         string $number,
-        int $projectId
     )
     {
         return $this->model->query()
             ->where([
                 'series' => $series,
                 'number' => $number,
-                'project_id' => $projectId
             ])
             ->first();
     }
@@ -40,7 +38,7 @@ class DecisionRepository implements DecisionRepositoryInterface
     public function update(?array $data)
     {
         try {
-            $model = $this->get($data['series'], $data['number'], $data['project_id']);
+            $model = $this->get($data['series'], $data['number']);
             if(!$model){
                 throw new \Exception('Bunday jarima mavjud emas');
             }

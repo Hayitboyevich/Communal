@@ -20,7 +20,6 @@ class FineUpdateRequest extends FormRequest
     {
         return [
             'parent_id' => 'required|integer',
-            'project_id' => 'required|integer',
             'created_time' => 'required',
             'updated_time' => 'required',
             'region_id' => 'required',
