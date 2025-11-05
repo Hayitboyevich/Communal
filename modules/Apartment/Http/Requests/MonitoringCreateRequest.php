@@ -30,7 +30,7 @@ class MonitoringCreateRequest extends FormRequest
             'lat' => 'required|string',
             'long' => 'required|string',
             'images' => 'required|array',
-            'docs' => 'required|array',
+            'docs' => 'sometimes',
             'user_id' => 'required|integer|exists:users,id',
             'role_id' => 'required|integer|exists:users,id',
             'monitoring_status_id' => 'required|integer|exists:protocol_statuses,id',
