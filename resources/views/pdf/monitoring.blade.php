@@ -471,7 +471,8 @@ if (!empty($monitoring?->regulation?->images[1])){
                 <td style="width: 50%">
                     <img src="{{ $image1 }}" alt="" style="width:200px; height:200px;">
                 </td>
-            @elseif($image2)
+            @endif
+            @if($image2)
                 <td style="width: 50%">
                     <img src="{{ $image2 }}" alt="" style="width:200px; height:200px;">
                 </td>
