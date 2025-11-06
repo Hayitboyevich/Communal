@@ -321,11 +321,7 @@ if (!empty($monitoring?->regulation?->images[1])){
                 text-align: center;
               "
                 >
-                    @if($monitoring->bsk_type)
-                        {{ $monitoring->address }}
-                    @else
-                        {{ $monitoring?->apartment?->home_name }}
-                    @endif
+                    {{ $monitoring->apartment ?  $monitoring?->apartment?->home_name : $monitoring->address}}
                 </p>
             </td>
         </tr>
