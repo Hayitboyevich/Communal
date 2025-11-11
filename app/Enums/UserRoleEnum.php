@@ -18,6 +18,7 @@ enum UserRoleEnum: int
     case CADASTR_HR = 12;
     case CADASTR_USER = 13;
     case CADASTR_VIEWER = 14;
+    case CADASTR_REGION_VIEWER = 15;
 
     case OGOH = 101;
 }

@@ -30,8 +30,8 @@ class ClaimRepository implements ClaimRepositoryInterface
             ->when(isset($filters['district_id']), function ($q) use ($filters) {
                 $q->where('district_id', $filters['district_id']);
             })
-            ->when(isset($filters['cadastral_number']), function ($q) use ($filters) {
-                $q->where('cadastral_number', $filters['cadastral_number']);
+            ->when(isset($filters['cad_number']), function ($q) use ($filters) {
+                $q->where('cadastral_number', $filters['cad_number']);
             });
 
         switch ($roleId) {
@@ -42,6 +42,12 @@ class ClaimRepository implements ClaimRepositoryInterface
                 return $query->where(function ($q) use ($user) {
                     $q->where('user_id', $user->id)
                         ->orWhere('district_id', $user->district_id);
+                });
+
+            case UserRoleEnum::CADASTR_REGION_VIEWER->value:
+                return $query->where(function ($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                        ->orWhere('region_id', $user->region_id);
                 });
             case  UserRoleEnum::APARTMENT_INSPECTOR->value:
                 return $query->where('inspector_id', $user->id);
