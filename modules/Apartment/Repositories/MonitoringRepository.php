@@ -65,9 +65,13 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                 ->when(isset($filters['category']), function ($query) use ($filters) {
                     $query->where('category', $filters['category']);
                 })
+                ->when(isset($filters['is_administrative']), function ($query) use ($filters) {
+                    $query->where('is_administrative', true);
+                })
                 ->when(isset($filters['region_id']), function ($query) use ($filters) {
                     $query->where('region_id', $filters['region_id']);
                 });
+
         } catch (\Exception $exception) {
             throw $exception;
         }
@@ -147,10 +151,10 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'fish' => $item['fish'] ?? null,
                             'phone' => $item['phone'] ?? null,
                         ]);
-                        if (isset($item['images'])){
+                        if (isset($item['images'])) {
                             $this->saveImages($regulation, $item['images']);
                         }
-                        if (isset($item['videos'])){
+                        if (isset($item['videos'])) {
                             $this->saveImages($regulation, $item['videos']);
                         }
 
@@ -199,10 +203,10 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'company_id' => $item['company_id'] ?? null,
                         ]);
                         $this->createHistory($newMonitoring, MonitoringHistoryType::VIOLATION_DETECTED);
-                        if (isset($item['images'])){
+                        if (isset($item['images'])) {
                             $this->saveImages($regulation, $item['images']);
                         }
-                        if (isset($item['videos'])){
+                        if (isset($item['videos'])) {
                             $this->saveImages($regulation, $item['videos']);
                         }
                         $results[] = $newMonitoring;
@@ -304,8 +308,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
 
     private function saveVideos(Regulation $regulation, ?array $videos)
     {
-        if (!empty($videos))
-        {
+        if (!empty($videos)) {
             $paths = array_map(fn($video) => $this->fileService->uploadImage($video, 'regulation/videos'), $videos);
             $regulation->videos()->createMany(array_map(fn($path) => ['url' => $path], $paths));
         }

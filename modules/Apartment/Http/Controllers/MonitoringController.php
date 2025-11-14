@@ -40,7 +40,7 @@ class MonitoringController extends BaseController
     public function index($id = null): JsonResponse
     {
         try {
-            $filters = request()->only(['status', 'type', 'category', 'region_id', 'district_id', 'id', 'monitoring_type']);
+            $filters = request()->only(['status', 'type', 'category', 'is_administrative', 'region_id', 'district_id', 'id', 'monitoring_type']);
             $monitorings = $id
                 ? $this->service->findById($id)
                 : $this->service->getAll($this->user, $this->roleId, $filters)->paginate(request('per_page', 15));
@@ -63,7 +63,7 @@ class MonitoringController extends BaseController
     public function count(): JsonResponse
     {
         try {
-            $filters = request()->only(['status', 'type', 'category', 'region_id', 'district_id', 'id', 'monitoring_type']);
+            $filters = request()->only(['status', 'is_administrative', 'type', 'category', 'region_id', 'district_id', 'id', 'monitoring_type']);
             $data = $this->service->count($this->user, $this->roleId, $filters);
             return $this->sendSuccess($data, 'Count');
         } catch (\Exception $exception) {

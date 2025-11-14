@@ -7,10 +7,14 @@ use App\Http\Resources\DocumentResource;
 use App\Http\Resources\ImageResource;
 use App\Http\Resources\RegionResource;
 use App\Http\Resources\VideoResource;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Const\TypeList;
+use Modules\Water\Models\ProtocolStatus;
 
 class ProtocolResource extends JsonResource
 {
@@ -73,6 +77,20 @@ class ProtocolResource extends JsonResource
             'step' => $this->step,
             'type' => $this->type,
             'fine' => $this->fine ? FineResource::make($this->fine) : null,
+            'history' => $this->histories ? $this->histories->map(function ($history) {
+                return [
+                    'id' => $history->id,
+                    'comment' => $history->content->comment,
+                    'user' => $history->content->user ? User::query()->find($history->content->user, ['name', 'surname', 'middle_name']) : null,
+                    'role' => $history->content->role ? Role::query()->find($history->content->role, ['name', 'description']) : null,
+                    'status' => $history->content->status ? ProtocolStatus::query()->find($history->content->status, ['id', 'name']) : null,
+                    'type' => $history->type,
+                    'files' => $history->documents ? DocumentResource::collection($history->documents): null,
+                    'images' =>$history->images ? ImageResource::collection($history->images): null,
+                    'is_change' => $history->type ? ProtocolHistoryType::getLabel($history->type) : null,
+                    'created_at' => $history->created_at,
+                ];
+            })->sortByDesc('created_at')->values() :null
         ];
     }
 }
