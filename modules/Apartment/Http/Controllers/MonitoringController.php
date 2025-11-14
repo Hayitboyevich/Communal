@@ -71,6 +71,17 @@ class MonitoringController extends BaseController
         }
     }
 
+    public function delete($id): JsonResponse
+    {
+        try {
+            $monitoring = $this->service->findById($id);
+            $monitoring->delete();
+            return $this->sendSuccess(null, 'Monitoring deleted successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
 
     private function getMonitoringCounts($query, $group, $startDate = null, $endDate = null)
     {

@@ -71,6 +71,17 @@ class ProtocolController extends BaseController
         }
     }
 
+    public function delete($id): JsonResponse
+    {
+        try {
+            $protocol = $this->service->findById($id);
+            $protocol->delete();
+            return $this->sendSuccess(null, 'Protocol deleted successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
     public function attach(Request $request): JsonResponse
     {
         try {

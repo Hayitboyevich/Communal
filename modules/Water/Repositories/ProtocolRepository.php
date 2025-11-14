@@ -18,6 +18,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
                 return Protocol::query()->where('inspector_id', $user->id);
             case UserRoleEnum::ADMIN->value:
             case UserRoleEnum::RES_VIEWER->value:
+            case UserRoleEnum::SUPER_ADMIN->value:
                 return Protocol::query();
             case UserRoleEnum::MANAGER->value:
                 return Protocol::query()->where('region_id', $user->region_id);
