@@ -77,7 +77,7 @@ class MonitoringController extends BaseController
             $monitoring = $this->service->findById($id);
             $monitoring->delete();
             return $this->sendSuccess(null, 'Monitoring deleted successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -117,6 +117,7 @@ class MonitoringController extends BaseController
             ->groupBy($group, 'monitorings.monitoring_status_id')
             ->get();
     }
+
     private function getDecisionCounts($query, $group, $startDate = null, $endDate = null)
     {
         if ($startDate && $endDate) {
@@ -141,13 +142,12 @@ class MonitoringController extends BaseController
     }
 
 
-
     public function report($regionId = null): JsonResponse
     {
         try {
             $startDate = request('date_from');
-            $endDate   = request('date_to');
-            $regionId  = request('region_id');
+            $endDate = request('date_to');
+            $regionId = request('region_id');
 
             $regions = $regionId
                 ? District::query()->where('region_id', $regionId)->get(['id', 'name_uz'])
@@ -179,18 +179,32 @@ class MonitoringController extends BaseController
             $data = $regions->map(function ($region) use ($userCounts, $monitoringCounts, $decisionCounts) {
                 $regionId = $region->id;
                 $regionMonitoring = $monitoringCounts->get($regionId, collect());
-                $regionDecision   = $decisionCounts->get($regionId);
-                $sumByStatus = fn($statuses) =>
-                $regionMonitoring->whereIn('monitoring_status_id', (array)$statuses)->sum('count');
+                $regionDecision = $decisionCounts->get($regionId);
+                $sumByStatus = fn($statuses) => $regionMonitoring->whereIn('monitoring_status_id', (array)$statuses)->sum('count');
 
                 return [
-                    'id'                  => $region->id,
-                    'name'                => $region->name_uz,
-                    'inspector_count'     => $userCounts->get($regionId, 0),
+                    'id' => $region->id,
+                    'name' => $region->name_uz,
+                    'inspector_count' => $userCounts->get($regionId, 0),
 
-                    'all_monitorings'     => $regionMonitoring->sum('count'),
-                    'all_defect_count'    => $regionMonitoring->sum('defect_count'),
-                    'all_fix'             => $sumByStatus([
+                    'all_monitorings' => $regionMonitoring->sum('count'),
+                    'enter_result' => $sumByStatus([
+                        MonitoringStatusEnum::ENTER_RESULT
+                    ]),
+                    'in_confirmation' => $sumByStatus([
+                        MonitoringStatusEnum::CONFIRM_DEFECT
+                    ]),
+                    'not_defect' => $sumByStatus([
+                        MonitoringStatusEnum::NOT_DEFECT
+                    ]),
+                    'confirm_result' => $sumByStatus([
+                        MonitoringStatusEnum::CONFIRM_RESULT
+                    ]),
+                    'defect' => $sumByStatus([
+                        MonitoringStatusEnum::DEFECT
+                    ]),
+                    'all_defect_count' => $regionMonitoring->sum('defect_count'),
+                    'all_fix' => $sumByStatus([
                         MonitoringStatusEnum::FORMED,
                         MonitoringStatusEnum::DONE,
                         MonitoringStatusEnum::ADMINISTRATIVE,
@@ -199,19 +213,19 @@ class MonitoringController extends BaseController
                         MonitoringStatusEnum::HMQO,
                         MonitoringStatusEnum::FIXED,
                     ]),
-                    'fix_formed'          => $regionMonitoring->sum('fix_formed'),
-                    'fix_done'            => $regionMonitoring->sum('fix_done'),
-                    'fix_administrative'  => $regionMonitoring->sum('fix_administrative'),
-                    'fix_court'           => $regionMonitoring->sum('fix_court'),
-                    'fix_mib'             => $regionMonitoring->sum('fix_mib'),
-                    'fixed'               => $regionMonitoring->sum('fixed'),
+                    'fix_formed' => $regionMonitoring->sum('fix_formed'),
+                    'fix_done' => $regionMonitoring->sum('fix_done'),
+                    'fix_administrative' => $regionMonitoring->sum('fix_administrative'),
+                    'fix_court' => $regionMonitoring->sum('fix_court'),
+                    'fix_mib' => $regionMonitoring->sum('fix_mib'),
+                    'fixed' => $regionMonitoring->sum('fixed'),
 
-                    'decision_count'      => $regionDecision->decision_count ?? 0,
-                    'paid_count'          => $regionDecision->paid_count ?? 0,
-                    'unpaid_count'        => $regionDecision->unpaid_count ?? 0,
-                    'total_amount'        => $regionDecision->total_amount ?? 0,
-                    'paid_amount'         => $regionDecision->paid_amount ?? 0,
-                    'unpaid_amount'       => $regionDecision->unpaid_amount ?? 0,
+                    'decision_count' => $regionDecision->decision_count ?? 0,
+                    'paid_count' => $regionDecision->paid_count ?? 0,
+                    'unpaid_count' => $regionDecision->unpaid_count ?? 0,
+                    'total_amount' => $regionDecision->total_amount ?? 0,
+                    'paid_amount' => $regionDecision->paid_amount ?? 0,
+                    'unpaid_amount' => $regionDecision->unpaid_amount ?? 0,
                 ];
             });
 
