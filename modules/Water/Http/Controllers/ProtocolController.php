@@ -45,7 +45,7 @@ class ProtocolController extends BaseController
             $filters = request()->only(['status', 'is_administrative', 'inspector_id', 'protocol_number', 'district_id', 'region_id', 'protocol_type', 'type', 'attach', 'category']);
             $protocols = $id
                 ? $this->service->findById($id)
-                : $this->service->getAll($this->user, $this->roleId, $filters)->paginate(request('per_page', 15));
+                : $this->service->getAll($this->user, $this->roleId, $filters)->orderBy('created_at', 'desc')->paginate(request('per_page', 15));
 
             $resource = $id
                 ? ProtocolResource::make($protocols)

@@ -43,7 +43,7 @@ class MonitoringController extends BaseController
             $filters = request()->only(['status', 'type', 'category', 'is_administrative', 'region_id', 'district_id', 'id', 'monitoring_type']);
             $monitorings = $id
                 ? $this->service->findById($id)
-                : $this->service->getAll($this->user, $this->roleId, $filters)->paginate(request('per_page', 15));
+                : $this->service->getAll($this->user, $this->roleId, $filters)->orderBy('created_at', 'desc')->paginate(request('per_page', 15));
 
             $resource = $id
                 ? MonitoringResource::make($monitorings)
