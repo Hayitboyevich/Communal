@@ -35,7 +35,8 @@ class ProtocolController extends BaseController
 
     public function __construct(
         protected ProtocolService $service
-    ){
+    )
+    {
         parent::__construct();
     }
 
@@ -66,7 +67,7 @@ class ProtocolController extends BaseController
     {
         try {
             return Excel::download(new ProtocolExport($id), 'protocol.xlsx');
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -77,7 +78,7 @@ class ProtocolController extends BaseController
             $protocol = $this->service->findById($id);
             $protocol->delete();
             return $this->sendSuccess(null, 'Protocol deleted successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -85,9 +86,9 @@ class ProtocolController extends BaseController
     public function attach(Request $request): JsonResponse
     {
         try {
-           $protocol = $this->service->attach($request->all(), $this->user, $this->roleId);
-           return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol attached successfully.');
-        }catch (\Exception $exception){
+            $protocol = $this->service->attach($request->all(), $this->user, $this->roleId);
+            return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol attached successfully.');
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -102,7 +103,7 @@ class ProtocolController extends BaseController
 
             DB::commit();
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol created successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
@@ -112,14 +113,14 @@ class ProtocolController extends BaseController
     {
         DB::beginTransaction();
         try {
-            $protocol = $this->service->update($this->user, $this->roleId,$id, $request->except('files', 'additional_files', 'images', 'videos'), ProtocolHistoryType::CREATE_SECOND);
+            $protocol = $this->service->update($this->user, $this->roleId, $id, $request->except('files', 'additional_files', 'images', 'videos'), ProtocolHistoryType::CREATE_SECOND);
             $this->service->saveFiles($protocol, $request['files']);
             $this->service->saveVideo($protocol, $request['videos']);
             $this->service->saveImages($protocol, $request['images']);
             $this->service->uploadFiles($protocol, 'additional_files', $request['additional_files']);
             DB::commit();
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol created successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
@@ -130,11 +131,11 @@ class ProtocolController extends BaseController
         DB::beginTransaction();
         try {
 
-            $protocol = $this->service->update($this->user, $this->roleId,$id, $request->except('image_files'), ProtocolHistoryType::CREATE_THIRD);
+            $protocol = $this->service->update($this->user, $this->roleId, $id, $request->except('image_files'), ProtocolHistoryType::CREATE_THIRD);
             $this->service->uploadFiles($protocol, 'image_files', $request['image_files']);
             DB::commit();
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol created successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
@@ -145,8 +146,8 @@ class ProtocolController extends BaseController
         try {
             $protocol = $this->service->statusChange($id, $request);
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol status changed successfully.');
-        }catch (\Exception $exception){
-            return  $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
@@ -155,16 +156,17 @@ class ProtocolController extends BaseController
         try {
             $protocol = $this->service->confirmDefect($this->user, $this->roleId, request('id'));
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol confirmed successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
     public function rejectDefect(): JsonResponse
     {
         try {
             $protocol = $this->service->rejectDefect($this->user, $this->roleId, request()->all());
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol rejected successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
 
@@ -175,7 +177,7 @@ class ProtocolController extends BaseController
         try {
             $protocol = $this->service->confirmResult($this->user, $this->roleId, request('id'));
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol confirmed successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -185,7 +187,7 @@ class ProtocolController extends BaseController
         try {
             $protocol = $this->service->rejectResult($this->user, $this->roleId, request()->all());
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol rejected successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -194,7 +196,7 @@ class ProtocolController extends BaseController
     {
         try {
             return $this->sendSuccess($this->service->history($id), 'Object History');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -205,7 +207,7 @@ class ProtocolController extends BaseController
             $filters = \request()->only(['status', 'category', 'type', 'is_administrative']);
             $data = $this->service->count($this->user, $this->roleId, $filters);
             return $this->sendSuccess($data, 'Count of protocols retrieved successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
 
@@ -214,9 +216,9 @@ class ProtocolController extends BaseController
     public function reject(): JsonResponse
     {
         try {
-         $protocol = $this->service->reject($this->user, $this->roleId, request()->all());
-         return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol rejected successfully.');
-        }catch (\Exception $exception){
+            $protocol = $this->service->reject($this->user, $this->roleId, request()->all());
+            return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol rejected successfully.');
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -225,7 +227,7 @@ class ProtocolController extends BaseController
     {
         try {
             $protocol = Protocol::query()->findOrFail($id);
-            $domain = URL::to('/protocol-pdf').'/'.$id;
+            $domain = URL::to('/protocol-pdf') . '/' . $id;
 
             $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
             $pdf = Pdf::loadView('pdf.protocol', compact(
@@ -235,16 +237,17 @@ class ProtocolController extends BaseController
             $pdfBase64 = base64_encode($pdfOutput);
             return $this->sendSuccess($pdfBase64, 'PDF');
 
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
     public function protocolReport($regionId = null): JsonResponse
     {
         try {
             $startDate = request('date_from');
-            $endDate   = request('date_to');
-            $regionId  = $regionId ?? request('region_id');
+            $endDate = request('date_to');
+            $regionId = $regionId ?? request('region_id');
 
             $regions = $regionId
                 ? District::query()->where('region_id', $regionId)->get(['id', 'name_uz'])
@@ -262,36 +265,40 @@ class ProtocolController extends BaseController
             $protocolCounts = $this->getGroupedCounts(
                 query: Protocol::query(),
                 selectRaw: $group . ' as group_id',
-                groupBy: [$group, 'protocols.protocol_status_id', 'protocols.is_finished', 'protocols.defect_id', 'protocols.defect_comment', 'protocols.decision_id', 'protocols.type',  'protocols.deadline', 'protocols.category'],
+                groupBy: [$group, 'protocols.protocol_status_id', 'protocols.is_finished', 'protocols.defect_id', 'protocols.defect_comment', 'protocols.decision_id', 'protocols.type', 'protocols.deadline', 'protocols.category'],
                 startDate: $startDate,
                 endDate: $endDate,
             )->groupBy('group_id');
 
             $data = $regions->map(function ($region) use ($userCounts, $protocolCounts) {
-                $regionId        = $region->id;
+                $regionId = $region->id;
                 $regionProtocols = $protocolCounts->get($regionId, collect());
 
                 return [
-                    'id'                   => $region->id,
-                    'name'                 => $region->name_uz,
-                    'inspector_count'      => $userCounts->get($regionId, 0),
-                    'all_protocols'        => $regionProtocols->sum('count'),
+                    'id' => $region->id,
+                    'name' => $region->name_uz,
+                    'inspector_count' => $userCounts->get($regionId, 0),
+                    'all_protocols' => $regionProtocols->sum('count'),
+                    'enter_result' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::ENTER_RESULT->value)->sum('count'),
+                    'not_defect' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::NOT_DEFECT->value)->sum('count'),
+                    'in_confirm' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value)->sum('count'),
+                    'confirm_result' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRM_RESULT->value)->sum('count'),
                     'defect_count' => $regionProtocols
                         ->filter(fn($item) => !is_null($item->defect_id) || !is_null($item->defect_comment))
                         ->sum('count'),
-                    'remedy_count'         => $regionProtocols->where('category', 2)->sum('count'),
-                    'confirmed_count'      => $regionProtocols->where('protocol_status_id', '!=', ProtocolStatusEnum::NOT_DEFECT->value)->where('is_finished', true)->sum('count'),
+                    'remedy_count' => $regionProtocols->where('category', 2)->sum('count'),
+                    'confirmed_count' => $regionProtocols->where('protocol_status_id', '!=', ProtocolStatusEnum::NOT_DEFECT->value)->where('is_finished', true)->sum('count'),
                     'administrative_count' => $regionProtocols->whereNotNull('decision_id')->sum('count'),
                     'confirm_result_count' => $regionProtocols->whereNotNull('deadline')->sum('count'),
-                    'hmqo_count'           => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::HMQO->value)->sum('count'),
+                    'hmqo_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::HMQO->value)->sum('count'),
 
-                    'decision_count'       => $regionProtocols->sum('decision_count'),
-                    'paid_count'           => $regionProtocols->sum('paid_count'),
-                    'unpaid_count'         => $regionProtocols->sum('unpaid_count'),
+                    'decision_count' => $regionProtocols->sum('decision_count'),
+                    'paid_count' => $regionProtocols->sum('paid_count'),
+                    'unpaid_count' => $regionProtocols->sum('unpaid_count'),
 
-                    'total_amount'         => $regionProtocols->sum('total_amount'),
-                    'paid_amount'          => $regionProtocols->sum('paid_amount'),
-                    'unpaid_amount'        => $regionProtocols->sum('unpaid_amount'),
+                    'total_amount' => $regionProtocols->sum('total_amount'),
+                    'paid_amount' => $regionProtocols->sum('paid_amount'),
+                    'unpaid_amount' => $regionProtocols->sum('unpaid_amount'),
                 ];
             });
 
@@ -301,7 +308,6 @@ class ProtocolController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
-
 
 
     private function getGroupedCounts($query, $selectRaw, $groupBy, $startDate = null, $endDate = null)
@@ -348,8 +354,8 @@ class ProtocolController extends BaseController
     {
         try {
             $protocol = $this->service->findById($id);
-            return  $this->sendSuccess(FineResource::make($protocol->fine), 'Success');
-        }catch (\Exception $exception){
+            return $this->sendSuccess(FineResource::make($protocol->fine), 'Success');
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
