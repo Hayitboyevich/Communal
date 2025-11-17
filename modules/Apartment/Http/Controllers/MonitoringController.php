@@ -203,7 +203,7 @@ class MonitoringController extends BaseController
                     'defect' => $sumByStatus([
                         MonitoringStatusEnum::DEFECT
                     ]),
-                    'all_defect_count' => $regionMonitoring->sum('defect_count') + $sumByStatus([MonitoringStatusEnum::DEFECT]),
+                    'all_defect_count' => $regionMonitoring->sum('defect_count'),
                     'fix_formed' => $sumByStatus([
                         MonitoringStatusEnum::FORMED
                     ]),
