@@ -287,9 +287,9 @@ class ProtocolController extends BaseController
                         ->filter(fn($item) => !is_null($item->defect_id) || !is_null($item->defect_comment))
                         ->sum('count'),
                     'remedy_count' => $regionProtocols->where('category', 2)->sum('count'),
-                    'confirmed_count' => $regionProtocols->where('protocol_status_id', '!=', ProtocolStatusEnum::NOT_DEFECT->value)->where('is_finished', true)->sum('count'),
-                    'administrative_count' => $regionProtocols->whereNotNull('decision_id')->sum('count'),
-                    'confirm_result_count' => $regionProtocols->whereNotNull('deadline')->sum('count'),
+                    'confirmed_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRMED->value)->sum('count'),
+                    'administrative_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::ADMINISTRATIVE->value)->sum('count'),
+                    'confirm_result_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRM_RESULT->value)->sum('count'),
                     'hmqo_count' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::HMQO->value)->sum('count'),
 
                     'decision_count' => $regionProtocols->sum('decision_count'),

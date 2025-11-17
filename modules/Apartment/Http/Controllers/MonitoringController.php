@@ -200,25 +200,29 @@ class MonitoringController extends BaseController
                     'confirm_result' => $sumByStatus([
                         MonitoringStatusEnum::CONFIRM_RESULT
                     ]),
-                    'defect' => $sumByStatus([
-                        MonitoringStatusEnum::DEFECT
-                    ]),
+//                    'defect' => $sumByStatus([
+//                        MonitoringStatusEnum::DEFECT
+//                    ]),
                     'all_defect_count' => $regionMonitoring->sum('defect_count'),
-                    'all_fix' => $sumByStatus([
-                        MonitoringStatusEnum::FORMED,
-                        MonitoringStatusEnum::DONE,
-                        MonitoringStatusEnum::ADMINISTRATIVE,
-                        MonitoringStatusEnum::COURT,
-                        MonitoringStatusEnum::MIB,
-                        MonitoringStatusEnum::HMQO,
-                        MonitoringStatusEnum::FIXED,
+                    'fix_formed' => $sumByStatus([
+                        MonitoringStatusEnum::FORMED
                     ]),
-                    'fix_formed' => $regionMonitoring->sum('fix_formed'),
-                    'fix_done' => $regionMonitoring->sum('fix_done'),
-                    'fix_administrative' => $regionMonitoring->sum('fix_administrative'),
-                    'fix_court' => $regionMonitoring->sum('fix_court'),
-                    'fix_mib' => $regionMonitoring->sum('fix_mib'),
-                    'fixed' => $regionMonitoring->sum('fixed'),
+                    'fix_done' => $sumByStatus([
+                        MonitoringStatusEnum::DONE
+                    ]),
+                    'fix_administrative' => $sumByStatus([
+                        MonitoringStatusEnum::ADMINISTRATIVE
+                    ]),
+                    'fix_court' => $sumByStatus([
+                        MonitoringStatusEnum::COURT
+                    ]),
+                    'fix_mib' => $sumByStatus([
+                        MonitoringStatusEnum::MIB
+                    ]),
+
+                    'fixed' => $sumByStatus([
+                        MonitoringStatusEnum::FIXED
+                    ]),
 
                     'decision_count' => $regionDecision->decision_count ?? 0,
                     'paid_count' => $regionDecision->paid_count ?? 0,
@@ -226,6 +230,29 @@ class MonitoringController extends BaseController
                     'total_amount' => $regionDecision->total_amount ?? 0,
                     'paid_amount' => $regionDecision->paid_amount ?? 0,
                     'unpaid_amount' => $regionDecision->unpaid_amount ?? 0,
+
+//                    'all_fix' => $sumByStatus([
+//                        MonitoringStatusEnum::FORMED,
+//                        MonitoringStatusEnum::DONE,
+//                        MonitoringStatusEnum::ADMINISTRATIVE,
+//                        MonitoringStatusEnum::COURT,
+//                        MonitoringStatusEnum::MIB,
+//                        MonitoringStatusEnum::HMQO,
+//                        MonitoringStatusEnum::FIXED,
+//                    ]),
+//                    'fix_formed' => $regionMonitoring->sum('fix_formed'),
+//                    'fix_done' => $regionMonitoring->sum('fix_done'),
+//                    'fix_administrative' => $regionMonitoring->sum('fix_administrative'),
+//                    'fix_court' => $regionMonitoring->sum('fix_court'),
+//                    'fix_mib' => $regionMonitoring->sum('fix_mib'),
+//                    'fixed' => $regionMonitoring->sum('fixed'),
+//
+//                    'decision_count' => $regionDecision->decision_count ?? 0,
+//                    'paid_count' => $regionDecision->paid_count ?? 0,
+//                    'unpaid_count' => $regionDecision->unpaid_count ?? 0,
+//                    'total_amount' => $regionDecision->total_amount ?? 0,
+//                    'paid_amount' => $regionDecision->paid_amount ?? 0,
+//                    'unpaid_amount' => $regionDecision->unpaid_amount ?? 0,
                 ];
             });
 
