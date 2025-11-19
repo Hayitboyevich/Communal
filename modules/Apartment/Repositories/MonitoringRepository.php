@@ -244,6 +244,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $monitoring = $this->findById($id);
             $monitoring->update([
                 'monitoring_status_id' => MonitoringStatusEnum::ENTER_RESULT->value,
+                'step' => Step::ONE,
             ]);
 
             //history yoziladi
