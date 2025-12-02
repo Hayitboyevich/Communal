@@ -2,6 +2,7 @@
 
 namespace Modules\Apartment\Repositories;
 
+use App\Services\FileService;
 use Illuminate\Support\Facades\DB;
 use Modules\Apartment\Contracts\ProgramMonitoringInterface;
 use Modules\Apartment\Contracts\ProgramRepositoryInterface;
@@ -12,7 +13,7 @@ use Modules\Apartment\Models\ProgramRegulation;
 class ProgramMonitoringRepository implements ProgramMonitoringInterface
 {
 
-    public function __construct(public ProgramMonitoring $model){}
+    public function __construct(public ProgramMonitoring $model, public FileService $fileService){}
 
     public function findById($id)
     {
@@ -66,13 +67,19 @@ class ProgramMonitoringRepository implements ProgramMonitoringInterface
         }
     }
 
-    private function saveImages($model, $images, $path)
+//    private function saveImages($model, $images, $path)
+//    {
+//        if (!empty($images)) {
+//            foreach ($images as $image) {
+//                $path = $image->store($path, 'public');
+//                $model->images()->create(['url' => $path]);
+//            }
+//        }
+//    }
+    private function saveImages($model, ?array $images, $filePath)
     {
-        if (!empty($images)) {
-            foreach ($images as $image) {
-                $path = $image->store($path, 'public');
-                $model->images()->create(['url' => $path]);
-            }
-        }
+        $paths = array_map(fn($image) => $this->fileService->uploadImage($image, $filePath), $images);
+        $model->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
     }
+
 }

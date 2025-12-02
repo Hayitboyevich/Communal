@@ -41,7 +41,7 @@ class ProgramMonitoringController extends BaseController
     {
         try {
             $data = $this->service->create($request, $this->user, $this->roleId);
-            return $this->sendSuccess($data, 'Monitoring created successfully.');
+            return $this->sendSuccess(ProgramMonitoringResource::make($data), 'Monitoring created successfully.');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
