@@ -78,7 +78,7 @@ if (!function_exists('getData'))
                 $login,
                 $password
             )
-                ->timeout(10)
+                ->timeout(5)
                 ->post($baseUrl);
 
             if ($response->successful()) {

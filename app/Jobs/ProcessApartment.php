@@ -2,16 +2,18 @@
 
 namespace App\Jobs;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
 use Modules\Apartment\Models\Apartment;
 use Modules\Apartment\Models\Company;
 
 class ProcessApartment implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, SerializesModels, InteractsWithQueue;
 
-    public function __construct(public int $companyId){}
+    public function __construct(public int $companyId) {}
 
     public function handle()
     {
@@ -31,8 +33,7 @@ class ProcessApartment implements ShouldQueue
         }
 
         foreach ($data['data'] as $item) {
-
-            Apartment::query()->updateOrCreate(
+            Apartment::updateOrCreate(
                 [
                     'company_id' => $company->company_id,
                     'street_id'  => $item['street_id'] ?? null,
@@ -45,5 +46,6 @@ class ProcessApartment implements ShouldQueue
             );
         }
 
+        sleep(1);
     }
 }

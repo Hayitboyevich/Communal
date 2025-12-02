@@ -27,4 +27,9 @@ return Application::configure(basePath: dirname(__DIR__))
             $response['message'] = 'Unauthorized';
             return response()->json($response, 401);
         });
+    })
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
+        $schedule->call(function () {
+
+        })->everyMinute();
     })->create();

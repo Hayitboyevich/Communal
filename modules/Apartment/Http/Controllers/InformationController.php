@@ -19,10 +19,11 @@ use Modules\Apartment\Models\MonitoringBase;
 use Modules\Apartment\Models\MonitoringStatus;
 use Modules\Apartment\Models\MonitoringType;
 use Modules\Apartment\Models\ViolationType;
+use Modules\Apartment\Models\WorkType;
 
 class InformationController extends BaseController
 {
-    public function place($id = null)
+    public function place($id = null): JsonResponse
     {
         try {
             return $this->sendSuccess(PlaceResource::collection(Place::query()->where('monitoring_type_id', $id)->get()), 'Place list');
@@ -31,7 +32,7 @@ class InformationController extends BaseController
         }
     }
 
-    public function violationType($id = null)
+    public function violationType($id = null): JsonResponse
     {
         try {
             return $this->sendSuccess(ViolationTypeResource::collection(ViolationType::query()->where('place_id', $id)->get()), 'Violation type list');
@@ -39,7 +40,7 @@ class InformationController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
         }
     }
-    public function monitoringType($id = null)
+    public function monitoringType($id = null): JsonResponse
     {
         try {
             return $this->sendSuccess(MonitoringTypeResource::collection(MonitoringType::all()), 'Monitoring type list');
@@ -48,7 +49,7 @@ class InformationController extends BaseController
         }
     }
 
-    public function monitoringBase($id = null)
+    public function monitoringBase($id = null): JsonResponse
     {
         try {
             return $this->sendSuccess(MonitoringBaseResource::collection(MonitoringBase::all()), 'Monitoring base list');
@@ -78,7 +79,7 @@ class InformationController extends BaseController
         }
     }
 
-    public function apartment($id = null)
+    public function apartment($id = null): JsonResponse
     {
         try {
             $apartments = Apartment::query()->where('company_id', request('company_id'))->get();
@@ -88,12 +89,22 @@ class InformationController extends BaseController
         }
     }
 
-    public function monitoringStatus($id=null)
+    public function monitoringStatus($id=null): JsonResponse
     {
         try {
             return $this->sendSuccess(MonitoringStatusResource::collection(MonitoringStatus::all()), 'Monitoring Status List');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function workType($id=null): JsonResponse
+    {
+        try {
+            $data = WorkType::all();
+            return $this->sendSuccess($data, 'Work Type List');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
         }
     }
 
