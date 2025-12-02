@@ -17,6 +17,7 @@ class ProgramMonitoringRequest extends FormRequest
     {
         return [
             'images' => 'array',
+            'program_object_id' => 'integer|exists:program_objects,id',
             'lat' => 'required|string',
             'long' => 'required|string',
             'checklists' => 'array',

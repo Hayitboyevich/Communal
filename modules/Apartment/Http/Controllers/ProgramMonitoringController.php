@@ -15,11 +15,23 @@ class ProgramMonitoringController extends BaseController
         parent::__construct();
     }
 
-    public function index(): JsonResponse
+    public function index($id = null): JsonResponse
     {
         try {
-            $data = $this->service->getAll()->paginate(request('per_page', 15));
-            return $this->sendSuccess(ProgramMonitoringResource::collection($data), 'Program Monitoring List', pagination($data));
+            $filters = request()->only(['work_type', 'object_id']);
+            $data = $id
+                ? $this->service->findById($id)
+                : $this->service->getAll($filters)->orderBy('created_at', 'desc')->paginate(request('per_page', 15));
+
+            $resource = $id
+                ? ProgramMonitoringResource::make($data)
+                : ProgramMonitoringResource::collection($data);
+
+            return $this->sendSuccess(
+                $resource,
+                $id ? 'Monitoring retrieved successfully.' : 'Monitorings retrieved successfully.',
+                $id ? null : pagination($data)
+            );
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
@@ -28,7 +40,8 @@ class ProgramMonitoringController extends BaseController
     public function create(ProgramMonitoringRequest $request): JsonResponse
     {
         try {
-            $data = $this->service->create($request);
+            $data = $this->service->create($request, $this->user, $this->roleId);
+            return $this->sendSuccess($data, 'Monitoring created successfully.');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }

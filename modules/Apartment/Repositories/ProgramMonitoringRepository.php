@@ -2,9 +2,12 @@
 
 namespace Modules\Apartment\Repositories;
 
+use Illuminate\Support\Facades\DB;
 use Modules\Apartment\Contracts\ProgramMonitoringInterface;
 use Modules\Apartment\Contracts\ProgramRepositoryInterface;
+use Modules\Apartment\Http\Requests\ProgramMonitoringRequest;
 use Modules\Apartment\Models\ProgramMonitoring;
+use Modules\Apartment\Models\ProgramRegulation;
 
 class ProgramMonitoringRepository implements ProgramMonitoringInterface
 {
@@ -21,8 +24,55 @@ class ProgramMonitoringRepository implements ProgramMonitoringInterface
         return $this->model;
     }
 
-    public function create(?array $data)
+    public function create(ProgramMonitoringRequest $request, $user, $roleId)
     {
-        return $this->model->create($data);
+        DB::beginTransaction();
+        try {
+            $monitoring = $this->model->create([
+                'lat' => $request->lat,
+                'long' => $request->long,
+                'program_object_id' => $request->program_object_id,
+                'user_id' => $user->id,
+                'role_id' => $roleId,
+            ]);
+            if ($request->images) {
+                $this->saveImages($monitoring, $request->images, 'images/object-monitoring');
+            }
+
+            foreach ($request->checklists as $item) {
+                $regulation = ProgramRegulation::query()->create([
+                   'program_monitoring_id'  => $monitoring->id,
+                    'program_object_id' => $request->program_object_id,
+                    'checklist_id' => $item['checklist_id'],
+                    'program_id' => $item['program_id'],
+                    'program_object_checklist_id' => $item['program_object_checklist_id'],
+                    'plan' => $item['plan'],
+                    'all' => $item['all'],
+                    'need_repair' => $item['need_repair'],
+                    'done' => $item['done'],
+                    'progress' => $item['progress'],
+                    'extra' => $item['extra'],
+                ]);
+                if ($item['images']){
+                    $this->saveImages($regulation, $item['images'], 'images/object-regulation');
+                }
+            }
+            DB::commit();
+            return $monitoring;
+
+        }catch (\Exception $exception){
+            DB::rollBack();
+            throw  $exception;
+        }
+    }
+
+    private function saveImages($model, $images, $path)
+    {
+        if (!empty($images)) {
+            foreach ($images as $image) {
+                $path = $image->store($path, 'public');
+                $model->images()->create(['url' => $path]);
+            }
+        }
     }
 }

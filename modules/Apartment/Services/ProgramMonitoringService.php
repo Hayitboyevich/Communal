@@ -14,9 +14,9 @@ class ProgramMonitoringService
         return $this->repository->getAll();
     }
 
-    public function create(ProgramMonitoringRequest $request)
+    public function create(ProgramMonitoringRequest $request, $user, $roleId)
     {
-        return $this->repository->create($request->except(['images']));
+        return $this->repository->create($request, $user, $roleId);
     }
 
     public function findById(int $id)
