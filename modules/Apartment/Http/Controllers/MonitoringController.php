@@ -150,7 +150,7 @@ class MonitoringController extends BaseController
             $regionId = request('region_id');
 
             $regions = $regionId
-                ? District::query()->where('region_id', $regionId)->get(['id', 'name_uz'])
+                ? District::query()->where('region_id', $regionId)->orderBy('name_uz')->get(['id', 'name_uz'])
                 : Region::all(['id', 'name_uz']);
 
             $group = $regionId ? 'monitorings.district_id' : 'monitorings.region_id';

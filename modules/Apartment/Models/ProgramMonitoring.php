@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class ProgramMonitoring extends Model
@@ -32,5 +33,15 @@ class ProgramMonitoring extends Model
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function object(): BelongsTo
+    {
+        return $this->belongsTo(ProgramObject::class, 'program_object_id');
+    }
+
+    public function regulations(): HasMany
+    {
+        return $this->hasMany(ProgramRegulation::class);
     }
 }

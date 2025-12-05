@@ -22,6 +22,9 @@ class ProgramObjectResource extends JsonResource
             'apartment_number' => $this->apartment_number,
             'created_at' => $this->created_at,
             'status' => $this->status,
+            'checklist_count' => $this->checklists()->count(),
+            'done' => 0,
+            'progress' => 0,
         ];
     }
 }

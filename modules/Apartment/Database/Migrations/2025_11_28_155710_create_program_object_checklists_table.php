@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('checklist_id')->index()->nullable()->constrained()->nullOnDelete();
             $table->string('plan');
             $table->string('unit');
+            $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });
     }

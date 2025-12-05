@@ -17,12 +17,31 @@ class ProgramMonitoringRepository implements ProgramMonitoringInterface
 
     public function findById($id)
     {
-        return $this->model->find($id);
+        return $this->model
+            ->with([
+               'object:id,region_id,district_id,apartment_number',
+               'object.region:id,name_uz',
+               'object.district:id,name_uz',
+                'images',
+                'user',
+                'role'
+            ])
+            ->withCount('regulations')
+            ->find($id);
     }
 
     public function getAll()
     {
-        return $this->model;
+        return $this->model
+            ->with([
+                'object:id,region_id,district_id,apartment_number',
+                'object.region:id,name_uz,soato',
+                'object.district:id,name_uz,soato',
+                'images',
+                'user',
+                'role'
+            ])
+            ->withCount('regulations');
     }
 
     public function create(ProgramMonitoringRequest $request, $user, $roleId)
@@ -36,6 +55,7 @@ class ProgramMonitoringRepository implements ProgramMonitoringInterface
                 'user_id' => $user->id,
                 'role_id' => $roleId,
             ]);
+
             if ($request->images) {
                 $this->saveImages($monitoring, $request->images, 'images/object-monitoring');
             }

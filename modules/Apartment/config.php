@@ -17,5 +17,11 @@ return [
         'url' => 'https://api.shaffofqurilish.uz/api/v1/get-cad-info',
         'login' => 'dev@gasn',
         'password' => 'EkN`9?@{3v0j',
+    ],
+    'hybrid' => [
+        'url' => 'https://devhybrid.pochta.uz',
+        'grant_type' => 'password',
+        'username' => '998990200020',
+        'password' => '11223344',
     ]
 ];

@@ -24,15 +24,22 @@ class ProgramObject extends Model
         return $this->belongsTo(District::class);
     }
 
-    public function checklists(): BelongsToMany
+//    public function checklists(): BelongsToMany
+//    {
+//        return $this->belongsToMany(
+//            Checklist::class,
+//            'program_object_checklists',
+//            'program_object_id',
+//            'checklist_id'
+//        )->withPivot(['plan', 'unit', 'program_id'])
+//            ->withTimestamps();
+//    }
+
+    public function checklists(): HasMany
     {
-        return $this->belongsToMany(
-            ProgramObjectChecklist::class,
-            'program_object_checklists',
-            'program_object_id',
-            'checklist_id'
-        )->withPivot(['plan', 'unit', 'program_id'])
-            ->withTimestamps();
+        return $this->hasMany(ProgramObjectChecklist::class);
     }
+
+
 
 }

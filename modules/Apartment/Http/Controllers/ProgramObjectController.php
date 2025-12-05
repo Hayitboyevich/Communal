@@ -4,9 +4,9 @@ namespace Modules\Apartment\Http\Controllers;
 
 use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
-use Dflydev\DotAccessData\Data;
 use Illuminate\Http\JsonResponse;
 use Modules\Apartment\Http\Requests\AttachObjectRequest;
+use Modules\Apartment\Http\Resources\ObjectCheckListResource;
 use Modules\Apartment\Http\Resources\ProgramObjectResource;
 use Modules\Apartment\Services\ProgramObjectService;
 
@@ -21,10 +21,10 @@ class ProgramObjectController extends BaseController
     {
         try {
             $filters = request()->only(['work_type', 'object_id']);
-
             $data = $id
                 ? $this->service->findById($id)
                 : $this->service->getAll($filters)->orderBy('created_at', 'desc')->paginate(request('per_page', 15));
+
 
             $resource = $id
                 ? ProgramObjectResource::make($data)
@@ -35,6 +35,16 @@ class ProgramObjectController extends BaseController
                 $id ? 'Object retrieved successfully.' : 'Objects retrieved successfully.',
                 $id ? null : pagination($data)
             );
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function checklist($id): JsonResponse
+    {
+        try {
+            $object = $this->service->findById($id);
+            return $this->sendSuccess(ObjectCheckListResource::collection($object->checklists), 'Object checklist retrieved successfully.');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }

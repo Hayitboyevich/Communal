@@ -51,6 +51,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::prefix('object')->controller(ProgramObjectController::class)->group(function () {
             Route::post('create', 'create');
             Route::post('attach', 'attach');
+            Route::get('checklist/{id}', 'checklist');
             Route::get('{id?}', 'index');
         });
 
