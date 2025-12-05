@@ -86,10 +86,8 @@ class ProgramMonitoringRepository implements ProgramMonitoringInterface
                     $status = ObjectChecklistStatus::NEED_REPAIR;
                 }
 
-                $objectChecklist = ProgramObjectChecklist::query()->find($regulation->program_object_checklist_id);
-                $objectChecklist->update(['status' => $status]);
-
-
+                $regulation->objectChecklist()->update(['status' => $status]);
+                
                 if ($item['images']){
                     $this->saveImages($regulation, $item['images'], 'images/object-regulation');
                 }

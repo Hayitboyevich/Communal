@@ -24,6 +24,6 @@ class ProgramRegulation extends Model
 
     public function objectChecklist(): BelongsTo
     {
-        return $this->belongsTo(ProgramMonitoring::class, 'program_monitoring_id');
+        return $this->belongsTo(ProgramObjectChecklist::class, 'program_object_checklist_id');
     }
 }
