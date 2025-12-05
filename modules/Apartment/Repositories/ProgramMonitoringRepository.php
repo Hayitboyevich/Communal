@@ -4,10 +4,12 @@ namespace Modules\Apartment\Repositories;
 
 use App\Services\FileService;
 use Illuminate\Support\Facades\DB;
+use Modules\Apartment\Const\ObjectChecklistStatus;
 use Modules\Apartment\Contracts\ProgramMonitoringInterface;
 use Modules\Apartment\Contracts\ProgramRepositoryInterface;
 use Modules\Apartment\Http\Requests\ProgramMonitoringRequest;
 use Modules\Apartment\Models\ProgramMonitoring;
+use Modules\Apartment\Models\ProgramObjectChecklist;
 use Modules\Apartment\Models\ProgramRegulation;
 
 class ProgramMonitoringRepository implements ProgramMonitoringInterface
@@ -48,6 +50,7 @@ class ProgramMonitoringRepository implements ProgramMonitoringInterface
     {
         DB::beginTransaction();
         try {
+            $status = 1;
             $monitoring = $this->model->create([
                 'lat' => $request->lat,
                 'long' => $request->long,
@@ -74,6 +77,19 @@ class ProgramMonitoringRepository implements ProgramMonitoringInterface
                     'progress' => $item['progress'],
                     'extra' => $item['extra'],
                 ]);
+
+                if ($regulation->plan > $regulation->done) {
+                    $status = ObjectChecklistStatus::PROGRESS;
+                }elseif ($regulation->plan == $regulation->done){
+                    $status = ObjectChecklistStatus::DONE;
+                }elseif ($regulation->plan < $regulation->need_repair && $regulation->plan == $regulation->done){
+                    $status = ObjectChecklistStatus::NEED_REPAIR;
+                }
+
+                $objectChecklist = ProgramObjectChecklist::query()->find($regulation->program_object_checklist_id);
+                $objectChecklist->update(['status' => $status]);
+
+
                 if ($item['images']){
                     $this->saveImages($regulation, $item['images'], 'images/object-regulation');
                 }

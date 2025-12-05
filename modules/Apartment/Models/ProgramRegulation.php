@@ -5,6 +5,7 @@ namespace Modules\Apartment\Models;
 use App\Models\Document;
 use App\Models\Image;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class ProgramRegulation extends Model
@@ -19,5 +20,10 @@ class ProgramRegulation extends Model
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');
+    }
+
+    public function objectChecklist(): BelongsTo
+    {
+        return $this->belongsTo(ProgramMonitoring::class, 'program_monitoring_id');
     }
 }
