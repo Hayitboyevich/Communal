@@ -16,7 +16,7 @@ class ProgramObjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'inspector_id' => 'required',
+            'user_id' => 'required',
             'status' => 'required',
             'region_id' => 'required',
             'district_id' => 'required',
@@ -31,7 +31,7 @@ class ProgramObjectRequest extends FormRequest
     public function prepareForValidation()
     {
         $this->merge([
-            'inspector_id' => Auth::id(),
+            'user_id' => Auth::id(),
             'status' => 1,
         ]);
     }

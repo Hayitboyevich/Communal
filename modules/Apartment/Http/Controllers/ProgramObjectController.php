@@ -6,6 +6,7 @@ use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\JsonResponse;
 use Modules\Apartment\Http\Requests\AttachObjectRequest;
+use Modules\Apartment\Http\Requests\ProgramObjectRequest;
 use Modules\Apartment\Http\Resources\ObjectCheckListResource;
 use Modules\Apartment\Http\Resources\ProgramObjectResource;
 use Modules\Apartment\Services\ProgramObjectService;
@@ -50,9 +51,13 @@ class ProgramObjectController extends BaseController
         }
     }
 
-    public function create(): JsonResponse
+    public function create(ProgramObjectRequest $request): JsonResponse
     {
+        try {
 
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
     }
 
     public function attach(AttachObjectRequest $request): JsonResponse

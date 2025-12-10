@@ -7,6 +7,7 @@ use App\Http\Resources\RegionResource;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Apartment\Const\ObjectChecklistStatus;
 
 class ProgramObjectResource extends JsonResource
 {
@@ -23,8 +24,8 @@ class ProgramObjectResource extends JsonResource
             'created_at' => $this->created_at,
             'status' => $this->status,
             'checklist_count' => $this->checklists()->count(),
-            'done' => 0,
-            'progress' => 0,
+            'done' => $this->checklists()->where('status', ObjectChecklistStatus::DONE)->count(),
+            'progress' => $this->checklists()->where('status', ObjectChecklistStatus::PROGRESS)->count(),
         ];
     }
 }

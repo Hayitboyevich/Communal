@@ -5,10 +5,12 @@ namespace Modules\Apartment\Repositories;
 use App\Services\FileService;
 use Illuminate\Support\Facades\DB;
 use Modules\Apartment\Const\ObjectChecklistStatus;
+use Modules\Apartment\Const\ProgramObjectStatusList;
 use Modules\Apartment\Contracts\ProgramMonitoringInterface;
 use Modules\Apartment\Contracts\ProgramRepositoryInterface;
 use Modules\Apartment\Http\Requests\ProgramMonitoringRequest;
 use Modules\Apartment\Models\ProgramMonitoring;
+use Modules\Apartment\Models\ProgramObject;
 use Modules\Apartment\Models\ProgramObjectChecklist;
 use Modules\Apartment\Models\ProgramRegulation;
 
@@ -87,7 +89,26 @@ class ProgramMonitoringRepository implements ProgramMonitoringInterface
                 }
 
                 $regulation->objectChecklist()->update(['status' => $status]);
-                
+
+                $object = ProgramObject::query()->find($request->program_object_id);
+
+                $objectChecklistCount =  $object->checklists()->count();
+                $doneCount = $object->checklists()->whereIn('status', [ObjectChecklistStatus::DONE])->count();
+                $needRepairCount = $object->checklists()->whereIn('status', [ObjectChecklistStatus::NEED_REPAIR])->count();
+                $processCount = $object->checklists()->whereIn('status', [ObjectChecklistStatus::PROGRESS])->count();
+
+                if ($objectChecklistCount == $doneCount){
+                    $object->update(['status' => ProgramObjectStatusList::DONE]);
+                }
+
+                if ($needRepairCount){
+                    $object->update(['status' => ProgramObjectStatusList::NEED_REPAIR]);
+                }
+
+                if ($processCount){
+                    $object->update(['status' => $processCount]);
+                }
+
                 if ($item['images']){
                     $this->saveImages($regulation, $item['images'], 'images/object-regulation');
                 }
