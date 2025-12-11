@@ -75,6 +75,7 @@ class MonitoringController extends BaseController
     {
         try {
             $monitoring = $this->service->findById($id);
+            $monitoring->regulation()->delete();
             $monitoring->delete();
             return $this->sendSuccess(null, 'Monitoring deleted successfully.');
         } catch (\Exception $exception) {
