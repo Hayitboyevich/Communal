@@ -282,7 +282,6 @@ class ProtocolController extends BaseController
                     'enter_result' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::ENTER_RESULT->value)->sum('count'),
                     'not_defect' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::NOT_DEFECT->value)->sum('count'),
                     'in_confirm' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRM_NOT_DEFECT->value)->sum('count'),
-                    'confirm_result' => $regionProtocols->where('protocol_status_id', ProtocolStatusEnum::CONFIRM_RESULT->value)->sum('count'),
                     'defect_count' => $regionProtocols
                         ->filter(fn($item) => !is_null($item->defect_id) || !is_null($item->defect_comment))
                         ->sum('count'),
