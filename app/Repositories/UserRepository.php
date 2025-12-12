@@ -90,6 +90,11 @@ class UserRepository implements UserRepositoryInterface
         return User::query()->findOrFail($id);
     }
 
+    public function findByPin($pin)
+    {
+        return User::query()->where('pin', $pin)->first();
+    }
+
     public function update($id, array $data)
     {
         try {

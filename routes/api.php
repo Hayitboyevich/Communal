@@ -27,6 +27,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::post('/create', 'create');
         Route::post('/edit/{id}', 'edit');
         Route::post('/info', 'info');
+        Route::post('/challenge', 'challenge');
         Route::get('/inspector/{id?}', 'inspector');
         Route::post('/organization', 'organization');
     });

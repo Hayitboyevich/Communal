@@ -101,6 +101,17 @@ class UserController extends BaseController
         }
     }
 
+    public function challenge(): JsonResponse
+    {
+        try {
+            $pin = request('pin');
+            $data = $this->service->challenge($pin);
+            return $this->sendSuccess($data, 'Passport Information Get Successfully');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
     public function inspector($id = null): JsonResponse
     {
         try {

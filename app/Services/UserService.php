@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Contracts\UserRepositoryInterface;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Http\Resources\RoleResource;
 use App\Models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
@@ -15,7 +16,8 @@ class UserService
     public function __construct(
         protected Client $client,
         protected UserRepositoryInterface $repository,
-        protected FileService             $fileService
+        protected FileService             $fileService,
+        protected EimzoService             $eimzoService,
     )
     {}
 
@@ -144,6 +146,18 @@ class UserService
     {
         $query = $this->repository->all($user, $roleId);
         return  $this->repository->search($query, $filters);
+    }
+
+    public function challenge($pin)
+    {
+        $user = $this->repository->findByPin($pin);
+        if ($user){
+            $data = $this->eimzoService->getChallenge();
+            $info['challenge'] = $data;
+            $info['roles'] = RoleResource::collection($user->roles);
+            return $info;
+        }
+        return null;
     }
 
 }

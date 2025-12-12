@@ -6,6 +6,7 @@ interface UserRepositoryInterface
 {
     public function all($user, $roleId);
     public function find($id);
+    public function findByPin($pin);
 
     public function create(?array $data);
 
@@ -14,4 +15,6 @@ interface UserRepositoryInterface
     public function delete($id);
 
     public function search($query, $filters);
+
+
 }
