@@ -51,6 +51,30 @@ class LetterRepository implements LetterInterface
         }
     }
 
+    public function change($id, $data)
+    {
+        DB::beginTransaction();
+        try {
+            $letter = $this->findById($id);
+            $this->sendMail($letter, $data['signature']);
+            $letter->update(['status' => 2]);
+            DB::commit();
+            return $letter;
+        }catch (\Exception $exception){
+            DB::rollBack();
+            throw $exception;
+        }
+    }
+
+    private function getMessage($letter)
+    {
+        try {
+
+        }catch (\Exception $exception){
+            throw $exception;
+        }
+    }
+
     private function getHashCode($letter, $token)
     {
         try {
@@ -65,6 +89,27 @@ class LetterRepository implements LetterInterface
         }catch (\Exception $exception){
             return null;
         }
+    }
+
+    public function sendMail($letter, $signature)
+    {
+        try {
+            $token = $this->authPost();
+            $url = config('apartment.hybrid.url').'/api/SendMail/'.$letter->letter_id;
+            $data = [
+                'signature' => $signature
+            ];
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/x-www-form-urlencoded',
+                'Authorization' => 'Bearer ' . $token,
+            ])->withBody(http_build_query($data), 'application/x-www-form-urlencoded')
+                ->put($url);
+
+            return $response->json() ?? null;
+        }catch (\Exception $exception){
+            throw $exception;
+        }
+
     }
 
     private function sendPost($letter, $token)

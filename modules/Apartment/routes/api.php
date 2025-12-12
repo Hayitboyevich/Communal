@@ -34,6 +34,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(LetterController::class)->prefix('letter')->group(function () {
         Route::post('/create', 'create');
+        Route::post('/send/hybrid/{id}', 'sendHybrid');
         Route::get('/{id?}', 'index');
     });
 

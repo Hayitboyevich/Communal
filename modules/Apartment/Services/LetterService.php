@@ -23,4 +23,9 @@ class LetterService
     {
         return $this->repository->create($request->validated());
     }
+
+    public function change($id, $data)
+    {
+        return $this->repository->change($id, $data);
+    }
 }
