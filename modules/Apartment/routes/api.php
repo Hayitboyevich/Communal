@@ -9,6 +9,7 @@ use Modules\Apartment\Http\Controllers\ProgramController;
 use Modules\Apartment\Http\Controllers\ProgramMonitoringController;
 use Modules\Apartment\Http\Controllers\ProgramObjectController;
 use Modules\Apartment\Http\Controllers\ChecklistController;
+use Modules\Apartment\Http\Controllers\LetterController;
 
 Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
@@ -28,6 +29,11 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::post('/attach', 'attach');
         Route::get('/excel/{id}', 'excel');
         Route::post('/delete/{id}', 'delete');
+        Route::get('/{id?}', 'index');
+    });
+
+    Route::controller(LetterController::class)->prefix('letter')->group(function () {
+        Route::post('/create', 'create');
         Route::get('/{id?}', 'index');
     });
 

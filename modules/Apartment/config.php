@@ -19,9 +19,9 @@ return [
         'password' => 'EkN`9?@{3v0j',
     ],
     'hybrid' => [
-        'url' => 'https://devhybrid.pochta.uz',
+        'url' => 'https://hybrid.pochta.uz',
         'grant_type' => 'password',
-        'username' => '998990200020',
+        'username' => '998998599402',
         'password' => '11223344',
     ]
 ];
