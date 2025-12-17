@@ -66,13 +66,17 @@ class LetterRepository implements LetterInterface
         }
     }
 
-    private function getMessage($letter)
-    {
-        try {
 
-        }catch (\Exception $exception){
-            throw $exception;
-        }
+    public function getLetter($id)
+    {
+        $token = $this->authPost();
+        $url = config('apartment.hybrid.url').'/api/mail/'.$id;
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get($url);
+
+        return $response->json() ?? null;
     }
 
     private function getHashCode($letter, $token)
@@ -152,6 +156,8 @@ class LetterRepository implements LetterInterface
 
         return  base64_encode($pdfOutput);
     }
+
+
 
     private function authPost()
     {

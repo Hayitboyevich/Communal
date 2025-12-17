@@ -72,4 +72,14 @@ class LetterController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
+    public function getHybrid($id): JsonResponse
+    {
+        try {
+            $data = $this->service->getHybrid($id);
+            return $this->sendSuccess($data, 'Letter retrieved successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
 }

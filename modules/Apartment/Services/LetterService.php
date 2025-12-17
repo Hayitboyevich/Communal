@@ -28,4 +28,9 @@ class LetterService
     {
         return $this->repository->change($id, $data);
     }
+
+    public function getHybrid($id)
+    {
+        return $this->repository->getLetter($id);
+    }
 }
