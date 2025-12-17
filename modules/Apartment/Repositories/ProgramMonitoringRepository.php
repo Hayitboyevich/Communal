@@ -111,7 +111,7 @@ class ProgramMonitoringRepository implements ProgramMonitoringInterface
                     $object->update(['status' => $processCount]);
                 }
 
-                if ($item['images']){
+                if (!empty($item['images'])){
                     $this->saveImages($regulation, $item['images'], 'images/object-regulation');
                 }
             }

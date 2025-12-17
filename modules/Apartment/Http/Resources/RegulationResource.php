@@ -28,7 +28,8 @@ class RegulationResource extends JsonResource
             'phone' => $this->phone,
             'images' => $this->images ? ImageResource::collection($this->images) : null,
             'videos' => $this->videos ? VideoResource::collection($this->videos) : null,
-            'address' => $this->address
+            'address' => $this->address,
+            'letter' => $this->letter ? $this->letter->letter_id : null,
         ];
     }
 }

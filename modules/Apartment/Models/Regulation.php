@@ -8,6 +8,7 @@ use App\Models\Place;
 use App\Models\Video;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Regulation extends Model
@@ -42,5 +43,10 @@ class Regulation extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'company_id', 'company_id');
+    }
+
+    public function letter(): HasOne
+    {
+        return $this->hasOne(Letter::class, 'regulation_id');
     }
 }
