@@ -50,22 +50,24 @@ class ProgramMonitoringRepository implements ProgramMonitoringInterface
 
     public function create(ProgramMonitoringRequest $request, $user, $roleId)
     {
+
         DB::beginTransaction();
         try {
+            $data = $request->validated();
             $status = 1;
             $monitoring = $this->model->create([
-                'lat' => $request->lat,
-                'long' => $request->long,
-                'program_object_id' => $request->program_object_id,
+                'lat' => $data['lat'],
+                'long' => $data['long'],
+                'program_object_id' => $data['program_object_id'],
                 'user_id' => $user->id,
                 'role_id' => $roleId,
             ]);
 
-            if ($request->images) {
+            if (!empty($data['images'])) {
                 $this->saveImages($monitoring, $request->images, 'images/object-monitoring');
             }
 
-            foreach ($request->checklists as $item) {
+            foreach ($data['checklists'] as $item) {
                 $regulation = ProgramRegulation::query()->create([
                    'program_monitoring_id'  => $monitoring->id,
                     'program_object_id' => $request->program_object_id,

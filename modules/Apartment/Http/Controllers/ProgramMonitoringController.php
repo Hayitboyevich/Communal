@@ -40,6 +40,7 @@ class ProgramMonitoringController extends BaseController
     public function create(ProgramMonitoringRequest $request): JsonResponse
     {
         try {
+
             $data = $this->service->create($request, $this->user, $this->roleId);
             return $this->sendSuccess(ProgramMonitoringResource::make($data), 'Monitoring created successfully.');
         }catch (\Exception $exception){
