@@ -243,10 +243,9 @@ class MonitoringService
     public function rejectRegulation($id, Request $request)
     {
         try {
-            $this->hybridAuth();
-//            $monitoring =  $this->repository->changeStatus($id, MonitoringStatusEnum::FORMED->value);
-//            $this->createHistory($monitoring, type:MonitoringHistoryType::REJECT_REGULATION_NOT_DETECTED, comment: $request['comment']);
-//            return $monitoring;
+            $monitoring =  $this->repository->changeStatus($id, MonitoringStatusEnum::FORMED->value);
+            $this->createHistory($monitoring, type:MonitoringHistoryType::REJECT_REGULATION_NOT_DETECTED, comment: $request['comment']);
+            return $monitoring;
         }catch (\Exception $exception){
             throw  $exception;
         }
@@ -315,17 +314,7 @@ class MonitoringService
         $monitoring = $this->findById($monitoringId);
         $this->createHistory($monitoring, MonitoringHistoryType::FINE);
     }
-
-    private function hybridAuth()
-    {
-        try {
-            $url = config('apartment.hybrid.url');
-            dd($url);
-//            Http::post('')
-        }catch (\Exception $exception){
-            throw  $exception;
-        }
-    }
+    
 
     private function saveImages($model, ?array $images, $filePath)
     {
