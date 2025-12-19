@@ -314,7 +314,7 @@ class MonitoringService
         $monitoring = $this->findById($monitoringId);
         $this->createHistory($monitoring, MonitoringHistoryType::FINE);
     }
-    
+
 
     private function saveImages($model, ?array $images, $filePath)
     {
