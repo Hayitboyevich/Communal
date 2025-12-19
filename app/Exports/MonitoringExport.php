@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Region;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Modules\Apartment\Models\Monitoring;
@@ -15,6 +16,7 @@ class MonitoringExport implements FromCollection, WithHeadings
 
     public function collection()
     {
+        $region = Region::query()->find($this->regionId);
         return Monitoring::query()
             ->with([
                 'user',
@@ -30,8 +32,9 @@ class MonitoringExport implements FromCollection, WithHeadings
             ])
             ->where('region_id', $this->regionId)
             ->get()
-            ->map(function ($monitoring) {
+            ->map(function ($monitoring) use ($region) {
                 return [
+                    $region->name_uz,
                     $monitoring->id,
                     $monitoring?->district?->name_uz ?? '',
                     $monitoring?->status?->name ?? '',
@@ -60,6 +63,7 @@ class MonitoringExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
+            'Viloyat',
             'ID',
             'Tuman',
             'Holati',

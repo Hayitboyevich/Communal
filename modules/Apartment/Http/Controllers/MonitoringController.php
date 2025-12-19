@@ -184,7 +184,6 @@ class MonitoringController extends BaseController
                 $sumByStatus = fn($statuses) => $regionMonitoring->whereIn('monitoring_status_id', (array)$statuses)->sum('count');
 
                 return [
-                    'region_name' => $region?->region?->name_uz,
                     'id' => $region->id,
                     'name' => $region->name_uz,
                     'inspector_count' => $userCounts->get($regionId, 0),
