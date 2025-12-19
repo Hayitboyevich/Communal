@@ -16,7 +16,6 @@ class MonitoringExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        $region = Region::query()->find($this->regionId);
         return Monitoring::query()
             ->with([
                 'user',
@@ -25,6 +24,7 @@ class MonitoringExport implements FromCollection, WithHeadings
                 'company',
                 'apartment',
                 'district',
+                'region',
                 'status',
                 'regulation',
                 'violation',
@@ -32,10 +32,10 @@ class MonitoringExport implements FromCollection, WithHeadings
             ])
             ->where('region_id', $this->regionId)
             ->get()
-            ->map(function ($monitoring) use ($region) {
+            ->map(function ($monitoring) {
                 return [
-                    $region->name_uz,
                     $monitoring->id,
+                    $monitoring?->region?->name_uz ?? '',
                     $monitoring?->district?->name_uz ?? '',
                     $monitoring?->status?->name ?? '',
                     $monitoring?->user?->full_name ?? '',
@@ -63,8 +63,8 @@ class MonitoringExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
-            'Viloyat',
             'ID',
+            'Viloyat',
             'Tuman',
             'Holati',
             'Inspektor fish',
