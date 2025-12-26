@@ -20,6 +20,7 @@ class LetterResource extends JsonResource
             'status' => $this->status,
             'address' => $this->address,
             'fish' => $this->fish,
+            'letter_id' => $this->letter_id,
             'inspector' => $this->inspector ? [
                 'id' => $this->inspector->id,
                 'name' => $this->inspector->name,
