@@ -77,8 +77,8 @@ class UserRepository implements UserRepositoryInterface
             ->when(isset($filters['role_id']), function ($query) use ($filters) {
                 $query->where('role_id', $filters['role_id']);
             })
-            ->when(isset($filters['full_name']), function ($query) use ($filters) {
-                $query->searchByFullName($filters['full_name']);
+            ->when(isset($filters['name']), function ($query) use ($filters) {
+                $query->searchByFullName($filters['name']);
             })
             ->when(isset($filters['phone']), function ($query) use ($filters) {
                 $query->where('phone', $filters['phone']);

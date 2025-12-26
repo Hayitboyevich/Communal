@@ -34,56 +34,67 @@ class ProtocolRepository implements ProtocolRepositoryInterface
     public function filter($query, $filters)
     {
         return $query
-            ->when(isset($filters['attach']), function ($query) use ($filters) {
-                $query->where(function ($q) {
-                    $q->whereNull('inspector_id')
-                        ->where(function ($sub) {
-                            $sub->where(function ($s) {
-                                $s->where('type', TypeList::WATER_INSPECTOR)
-                                    ->where('protocol_status_id', ProtocolStatusEnum::FORMING);
-                            })->orWhere(function ($s) {
-                                $s->where('type', TypeList::OGOH_FUQARO)
-                                    ->where('protocol_status_id', ProtocolStatusEnum::ENTER_RESULT);
-                            });
+            ->when(!empty($filters['attach']), function ($query) {
+                $query->whereNull('inspector_id')
+                    ->where(function ($sub) {
+                        $sub->where(function ($s) {
+                            $s->where('type', TypeList::WATER_INSPECTOR)
+                                ->where('protocol_status_id', ProtocolStatusEnum::FORMING);
+                        })->orWhere(function ($s) {
+                            $s->where('type', TypeList::OGOH_FUQARO)
+                                ->where('protocol_status_id', ProtocolStatusEnum::ENTER_RESULT);
                         });
-                });
+                    });
             })
-            ->when(isset($filters['inspector_id']), function ($query) use ($filters) {
+
+            ->when(!empty($filters['inspector_id']), function ($query) use ($filters) {
                 $query->where(function ($q) use ($filters) {
                     $q->where('user_id', $filters['inspector_id'])
                         ->orWhere('inspector_id', $filters['inspector_id']);
                 });
             })
-            ->when(isset($filters['user_id']), function ($query) use ($filters) {
-                $query->where('user_id', $filters['user_id']);
-            })
-            ->when(isset($filters['type']), function ($query) use ($filters) {
-                $query->where('type', $filters['type']);
-            })
-            ->when(isset($filters['category']), function ($query) use ($filters) {
-                $query->where('category', $filters['category']);
-            })
-            ->when(isset($filters['status']), function ($query) use ($filters) {
-                $query->where('protocol_status_id', $filters['status']);
-            })
-            ->when(isset($filters['protocol_number']), function ($query) use ($filters) {
-                $query->where('protocol_number', $filters['protocol_number']);
-            })
-            ->when(isset($filters['region_id']), function ($query) use ($filters) {
-                $query->where('region_id', $filters['region_id']);
-            })
-            ->when(isset($filters['district_id']), function ($query) use ($filters) {
-                $query->where('district_id', $filters['district_id']);
-            })
-            ->when(isset($filters['protocol_type']), function ($query) use ($filters) {
-                $query->where('protocol_type_id', $filters['protocol_type']);
-            })
-            ->when(isset($filters['is_administrative']), function ($query) use ($filters) {
-            $query->where('is_administrative', true);
-        });
 
+            ->when(!empty($filters['id']), fn ($q) =>
+            $q->where('id', $filters['id'])
+            )
 
+            ->when(!empty($filters['user_id']), fn ($q) =>
+            $q->where('user_id', $filters['user_id'])
+            )
+
+            ->when(!empty($filters['type']), fn ($q) =>
+            $q->where('type', $filters['type'])
+            )
+
+            ->when(!empty($filters['category']), fn ($q) =>
+            $q->where('category', $filters['category'])
+            )
+
+            ->when(!empty($filters['status']), fn ($q) =>
+            $q->where('protocol_status_id', $filters['status'])
+            )
+
+            ->when(!empty($filters['protocol_number']), fn ($q) =>
+            $q->where('protocol_number', $filters['protocol_number'])
+            )
+
+            ->when(!empty($filters['region_id']), fn ($q) =>
+            $q->where('region_id', $filters['region_id'])
+            )
+
+            ->when(!empty($filters['district_id']), fn ($q) =>
+            $q->where('district_id', $filters['district_id'])
+            )
+
+            ->when(!empty($filters['protocol_type']), fn ($q) =>
+            $q->where('protocol_type_id', $filters['protocol_type'])
+            )
+
+            ->when(isset($filters['is_administrative']), function ($q) use ($filters) {
+                $q->where('is_administrative', $filters['is_administrative']);
+            });
     }
+
 
 
     public function findById(?int $id)

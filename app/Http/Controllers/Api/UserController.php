@@ -115,7 +115,7 @@ class UserController extends BaseController
     public function inspector($id = null): JsonResponse
     {
         try {
-            $filters = request()->only(['region_id', 'full_name', 'phone', 'pin']);
+            $filters = request()->only(['region_id', 'name', 'phone', 'pin']);
 
             $users = $this->service->getInspectors($this->user, $this->roleId, $filters)->get();
 
