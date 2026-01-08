@@ -86,6 +86,12 @@ return [
         ),
     ],
 
+    'e-invoice' => [
+        'url' => 'https://back.e-invoice.uz/api/ru/',
+        'phone' => '+998977338128',
+        'password' => 'V2ynuDgP5drSN'
+    ],
+
 
 
     'maintenance' => [

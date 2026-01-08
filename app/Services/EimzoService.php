@@ -3,14 +3,70 @@
 namespace App\Services;
 
 use App\Enums\UserStatusEnum;
+use App\Exceptions\NotFoundException;
 use App\Models\District;
 use App\Models\Region;
+use GuzzleHttp\Client;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 
 class EimzoService
 {
     private const URL = "http://10.100.1.191:8080";
+
+    public function __construct(protected  InvoiceService $invoiceService, protected Client $client){}
+
+    private function sendingRequest($method, $url, $headers_with_body = null)
+    {
+        $res = match ($method) {
+            'GET' => $this->safeCall(fn() => $this->client->request($method, self::URL . $url)->getBody()->getContents()),
+            'POST' => $this->safeCall(fn() => $this->client->request($method, self::URL . $url, $headers_with_body)->getBody()->getContents())
+        };
+        return json_decode($res);
+    }
+
+    private function postHeadrs($pkcs7)
+    {
+        $user_ip = empty($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['REMOTE_ADDR'] : $_SERVER['HTTP_X_REAL_IP'];
+        $host = $_SERVER['HTTP_HOST'];
+        return [
+            'headers' => [
+                'Host' => $host,
+                'X-Real-IP' => $user_ip
+            ],
+            'body' => $pkcs7
+        ];
+    }
+
+    public function infoByPkcs7($pkcs7)
+    {
+        $headers_with_body = $this->postHeadrs($pkcs7);
+        return $this->sendingRequest(method: 'POST', url: '/backend/auth', headers_with_body: $headers_with_body);
+    }
+    public function signTimestamp($pkcs7)
+    {
+        $result = $this->getPkcs7($pkcs7);
+        $this->checkStatus($result);
+
+        if (empty($result->pkcs7b64)) {
+            throw new \Exception('PKCS7 bo‘sh');
+        }
+
+        return $result->pkcs7b64;
+    }
+
+    public function getPkcs7($pkcs7)
+    {
+        $headers_with_body = $this->postHeadrs($pkcs7);
+        return $this->sendingRequest(method: 'POST', url: '/frontend/timestamp/pkcs7', headers_with_body: $headers_with_body);
+    }
+
+    public function attached($pkcs7b64)
+    {
+        $headers_with_body = $this->postHeadrs($pkcs7b64);
+        return $this->sendingRequest(method: 'POST', url: '/backend/pkcs7/verify/attached', headers_with_body: $headers_with_body);
+    }
 
 
     public function getChallenge(): null|string
@@ -96,6 +152,30 @@ class EimzoService
                 return "ERI topilmadi yoki muddati o‘tgan. Qayta urinib ko'ring.";
             default:
                 return "Noma'lum xato. Qayta urinib ko'ring.";
+        }
+    }
+
+    private function checkStatus($result)
+    {
+        if (!$result || !isset($result->status)) {
+            throw new \Exception('E-imzo servisedan noto‘g‘ri javob keldi');
+        }
+
+        if ((int)$result->status !== 1) {
+            throw new \Exception($result->message ?? 'E-imzo xatoligi');
+        }
+    }
+
+    protected function safeCall(callable $callable): mixed
+    {
+        try {
+            return $callable();
+        } catch (ModelNotFoundException $e) {
+            report($e);
+            throw new \Exception('Data not found');
+        } catch (\Throwable $exception) {
+            report($exception);
+            throw new \Exception($exception->getMessage());
         }
     }
 }

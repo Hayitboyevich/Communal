@@ -2,6 +2,7 @@
 
 namespace Modules\Apartment\Repositories;
 
+use App\Services\EimzoService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -13,7 +14,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class LetterRepository implements LetterInterface
 {
-    public function __construct(public Letter $letter){}
+    public function __construct(public Letter $letter, protected EimzoService $imzoService){}
 
     public function all()
     {
@@ -56,8 +57,9 @@ class LetterRepository implements LetterInterface
         DB::beginTransaction();
         try {
             $letter = $this->findById($id);
-            $this->sendMail($letter, $data['signature']);
-            $letter->update(['status' => 2]);
+            $pkcs7b64 = $this->imzoService->signTimestamp($data['signature']);
+            $this->sendMail($letter, $pkcs7b64);
+            $letter->update(['status' => 2, 'pkcs7' => $pkcs7b64]);
             DB::commit();
             return $letter;
         }catch (\Exception $exception){

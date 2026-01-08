@@ -4,6 +4,7 @@ namespace Modules\Apartment\Repositories;
 
 use App\Enums\UserRoleEnum;
 use App\Services\FileService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Modules\Apartment\Const\MonitoringHistoryType;
 use Modules\Apartment\Contracts\MonitoringRepositoryInterface;
@@ -56,6 +57,11 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                 })
                 ->when(isset($filters['monitoring_type']), function ($query) use ($filters) {
                     $query->where('monitoring_type_id', $filters['monitoring_type']);
+                })
+                ->when(isset($filters['month']), function ($query) use ($filters) {
+                    $startDate = Carbon::createFromFormat('Y-m', $filters['month'])->startOfMonth();
+                    $endDate = Carbon::createFromFormat('Y-m', $filters['month'])->endOfMonth();
+                    $query->whereBetween('created_at', [$startDate, $endDate]);
                 })
                 ->when(isset($filters['id']), function ($query) use ($filters) {
                     $query->where('id', $filters['id']);
