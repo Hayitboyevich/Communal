@@ -111,6 +111,8 @@ class LetterRepository implements LetterInterface
             ])->withBody(http_build_query($data), 'application/x-www-form-urlencoded')
                 ->put($url);
 
+            if ($response->failed()) throw new \Exception('Hybrid potchada xatolik');
+
             return $response->json() ?? null;
         }catch (\Exception $exception){
             throw $exception;
