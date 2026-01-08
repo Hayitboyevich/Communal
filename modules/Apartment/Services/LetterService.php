@@ -50,6 +50,9 @@ class LetterService
         $directorPin = null;
         $fullName = null;
         $data = $this->imzoService->getUserInfo($pkcs7);
+
+        if (empty($data)) throw new \Exception('Eimzoda ma\'lumot topilmadi');
+
         if (is_string($data)) throw new \Exception($data);
 
         if ($isYuridik){

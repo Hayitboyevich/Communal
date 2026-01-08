@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\UserStatusEnum;
-use App\Exceptions\NotFoundException;
 use App\Models\District;
 use App\Models\Region;
 use GuzzleHttp\Client;
@@ -109,6 +108,7 @@ class EimzoService
             return null;
         }
         $res = json_decode($response, true);
+
         switch ($res['status']) {
             case 1:
                 $userInfo = $res['subjectCertificateInfo']['subjectName'];
