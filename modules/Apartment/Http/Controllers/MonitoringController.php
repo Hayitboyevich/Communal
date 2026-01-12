@@ -12,6 +12,7 @@ use App\Models\District;
 use App\Models\Region;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -60,6 +61,17 @@ class MonitoringController extends BaseController
         }
     }
 
+    public function getMonth($id = null): JsonResponse
+    {
+        try {
+            $filters = request(['month', 'region_id', 'status']);
+            $data = $this->service->getMonth($this->user, $this->roleId, $filters);
+            return $this->sendSuccess($data, 'Success');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
     public function count(): JsonResponse
     {
         try {
@@ -94,10 +106,12 @@ class MonitoringController extends BaseController
             ->groupBy('monitoring_id');
 
         if ($startDate && $endDate) {
+            $startDate = Carbon::parse($startDate)->startOfDay();
+            $endDate   = Carbon::parse($endDate)->endOfDay();
             $query->whereBetween('monitorings.created_at', [$startDate, $endDate]);
         }
 
-        return $query
+         return $query
             ->leftJoinSub($violationsSub, 'vio', function ($join) {
                 $join->on('vio.monitoring_id', '=', 'monitorings.id');
             })
@@ -117,6 +131,7 @@ class MonitoringController extends BaseController
         ")
             ->groupBy($group, 'monitorings.monitoring_status_id')
             ->get();
+
     }
 
     private function getDecisionCounts($query, $group, $startDate = null, $endDate = null)
@@ -150,11 +165,13 @@ class MonitoringController extends BaseController
             $endDate = request('date_to');
             $regionId = request('region_id');
 
+
             $regions = $regionId
                 ? District::query()->where('region_id', $regionId)->orderBy('name_uz')->get(['id', 'name_uz'])
                 : Region::all(['id', 'name_uz']);
 
             $group = $regionId ? 'monitorings.district_id' : 'monitorings.region_id';
+
 
             $userCounts = User::query()
                 ->join('user_roles', 'user_roles.user_id', '=', 'users.id')
@@ -169,6 +186,7 @@ class MonitoringController extends BaseController
                 $startDate,
                 $endDate
             )->groupBy('group_id');
+
 
             $decisionCounts = $this->getDecisionCounts(
                 Monitoring::query(),
@@ -246,7 +264,8 @@ class MonitoringController extends BaseController
     public function excel($id)
     {
         try {
-            return Excel::download(new MonitoringExport($id), 'protocol.xlsx');
+            $filters = \request()->only(['date_from', 'date_to']);
+            return Excel::download(new MonitoringExport($id, $filters), 'protocol.xlsx');
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
         }

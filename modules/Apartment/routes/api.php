@@ -25,6 +25,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::get('/count', 'count');
         Route::get('/pdf/{id}', 'pdf');
         Route::get('/report/{id?}', 'report');
+        Route::get('/month', 'getMonth');
         Route::get('/history/{id}', 'history');
         Route::post('/attach', 'attach');
         Route::get('/excel/{id}', 'excel');

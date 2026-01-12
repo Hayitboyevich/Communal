@@ -84,6 +84,27 @@ class MonitoringService
         }
     }
 
+    public function getMonth($user, $roleId, $filters)
+    {
+        try {
+            $query = $this->repository->all($user, $roleId)
+                ->with('violation');
+            return $this->repository
+                ->filter($query, $filters)
+                ->get()
+                ->map(function ($monitoring) {
+                    return [
+                        'id' => $monitoring->id,
+                        'status' => $monitoring->monitoring_status_id,
+                        'deadline' => $monitoring->violation?->deadline,
+                    ];
+                });
+
+        }catch (\Exception $exception){
+            throw  $exception;
+        }
+    }
+
     public function attach($userId, $monitoringId)
     {
         try {

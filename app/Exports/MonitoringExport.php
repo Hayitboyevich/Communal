@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Region;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Modules\Apartment\Models\Monitoring;
@@ -11,11 +12,20 @@ class MonitoringExport implements FromCollection, WithHeadings
 {
 
     public function __construct(
-        protected ?int $regionId
-    ){}
+        protected ?int   $regionId,
+        protected ?array $filters = []
+    )
+    {
+    }
 
     public function collection()
     {
+        $dateFrom = null;
+        $dateTo = null;
+        if (!empty($this->filters)) {
+            $dateFrom = $this->filters['date_from'] ?? null;
+            $dateTo = $this->filters['date_to'] ?? null;
+        }
         return Monitoring::query()
             ->with([
                 'user',
@@ -31,6 +41,13 @@ class MonitoringExport implements FromCollection, WithHeadings
                 'fine',
             ])
             ->where('region_id', $this->regionId)
+            ->when($dateFrom && $dateTo, function ($query, $filters) {
+
+                $startDate = Carbon::parse($filters['date_from'])->startOfDay();
+                $endDate = Carbon::parse($filters['date_to'])->endOfDay();
+
+                $query->whereBetween('created_at', [$startDate, $endDate]);
+            })
             ->get()
             ->map(function ($monitoring) {
                 return [
@@ -45,14 +62,14 @@ class MonitoringExport implements FromCollection, WithHeadings
                     date_format($monitoring->created_at, 'Y-m-d') ?? '',
                     $monitoring?->base?->name ?? '',
                     $monitoring?->company?->company_name ?? '',
-                    $monitoring?->apartment?->street_name .' '. $monitoring?->apartment?->home_name ?? '',
+                    $monitoring?->apartment?->street_name . ' ' . $monitoring?->apartment?->home_name ?? '',
                     $monitoring->address_commit ?? '',
                     $monitoring->address ?? '',
                     $monitoring->additional_comment ?? '',
                     $monitoring?->regulation?->fish ?? $monitoring?->regulation?->organization_name ?? '',
                     $monitoring?->violation?->deadline ?? '',
-                    $monitoring->fine ? $monitoring->fine->series .''.$monitoring->fine->number : '',
-                    $monitoring->fine ? $monitoring->fine->decision_series .''.$monitoring->fine->decision_number : '',
+                    $monitoring->fine ? $monitoring->fine->series . '' . $monitoring->fine->number : '',
+                    $monitoring->fine ? $monitoring->fine->decision_series . '' . $monitoring->fine->decision_number : '',
                     $monitoring->fine ? $monitoring->fine->status_name : '',
                     $monitoring->fine ? $monitoring->fine->main_punishment_amount : '',
                     $monitoring->fine ? $monitoring->fine->paid_amount : '',
