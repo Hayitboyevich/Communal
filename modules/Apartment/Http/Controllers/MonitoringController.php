@@ -267,7 +267,7 @@ class MonitoringController extends BaseController
             $filters = \request()->only(['date_from', 'date_to']);
             return Excel::download(new MonitoringExport($id, $filters), 'protocol.xlsx');
         } catch (\Exception $exception) {
-            return $this->sendError(ErrorMessage::ERROR_1, $exception->getLine());
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 

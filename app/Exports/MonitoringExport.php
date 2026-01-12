@@ -26,6 +26,8 @@ class MonitoringExport implements FromCollection, WithHeadings
             $dateFrom = $this->filters['date_from'] ?? null;
             $dateTo = $this->filters['date_to'] ?? null;
         }
+
+
         return Monitoring::query()
             ->with([
                 'user',
@@ -41,10 +43,10 @@ class MonitoringExport implements FromCollection, WithHeadings
                 'fine',
             ])
             ->where('region_id', $this->regionId)
-            ->when($dateFrom && $dateTo, function ($query, $filters) {
+            ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
 
-                $startDate = Carbon::parse($filters['date_from'])->startOfDay();
-                $endDate = Carbon::parse($filters['date_to'])->endOfDay();
+                $startDate = Carbon::parse($dateFrom)->startOfDay();
+                $endDate   = Carbon::parse($dateTo)->endOfDay();
 
                 $query->whereBetween('created_at', [$startDate, $endDate]);
             })
