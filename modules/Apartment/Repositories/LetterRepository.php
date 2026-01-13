@@ -2,6 +2,7 @@
 
 namespace Modules\Apartment\Repositories;
 
+use App\Enums\UserRoleEnum;
 use App\Services\EimzoService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
@@ -16,9 +17,20 @@ class LetterRepository implements LetterInterface
 {
     public function __construct(public Letter $letter, protected EimzoService $imzoService){}
 
-    public function all()
+    public function all($user, $roleId)
     {
-        return $this->letter->query();
+        try {
+            switch ($roleId) {
+                case UserRoleEnum::APARTMENT_MANAGER->value:
+                    return $this->letter->query()->where('region_id', $user->region_id);
+                case UserRoleEnum::APARTMENT_VIEWER->value:
+                    return $this->letter->query();
+                default:
+                    return $this->letter->query()->whereRaw('1 = 0');
+            }
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
     }
 
     public function findById($id)

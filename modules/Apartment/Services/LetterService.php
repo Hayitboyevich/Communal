@@ -14,9 +14,9 @@ class LetterService
         protected EimzoService $imzoService,
         protected InvoiceService $invoiceService){}
 
-    public function getAll()
+    public function getAll($user, $roleId)
     {
-        return $this->repository->all();
+        return $this->repository->all($user, $roleId);
     }
 
     public function findById(int $id)

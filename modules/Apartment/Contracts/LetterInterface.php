@@ -4,7 +4,7 @@ namespace Modules\Apartment\Contracts;
 
 interface LetterInterface
 {
-    public function all();
+    public function all($user, $roleId);
 
     public function findById(int $id);
 
