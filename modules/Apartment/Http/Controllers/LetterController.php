@@ -36,7 +36,7 @@ class LetterController extends BaseController
             $filters = request()->only(['name']);
             $data = $id
                 ? $this->service->findById($id)
-                : $this->service->getAll($filters)->orderBy('created_at', 'desc')->paginate(request('per_page', 15));
+                : $this->service->getAll($this->user, $this->roleId)->orderBy('created_at', 'desc')->paginate(request('per_page', 15));
 
             $resource = $id
                 ? LetterResource::make($data)
