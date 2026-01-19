@@ -201,9 +201,8 @@ class LetterRepository implements LetterInterface
     public function receipt($id)
     {
         try {
-            $model= $this->findById($id);
             $token = $this->authPost();
-            $url = config('apartment.hybrid.url').'/api/Receipt?id='.$model->letter_id;
+            $url = config('apartment.hybrid.url').'/api/Receipt?id='.$id;
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
