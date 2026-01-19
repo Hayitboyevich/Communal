@@ -29,10 +29,10 @@ class LetterService
         return $this->repository->create($request->validated());
     }
 
-    public function change($user, $id, $data)
+    public function change($user, $id, $request)
     {
         try {
-            $data = $this->imzoService->signTimestamp($data['signature']);
+            $data = $this->imzoService->signTimestamp($request['signature']);
 
             if (empty($data)) throw new \Exception('E-imzo malumot olishda xatolik yuz berdi');
 
