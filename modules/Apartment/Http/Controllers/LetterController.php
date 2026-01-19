@@ -82,4 +82,14 @@ class LetterController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
+    public function getReceipt($id = null): JsonResponse
+    {
+        try {
+            $data = $this->service->receipt($id);
+            return $this->sendSuccess($data, 'Receipt retrieved successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
 }

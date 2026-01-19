@@ -33,7 +33,6 @@ class LetterService
     {
         try {
             $data = $this->imzoService->signTimestamp($request['signature']);
-
             if (empty($data)) throw new \Exception('E-imzo malumot olishda xatolik yuz berdi');
 
             $director = $this->checkDirector($data, false);
@@ -122,4 +121,15 @@ class LetterService
     {
         return $this->repository->getLetter($id);
     }
+
+    public function receipt($id)
+    {
+        try {
+            return $this->repository->receipt($id);
+
+        }catch (\Exception $exception){
+            throw $exception;
+        }
+    }
+
 }

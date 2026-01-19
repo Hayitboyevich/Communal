@@ -13,4 +13,6 @@ interface LetterInterface
     public function create(array $data);
 
     public function getLetter($id);
+
+    public function receipt($id);
 }
