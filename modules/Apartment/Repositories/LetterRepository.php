@@ -208,7 +208,7 @@ class LetterRepository implements LetterInterface
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
             ])->get($url);
-             return $response->body();
+             return base64_encode($response->body());
         }catch (\Exception $exception){
             throw $exception;
         }
