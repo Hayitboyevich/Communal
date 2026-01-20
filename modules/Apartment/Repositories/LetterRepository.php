@@ -64,14 +64,14 @@ class LetterRepository implements LetterInterface
         }
     }
 
-    public function change($id, $data)
+    public function change($id, $signature)
     {
         DB::beginTransaction();
         try {
             $letter = $this->findById($id);
-            $pkcs7b64 = $this->imzoService->signTimestamp($data['signature']);
-            $this->sendMail($letter, $pkcs7b64);
-            $letter->update(['status' => 2, 'pkcs7' => $pkcs7b64]);
+            $pkcs7b64 = $this->imzoService->signTimestamp($signature);
+            $this->sendMail($letter, $pkcs7b64['pkcs7b64']);
+            $letter->update(['status' => 2, 'pkcs7' => $pkcs7b64['pkcs7b64']]);
             DB::commit();
             return $letter;
         }catch (\Exception $exception){

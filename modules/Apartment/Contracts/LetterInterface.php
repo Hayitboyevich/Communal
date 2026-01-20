@@ -8,7 +8,7 @@ interface LetterInterface
 
     public function findById(int $id);
 
-    public function change(int $id, $data);
+    public function change(int $id, $signature);
 
     public function create(array $data);
 

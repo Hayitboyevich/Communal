@@ -40,7 +40,7 @@ class LetterService
             if ($director['inn'] != $user->pin) {
                 throw new \Exception('E-imzo egasi mos kelmadi');
             }
-            return $this->repository->change($id, $data);
+            return $this->repository->change($id, $request['signature']);
         }catch (\Exception $exception){
             throw $exception;
         }
