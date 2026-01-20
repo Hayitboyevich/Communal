@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Http;
 class EimzoService
 {
     private const URL = "http://10.100.1.191:8080";
+//    private const URL = "http://172.18.0.43:9091";
 
     public function __construct(protected  InvoiceService $invoiceService, protected Client $client){}
 
@@ -45,14 +46,24 @@ class EimzoService
     }
     public function signTimestamp($pkcs7)
     {
+        $inn = null;
         $result = $this->getPkcs7($pkcs7);
         $this->checkStatus($result);
+
+        if (!empty($result->timestampedSignerList[0]->subjectName->{'1.2.860.3.16.1.1'})){
+            $inn = $result->timestampedSignerList[0]->subjectName->{'1.2.860.3.16.1.1'};
+        }
 
         if (empty($result->pkcs7b64)) {
             throw new \Exception('PKCS7 bo‘sh');
         }
 
-        return $result->pkcs7b64;
+        return [
+            'pkcs7b64' => $result->pkcs7b64,
+            'pin' => $result->timestampedSignerList[0]->subjectName->{'1.2.860.3.16.1.2'},
+            'inn' => $inn
+        ];
+
     }
 
     public function getPkcs7($pkcs7)
