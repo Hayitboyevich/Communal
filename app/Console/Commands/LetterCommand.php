@@ -14,7 +14,7 @@ class LetterCommand extends Command
     public function handle()
     {
         $letters = Letter::query()
-            ->where('status', '<>', 3)
+            ->where('status', '<>', 2)
             ->get();
 
         if ($letters->isEmpty()) {
