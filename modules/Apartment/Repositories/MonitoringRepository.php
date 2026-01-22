@@ -75,6 +75,9 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                 ->when(isset($filters['is_administrative']), function ($query) use ($filters) {
                     $query->where('is_administrative', true);
                 })
+                ->when(isset($filters['inspector_id']), function ($query) use ($filters) {
+                    $query->where('user_id', $filters['inspector_id']);
+                })
                 ->when(isset($filters['region_id']), function ($query) use ($filters) {
                     $query->where('region_id', $filters['region_id']);
                 });
@@ -194,7 +197,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             $newVideo->videoable_id = $newMonitoring->id;
                             $newVideo->save();
                         }
-                        
+
                         $regulation = Regulation::create([
                             'monitoring_id' => $newMonitoring->id,
                             'place_id' => $item['place_id'],
