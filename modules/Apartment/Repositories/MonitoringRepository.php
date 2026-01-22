@@ -194,13 +194,14 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             $newVideo->videoable_id = $newMonitoring->id;
                             $newVideo->save();
                         }
-
+                        
                         $regulation = Regulation::create([
                             'monitoring_id' => $newMonitoring->id,
                             'place_id' => $item['place_id'],
                             'violation_type_id' => $item['violation_type_id'],
                             'comment' => $item['comment'],
                             'user_type' => $item['user_type'],
+                            'address' => $item['address'] ?? null,
                             'pin' => $item['pin'] ?? null,
                             'birth_date' => $item['birth_date'] ?? null,
                             'fish' => $item['fish'] ?? null,
