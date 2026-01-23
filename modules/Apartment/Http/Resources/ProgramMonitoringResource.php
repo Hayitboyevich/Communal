@@ -20,16 +20,16 @@ class ProgramMonitoringResource extends JsonResource
             'region' => $this->object->region ? RegionResource::make($this->object->region) : null,
             'district' => $this->object->district ? DistrictResource::make($this->object->district) : null,
             'apartment_number' => $this->object->apartment_number,
-            'regulation_count' => $this->regulation_count,
-            'done' => 0,
-            'progress' => 0,
+            'regulation_count' => $this->regulations()->count(),
+            'done' => $this->regulations->filter(fn($regulation) => $regulation->plan === $regulation->done)->count(),
+            'progress' => $this->regulations->filter(fn($regulation) => $regulation->plan !== $regulation->done)->count(),
             'user' => $this->user
                 ? [
                     'id' => $this->user->id,
                     'name' => $this->user->name,
                     'middle_name' => $this->user->middle_name,
                     'surname' => $this->user->surname,
-                    ]
+                ]
                 :
                 null,
             'role' => $this->role ? RoleResource::make($this->role) : null,
