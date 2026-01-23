@@ -20,7 +20,9 @@ class ObjectCheckListResource extends JsonResource
             'checklist' => $this->checklist ? CheckListResource::make($this->checklist) : null,
             'plan' => $this->plan,
             'unit' => $this->unit,
-            'status' => $this->status
+            'status' => $this->status,
+            'done' => 0,
+            'progress' => 0
         ];
     }
 }

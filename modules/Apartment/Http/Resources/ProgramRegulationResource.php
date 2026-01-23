@@ -24,6 +24,7 @@ class ProgramRegulationResource extends JsonResource
             'all' => $this->all,
             'need_repair' => $this->need_repair,
             'done' => $this->done,
+            'unit' => $this->objectChecklist->unit,
             'progress' => $this->progress,
             'extra' => $this->extra,
             'images' => $this->images ? ImageResource::collection($this->images) : null,

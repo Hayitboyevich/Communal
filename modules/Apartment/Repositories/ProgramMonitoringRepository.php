@@ -90,7 +90,7 @@ class ProgramMonitoringRepository implements ProgramMonitoringInterface
                     $status = ObjectChecklistStatus::NEED_REPAIR;
                 }
 
-                $regulation->objectChecklist()->update(['status' => $status]);
+                $regulation->objectChecklist()->update(['status' => $status, 'program_regulation_id' => $regulation->id]);
 
                 $object = ProgramObject::query()->find($request->program_object_id);
 
