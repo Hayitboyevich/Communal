@@ -65,6 +65,8 @@ class MonitoringResource extends JsonResource
                 'name' => $this->district->name_uz
             ] : null,
             'address_commit' => $this->address_commit,
+            'bsk_name' => $this->bsk_name,
+            'bsk_inn' => $this->bsk_inn,
             'lat' => $this->lat,
             'long' => $this->long,
             'bsk_type' => $this->bsk_type,

@@ -299,6 +299,7 @@ if (!empty($monitoring?->regulation?->images[1])){
                 >
                     @if($monitoring->bsk_type == 1) O'zini o'zi boshqaruvchi
                     @elseif($monitoring->bsk_type == 2) Egasiz
+                    @elseif($monitoring->bsk_type == 3) Ro'yxatdan o'tmagan
                     @else
                         {{ $monitoring?->company?->company_name ?? null }}
                     @endif

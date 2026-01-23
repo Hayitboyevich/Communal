@@ -36,6 +36,8 @@ class MonitoringCreateRequest extends FormRequest
             'monitoring_status_id' => 'required|integer|exists:protocol_statuses,id',
             'type' => 'required',
             'bsk_type' => 'sometimes',
+            'bsk_name' => 'sometimes',
+            'bsk_inn' => 'sometimes',
             'address' => 'sometimes',
             'category' => 'required',
         ];
