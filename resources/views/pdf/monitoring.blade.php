@@ -1,36 +1,66 @@
 @php
-$image1 = null;
-$image2 = null;
-if (!empty($monitoring?->regulation?->images[0])){
-    $path = public_path('storage/' . $monitoring->regulation->images[0]->url);
+    use Modules\Apartment\Enums\MonitoringStatusEnum;
 
-    if (file_exists($path)) {
-        $type = pathinfo($path, PATHINFO_EXTENSION);
-        $data = file_get_contents($path);
-        $image1 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    $image1 = null;
+    $image2 = null;
+    $image3 = null;
+    $image4 = null;
+
+    if ($monitoring->monitoring_status_id != MonitoringStatusEnum::NOT_DEFECT){
+        $text1 = "aniqlangan qonunbuzilish holatlarini bartaraf etish bo‘yicha";
+        $text2 = "Majburiy Ko'rsatma";
+    }else{
+        $files = json_decode($monitoring->additional_files);
+        if (!empty($files[0])){
+           $path = public_path('storage/' . $files[0]->url);
+            if (file_exists($path)) {
+                $type = pathinfo($path, PATHINFO_EXTENSION);
+                $data = file_get_contents($path);
+                $image3 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            }
+        }
+         if (!empty($files[1])){
+           $path = public_path('storage/' . $files[1]->url);
+            if (file_exists($path)) {
+                $type = pathinfo($path, PATHINFO_EXTENSION);
+                $data = file_get_contents($path);
+                $image4 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            }
+        }
+         $text1 = "qonun buzilish holatlari aniqlanmaganligi bo'yicha";
+        $text2 = "Ma'lumotnoma";
+
     }
-}
+    if (!empty($monitoring?->regulation?->images[0])){
+        $path = public_path('storage/' . $monitoring->regulation->images[0]->url);
 
-if (!empty($monitoring?->regulation?->images[1])){
-    $path = public_path('storage/' . $monitoring->regulation->images[1]->url);
-
-    if (file_exists($path)) {
-        $type = pathinfo($path, PATHINFO_EXTENSION);
-        $data = file_get_contents($path);
-        $image2 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        if (file_exists($path)) {
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            $image1 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
     }
-}
+
+    if (!empty($monitoring?->regulation?->images[1])){
+        $path = public_path('storage/' . $monitoring->regulation->images[1]->url);
+
+        if (file_exists($path)) {
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            $image2 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+    }
 
 @endphp
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <meta
         name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, charset=utf-8"
     />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <title>PDF</title>
 
     <style>
@@ -45,9 +75,11 @@ if (!empty($monitoring?->regulation?->images[1])){
             clear: both;
             display: table;
         }
+
         @page {
             size: A4 portrait;
         }
+
         body {
             font-family: "DejaVu Sans", sans-serif !important;
             color: #080b22;
@@ -78,9 +110,9 @@ if (!empty($monitoring?->regulation?->images[1])){
             <td
                 style="width: 32%; text-align: center; text-transform: uppercase; font-weight:700; font-size:12px"
             >
-                {{ $monitoring?->region->name_uz }} Qurilish <br /> va
-                uy-joy kommunal  <br />xo'jaligi
-                sohasida <br />HUDUDIY NAZORAT
+                {{ $monitoring?->region->name_uz }} Qurilish <br/> va
+                uy-joy kommunal <br/>xo'jaligi
+                sohasida <br/>HUDUDIY NAZORAT
                 INSPEKSIYASI
             </td>
             <td style="text-align: center; padding-bottom: 8px">
@@ -93,9 +125,9 @@ if (!empty($monitoring?->regulation?->images[1])){
             <td
                 style="width: 38%; text-align: center; text-transform: uppercase; font-weight:700; font-size:12px"
             >
-                Территориальная контрольная <br />
-                инспекция в сфере строительства <br />
-                и жилищно-коммунального <br />
+                Территориальная контрольная <br/>
+                инспекция в сфере строительства <br/>
+                и жилищно-коммунального <br/>
                 хозяйства {{ getRegionName($monitoring->region_id) }}
             </td>
         </tr>
@@ -144,9 +176,9 @@ if (!empty($monitoring?->regulation?->images[1])){
             <td style="text-align: center; font-weight: 500;">
                 <p style="color: #8c8c8c">{{ $monitoring?->region->address }}</p>
                 <div style="margin-bottom: 8px;  font-size: 16px">
-                    Ko‘p kvartirali uylarni boshqarish  va saqlash qoidalariga hamda issiqlik ta'minotidan
+                    Ko‘p kvartirali uylarni boshqarish va saqlash qoidalariga hamda issiqlik ta'minotidan
                     foydalanishda normativ-huquqiy hujjatlar talablariga rioya etilishi yuzasidan o‘tkazilgan
-                    nazorat tadbiri jarayonida aniqlangan qonunbuzilish holatlarini bartaraf etish bo‘yicha
+                    nazorat tadbiri jarayonida {{$text1}}
                 </div>
                 <div
                     style="
@@ -155,7 +187,7 @@ if (!empty($monitoring?->regulation?->images[1])){
                 font-size: 18px;
               "
                 >
-                    Majburiy Ko'rsatma
+                    {{$text2}}
                 </div>
             </td>
         </tr>
@@ -181,7 +213,7 @@ if (!empty($monitoring?->regulation?->images[1])){
             <td style="width: 50%">
                 <div style="text-align: right; padding: 0 10px">
                     <span style="color: #8c8c8c">№:</span>
-                    <span>{{ $monitoring?->regulation?->id }}</span>
+                    <span>{{ $monitoring?->id }}</span>
                 </div>
             </td>
         </tr>
@@ -190,6 +222,7 @@ if (!empty($monitoring?->regulation?->images[1])){
 
     <table style="margin-bottom: 20px; width: 100%">
         <tbody>
+        @if($monitoring->monitoring_status_id != MonitoringStatusEnum::NOT_DEFECT)
         <tr>
             <td style="padding: 10px">
                 <div style="font-weight: 500; margin-bottom: 5px">Kimga:</div>
@@ -204,48 +237,26 @@ if (!empty($monitoring?->regulation?->images[1])){
                 >
                     {{ $monitoring?->regulation?->fish  ?? $monitoring?->company?->company_name}}
                 </p>
-{{--                <div style="font-size: 12px; text-align: center">--}}
-{{--                    (Tashkilot nomi)--}}
-{{--                </div>--}}
             </td>
         </tr>
-        <tr>
-            <td style="padding: 10px">
-                <div style="font-weight: 500; margin-bottom: 5px">
-                    Tuman/Shahar:
-                </div>
-            </td>
-            <td>
-                <p
-                    style="
-                border-bottom: 1px solid #bfbfbf;
-                margin-bottom: 5px;
-                text-align: center;
-              "
-                >
-                    {{ $monitoring->district->name_uz }}
-                </p>
-            </td>
-        </tr>
-
-        @if($monitoring->regulation->organization_name)
-            <tr>
-                <td style="padding: 10px">
-                    <div style="font-weight: 500; margin-bottom: 5px">Korxona nomi:</div>
-                </td>
-                <td>
-                    <p
-                        style="
-                border-bottom: 1px solid #bfbfbf;
-                margin-bottom: 5px;
-                text-align: center;
-              "
-                    >
-                        {{ $monitoring->regulation->organization_name }}
-                    </p>
-                </td>
-            </tr>
-        @endif
+            @if($monitoring->regulation->organization_name)
+                <tr>
+                    <td style="padding: 10px">
+                        <div style="font-weight: 500; margin-bottom: 5px">Korxona nomi:</div>
+                    </td>
+                    <td>
+                        <p
+                            style="
+                    border-bottom: 1px solid #bfbfbf;
+                    margin-bottom: 5px;
+                    text-align: center;
+                  "
+                        >
+                            {{ $monitoring->regulation->organization_name }}
+                        </p>
+                    </td>
+                </tr>
+            @endif
         <tr>
             <td style="padding: 10px">
                 <div style="font-weight: 500; margin-bottom: 5px">
@@ -282,6 +293,25 @@ if (!empty($monitoring?->regulation?->images[1])){
                 </p>
             </td>
         </tr>
+        @endif
+        <tr>
+            <td style="padding: 10px">
+                <div style="font-weight: 500; margin-bottom: 5px">
+                    Tuman/Shahar:
+                </div>
+            </td>
+            <td>
+                <p
+                    style="
+                border-bottom: 1px solid #bfbfbf;
+                margin-bottom: 5px;
+                text-align: center;
+              "
+                >
+                    {{ $monitoring->district->name_uz }}
+                </p>
+            </td>
+        </tr>
 
         <tr>
             <td style="padding: 10px">
@@ -297,9 +327,12 @@ if (!empty($monitoring?->regulation?->images[1])){
                 text-align: center;
               "
                 >
-                    @if($monitoring->bsk_type == 1) O'zini o'zi boshqaruvchi
-                    @elseif($monitoring->bsk_type == 2) Egasiz
-                    @elseif($monitoring->bsk_type == 3) Ro'yxatdan o'tmagan
+                    @if($monitoring->bsk_type == 1)
+                        O'zini o'zi boshqaruvchi
+                    @elseif($monitoring->bsk_type == 2)
+                        Egasiz
+                    @elseif($monitoring->bsk_type == 3)
+                        Ro'yxatdan o'tmagan
                     @else
                         {{ $monitoring?->company?->company_name ?? null }}
                     @endif
@@ -347,28 +380,29 @@ if (!empty($monitoring?->regulation?->images[1])){
         </tbody>
     </table>
 
-    <table
-        style="
+    @if($monitoring->monitoring_status_id != MonitoringStatusEnum::NOT_DEFECT)
+        <table
+            style="
         margin-bottom: 30px;
         width: 100%;
         border: 1px solid #bfbfbf;
         border-collapse: collapse;
       "
-    >
-        <thead>
-        <tr>
-            <th style="border: 1px solid #bfbfbf; padding: 10px">№</th>
-            <th style="border: 1px solid #bfbfbf; padding: 10px">O'rganilgan joy:</th>
-            <th style="border: 1px solid #bfbfbf; padding: 10px">
-               Aniqlangan qoidabuzarlik:
-            </th>
-            <th style="border: 1px solid #bfbfbf; padding: 10px">Berilgan ko'rsatma:</th>
-            <th style="border: 1px solid #bfbfbf; padding: 10px">
-                Bajarilish muddati
-            </th>
-        </tr>
-        </thead>
-        <tbody>
+        >
+            <thead>
+            <tr>
+                <th style="border: 1px solid #bfbfbf; padding: 10px">№</th>
+                <th style="border: 1px solid #bfbfbf; padding: 10px">O'rganilgan joy:</th>
+                <th style="border: 1px solid #bfbfbf; padding: 10px">
+                    Aniqlangan qoidabuzarlik:
+                </th>
+                <th style="border: 1px solid #bfbfbf; padding: 10px">Berilgan ko'rsatma:</th>
+                <th style="border: 1px solid #bfbfbf; padding: 10px">
+                    Bajarilish muddati
+                </th>
+            </tr>
+            </thead>
+            <tbody>
 
             <tr>
                 <td
@@ -418,45 +452,111 @@ if (!empty($monitoring?->regulation?->images[1])){
                     {{ $monitoring?->violation?->deadline }}
                 </td>
             </tr>
-        </tbody>
-    </table>
-    <div class="indent">
-        <b>MJtKning 101-moddasi.Elektr, issiqlik energiyasi, gazdan foydalanish qoidalarini buzish </b>
-        Umumiy foydalanishdagi elektr, issiqlik, gaz tarmoqlariga oʻzboshimchalik bilan ulanish yoki ulardan foydalanish qoidalarini boshqacha tarzda buzish yoxud elektr, issiqlik energiyasi, tabiiy gazni hisobga olish asboblariga shu jumladan ularning plombalariga qasddan shikast yetkazish yoki bunday hisobga olish asboblarining koʻrsatkichlarini oʻzgartirish maqsadida ularga tashqaridan aralashish,
-        fuqarolarga bazaviy hisoblash miqdorining oʻn baravaridan oʻn besh baravarigacha, mansabdor shaxslarga esa — yigirma baravaridan yigirma besh baravarigacha miqdorda jarima solishga sabab boʻladi.
-    </div>
-    <div class="indent">
-        <b>MJtKning 159-moddasi. Turar joylarni saqlash va ulardan foydalanish qoidalarini, uy-joy fondidan texnik foydalanish qoidalari va normalarini, koʻp kvartirali uylarni boshqarish qoidalarini buzish </b>
-        <div class="indent">Turar joylarni saqlash va ulardan foydalanish, umum foydalanadigan joylarni sanitariya holatida saqlash qoidalarini buzish, uy-joy fondidan texnik foydalanish qoidalari va normalarini buzish - fuqarolarga bazaviy hisoblash miqdorining besh baravaridan oʻn baravarigacha, mansabdor shaxslarga esa — oʻn baravaridan oʻn besh baravarigacha miqdorda jarima solishga sabab boʻladi.</div>
-        <div class="indent">Koʻp kvartirali uylarni boshqarish qoidalarini buzish - mansabdor shaxslarga bazaviy hisoblash miqdorining oʻn besh baravari miqdorida jarima solishga sabab boʻladi.</div>
-        Koʻp kvartirali uylardagi tayanch va (yoki) toʻsiq konstruksiyalarni qonunchilikni hamda texnik jihatdan tartibga solish sohasidagi normativ hujjatlarni buzgan holda oʻzgartirish va (yoki) rekonstruksiya qilish, shu jumladan koʻp kvartirali uylarda va koʻp kvartirali uylarga tutash yer uchastkalarida oʻzboshimchalik bilan imoratlar (inshootlar) qurish ishlarini amalga oshirish -fuqarolarga bazaviy hisoblash miqdorining ellik baravari, mansabdor shaxslarga esa — yuz baravari miqdorda jarima solishga sabab boʻladi.
-        <div class="indent">Ushbu moddaning uchinchi qismida nazarda tutilgan huquqbuzarlikni (toʻsiq konstruksiyalarga oid qismida) birinchi marta sodir etgan shaxs, agar u koʻp kvartirali uydagi toʻsiq konstruksiyalarning amalga oshirilgan oʻzgartirilishini yoki ularni rekonstruksiya qilish tufayli yoʻl qoʻyilgan buzilishlarni, koʻp kvartirali uyga tutash yer uchastkasida oʻzboshimchalik bilan qurilgan imoratlarni (inshootlarni), shuningdek ularning oqibatlarini ixtiyoriy ravishda bartaraf etsa, javobgarlikdan ozod etiladi.</div>
-       <div class="indent"> <b> Jinoyat Kodeksining 229<sup>3</sup>-moddasi. </b> Koʻp kvartirali uylardagi tayanch konstruksiyalarni qonunchilikni hamda texnik jihatdan tartibga solish sohasidagi normativ hujjatlarni buzgan holda oʻzgartirish va (yoki) rekonstruksiya qilish, shunday harakatlar uchun maʼmuriy jazo qoʻllanilganidan keyin sodir etilgan boʻlsa, —
-           uch yilgacha axloq tuzatish ishlari yoki ikki yildan uch yilgacha ozodlikni cheklash yoxud ikki yildan uch yilgacha ozodlikdan mahrum qilish bilan jazolanadi.</div>
-        <div class="indent">Koʻp kvartirali uylardagi buzilgan tayanch konstruksiyasini loyiha smeta hujjatlariga asosan mustahkamlash ishlarini amalaga oshirilgan holda bartaraf etilib avvalgi holatiga qaytarilishi shart.</div>
-    </div>
-    <table
-        style="
+            </tbody>
+        </table>
+
+        <div class="indent">
+            <b>MJtKning 101-moddasi.Elektr, issiqlik energiyasi, gazdan foydalanish qoidalarini buzish </b>
+            Umumiy foydalanishdagi elektr, issiqlik, gaz tarmoqlariga oʻzboshimchalik bilan ulanish yoki ulardan
+            foydalanish qoidalarini boshqacha tarzda buzish yoxud elektr, issiqlik energiyasi, tabiiy gazni hisobga
+            olish asboblariga shu jumladan ularning plombalariga qasddan shikast yetkazish yoki bunday hisobga olish
+            asboblarining koʻrsatkichlarini oʻzgartirish maqsadida ularga tashqaridan aralashish,
+            fuqarolarga bazaviy hisoblash miqdorining oʻn baravaridan oʻn besh baravarigacha, mansabdor shaxslarga esa —
+            yigirma baravaridan yigirma besh baravarigacha miqdorda jarima solishga sabab boʻladi.
+        </div>
+        <div class="indent">
+            <b>MJtKning 159-moddasi. Turar joylarni saqlash va ulardan foydalanish qoidalarini, uy-joy fondidan texnik
+                foydalanish qoidalari va normalarini, koʻp kvartirali uylarni boshqarish qoidalarini buzish </b>
+            <div class="indent">Turar joylarni saqlash va ulardan foydalanish, umum foydalanadigan joylarni sanitariya
+                holatida saqlash qoidalarini buzish, uy-joy fondidan texnik foydalanish qoidalari va normalarini buzish
+                - fuqarolarga bazaviy hisoblash miqdorining besh baravaridan oʻn baravarigacha, mansabdor shaxslarga esa
+                — oʻn baravaridan oʻn besh baravarigacha miqdorda jarima solishga sabab boʻladi.
+            </div>
+            <div class="indent">Koʻp kvartirali uylarni boshqarish qoidalarini buzish - mansabdor shaxslarga bazaviy
+                hisoblash miqdorining oʻn besh baravari miqdorida jarima solishga sabab boʻladi.
+            </div>
+            Koʻp kvartirali uylardagi tayanch va (yoki) toʻsiq konstruksiyalarni qonunchilikni hamda texnik jihatdan
+            tartibga solish sohasidagi normativ hujjatlarni buzgan holda oʻzgartirish va (yoki) rekonstruksiya qilish,
+            shu jumladan koʻp kvartirali uylarda va koʻp kvartirali uylarga tutash yer uchastkalarida oʻzboshimchalik
+            bilan imoratlar (inshootlar) qurish ishlarini amalga oshirish -fuqarolarga bazaviy hisoblash miqdorining
+            ellik baravari, mansabdor shaxslarga esa — yuz baravari miqdorda jarima solishga sabab boʻladi.
+            <div class="indent">Ushbu moddaning uchinchi qismida nazarda tutilgan huquqbuzarlikni (toʻsiq
+                konstruksiyalarga oid qismida) birinchi marta sodir etgan shaxs, agar u koʻp kvartirali uydagi toʻsiq
+                konstruksiyalarning amalga oshirilgan oʻzgartirilishini yoki ularni rekonstruksiya qilish tufayli yoʻl
+                qoʻyilgan buzilishlarni, koʻp kvartirali uyga tutash yer uchastkasida oʻzboshimchalik bilan qurilgan
+                imoratlarni (inshootlarni), shuningdek ularning oqibatlarini ixtiyoriy ravishda bartaraf etsa,
+                javobgarlikdan ozod etiladi.
+            </div>
+            <div class="indent"><b> Jinoyat Kodeksining 229<sup>3</sup>-moddasi. </b> Koʻp kvartirali uylardagi tayanch
+                konstruksiyalarni qonunchilikni hamda texnik jihatdan tartibga solish sohasidagi normativ hujjatlarni
+                buzgan holda oʻzgartirish va (yoki) rekonstruksiya qilish, shunday harakatlar uchun maʼmuriy jazo
+                qoʻllanilganidan keyin sodir etilgan boʻlsa, —
+                uch yilgacha axloq tuzatish ishlari yoki ikki yildan uch yilgacha ozodlikni cheklash yoxud ikki yildan
+                uch yilgacha ozodlikdan mahrum qilish bilan jazolanadi.
+            </div>
+            <div class="indent">Koʻp kvartirali uylardagi buzilgan tayanch konstruksiyasini loyiha smeta hujjatlariga
+                asosan mustahkamlash ishlarini amalaga oshirilgan holda bartaraf etilib avvalgi holatiga qaytarilishi
+                shart.
+            </div>
+        </div>
+
+        <table
+            style="
         margin-bottom: 10px;
         width: 100%;
         border: none;
         border-collapse: collapse;
       "
-    >
-        <tbody>
-        <tr>
-           <td>
+        >
+            <tbody>
+            <tr>
+                <td>
 
-           </td>
+                </td>
 
-        </tr>
-        <tr>
-            <td>
-                <b>Mazkur majburiy koʻrsatma talablari belgilangan muddatda bajarilmagan taqdirda, oʻrnatilgan tartibda tegishli sud organlariga daʼvo arizasi kiritilishi toʻg’risida ogohlantiramiz.</b>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            </tr>
+            <tr>
+                <td>
+                    <b>Mazkur majburiy koʻrsatma talablari belgilangan muddatda bajarilmagan taqdirda, oʻrnatilgan
+                        tartibda tegishli sud organlariga daʼvo arizasi kiritilishi toʻg’risida ogohlantiramiz.</b>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+    @endif
+
+    @if($monitoring->monitoring_status_id == MonitoringStatusEnum::NOT_DEFECT)
+        <div>
+            <b> Qoidabuzarlik aniqlanmaganligi haqida izoh: </b>
+            {{ $monitoring->additional_comment }}
+        </div>
+
+        <table
+            style="
+        margin-bottom: 10px;
+        width: 100%;
+        border: none;
+        border-collapse: collapse;
+      "
+        >
+            <tbody>
+            <tr>
+                @if($image3)
+                    <td style="width: 50%">
+                        <img src="{{ $image3 }}" alt="" style="width:200px; height:200px;">
+                    </td>
+                @endif
+                @if($image4)
+                    <td style="width: 50%">
+                        <img src="{{ $image4 }}" alt="" style="width:200px; height:200px;">
+                    </td>
+                @endif
+            </tr>
+            </tbody>
+        </table>
+
+    @endif
 
     <table
         style="

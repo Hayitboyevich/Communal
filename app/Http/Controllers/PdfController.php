@@ -41,7 +41,7 @@ class PdfController extends Controller
             $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
             $pdf = PDF::loadView('pdf.monitoring', compact('monitoring', 'qrImage'));
 
-            return $pdf->download('monitoring.pdf');
+            return $pdf->stream('monitoring.pdf');
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }
