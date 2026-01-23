@@ -21,8 +21,11 @@ class ObjectCheckListResource extends JsonResource
             'plan' => $this->plan,
             'unit' => $this->unit,
             'status' => $this->status,
-            'done' => 0,
-            'progress' => 0
+            'done' => $this->regulation ? $this->regulation->done : null,
+            'progress' => $this->regulation ? $this->regulation->progress : null,
+            'all' => $this->regulation ? $this->regulation->all : null,
+            'need_repair' => $this->regulation ? $this->regulation->need_repair : null,
+            'extra' => $this->regulation ? $this->regulation->extra : null,
         ];
     }
 }
