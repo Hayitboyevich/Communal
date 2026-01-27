@@ -385,12 +385,12 @@
         >
             <tbody>
             <tr>
-                @if($image1)
+                @if($image5)
                     <td style="width: 50%">
                         <img src="{{ $image5 }}" alt="" style="width:200px; height:200px;">
                     </td>
                 @endif
-                @if($image2)
+                @if($image6)
                     <td style="width: 50%">
                         <img src="{{ $image6 }}" alt="" style="width:200px; height:200px;">
                     </td>
