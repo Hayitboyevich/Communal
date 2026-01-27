@@ -5,6 +5,8 @@
     $image2 = null;
     $image3 = null;
     $image4 = null;
+    $image5 = null;
+    $image6 = null;
     $date = null;
 
     if ($monitoring->monitoring_status_id == MonitoringStatusEnum::NOT_DEFECT){
@@ -45,7 +47,7 @@
             if (file_exists($path)) {
                 $type = pathinfo($path, PATHINFO_EXTENSION);
                 $data = file_get_contents($path);
-                $image1 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                $image5 = 'data:image/' . $type . ';base64,' . base64_encode($data);
             }
         }
 
@@ -55,9 +57,29 @@
             if (file_exists($path)) {
                 $type = pathinfo($path, PATHINFO_EXTENSION);
                 $data = file_get_contents($path);
-                $image2 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                $image6 = 'data:image/' . $type . ';base64,' . base64_encode($data);
             }
         }
+
+         if (!empty($monitoring?->regulation?->images[0])){
+            $path = public_path('storage/' . $monitoring->regulation->images[0]->url);
+
+            if (file_exists($path)) {
+                $type = pathinfo($path, PATHINFO_EXTENSION);
+                $data = file_get_contents($path);
+                $image1 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                }
+            }
+
+            if (!empty($monitoring?->regulation?->images[1])){
+                $path = public_path('storage/' . $monitoring->regulation->images[1]->url);
+
+                if (file_exists($path)) {
+                    $type = pathinfo($path, PATHINFO_EXTENSION);
+                    $data = file_get_contents($path);
+                    $image2 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                }
+            }
 
     }
     else{
@@ -366,12 +388,12 @@
             <tr>
                 @if($image1)
                     <td style="width: 50%">
-                        <img src="{{ $image1 }}" alt="" style="width:200px; height:200px;">
+                        <img src="{{ $image5 }}" alt="" style="width:200px; height:200px;">
                     </td>
                 @endif
                 @if($image2)
                     <td style="width: 50%">
-                        <img src="{{ $image2 }}" alt="" style="width:200px; height:200px;">
+                        <img src="{{ $image6 }}" alt="" style="width:200px; height:200px;">
                     </td>
                 @endif
             </tr>
