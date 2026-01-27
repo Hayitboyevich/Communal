@@ -21,7 +21,7 @@ class ProgramObjectController extends BaseController
     public function index($id = null): JsonResponse
     {
         try {
-            $filters = request()->only(['work_type', 'object_id']);
+            $filters = request()->only(['work_type', 'object_id', 'street', 'quarter', 'apartment', 'region_id', 'district_id']);
             $data = $id
                 ? $this->service->findById($id)
                 : $this->service->getAll($filters)->orderBy('created_at', 'desc')->paginate(request('per_page', 15));
