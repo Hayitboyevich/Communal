@@ -34,14 +34,14 @@
     }elseif($monitoring->monitoring_status_id == MonitoringStatusEnum::DONE){
         $text1 = "aniqlangan qonunbuzilish holatlarini bartaraf etish bo‘yicha";
         $text2 = "Majburiy Ko'rsatma";
+
         $text3 = " aniqlangan qonunbuzilish holatlarini bartaraf etilganligi bo'yicha";
         $text4 = "Ma'lumotnoma";
         $history = $monitoring->histories()->where('type', 30)->first();
         $history2 = $monitoring->histories()->where('type', 32)->first();
         $date = $history2->created_at;
 
-
-        if ($history && !empty($history?->documents)){
+        if ($history && !empty($history?->documents[0])){
             $path = public_path('storage/' . $history->documents[0]->url);
 
             if (file_exists($path)) {
@@ -50,8 +50,7 @@
                 $image5 = 'data:image/' . $type . ';base64,' . base64_encode($data);
             }
         }
-
-         if ($history && !empty($history?->documents)){
+         if ($history && !empty($history?->documents[1])){
             $path = public_path('storage/' . $history->documents[1]->url);
 
             if (file_exists($path)) {
