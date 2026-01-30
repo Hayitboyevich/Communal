@@ -4,22 +4,21 @@ namespace Modules\Water\Http\Controllers;
 
 use App\Constants\ErrorMessage;
 use App\Constants\FineType;
-use App\Enums\ObjectStatusEnum;
 use App\Enums\UserRoleEnum;
 use App\Exports\ProtocolExport;
 use App\Http\Controllers\BaseController;
-use App\Http\Requests\ProtocolChangeRequest;
 use App\Models\District;
 use App\Models\Region;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Maatwebsite\Excel\Facades\Excel;
 use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Enums\ProtocolStatusEnum;
+use Modules\Water\Http\Requests\ProtocolChangeRequest;
 use Modules\Water\Http\Requests\ProtocolFirstStepRequest;
 use Modules\Water\Http\Requests\ProtocolSecondStepRequest;
 use Modules\Water\Http\Requests\ProtocolThirdStepRequest;
@@ -369,6 +368,16 @@ class ProtocolController extends BaseController
             $protocol = $this->service->findById($id);
             return $this->sendSuccess(FineResource::make($protocol->fine), 'Success');
         } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function change(): JsonResponse
+    {
+        try {
+            $data = $this->service->change($request);
+            return $this->sendSuccess(ProtocolResource::make($data), 'Data retrieved successfully');
+        }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }

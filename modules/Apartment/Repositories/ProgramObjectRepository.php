@@ -11,11 +11,15 @@ class ProgramObjectRepository implements ProgramObjectInterface
 
     public function __construct(public ProgramObject $model){}
 
-    public function getAll($filters)
+    public function getAll()
     {
         return $this->model;
     }
 
+    public function search($filters, $query)
+    {
+
+    }
     public function findById($id)
     {
         return $this->model->find($id);

@@ -17,8 +17,9 @@ class ProgramObjectService
 
     public function getAll($filters)
     {
-        $query = $this->repository->getAll();
-        return $this->repository->search($filters, $query);
+        return $this->repository->getAll();
+//        $query = $this->repository->getAll();
+//        return $this->repository->search($filters, $query);
     }
 
     public function create(ProgramObjectRequest $request)

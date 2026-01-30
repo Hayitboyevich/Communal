@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace Modules\Water\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Modules\Water\Enums\ProtocolStatusEnum;

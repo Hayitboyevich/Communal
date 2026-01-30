@@ -3,7 +3,6 @@
 namespace Modules\Water\Services;
 
 use App\Enums\UserRoleEnum;
-use App\Http\Requests\ProtocolChangeRequest;
 use App\Http\Resources\DocumentResource;
 use App\Http\Resources\ImageResource;
 use App\Models\Role;
@@ -14,6 +13,8 @@ use Modules\Water\Const\CategoryType;
 use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Contracts\ProtocolRepositoryInterface;
 use Modules\Water\Enums\ProtocolStatusEnum;
+use Modules\Water\Http\Requests\ProtocolChangeRequest;
+use Modules\Water\Http\Requests\ProtocolSuperAdminRequest;
 use Modules\Water\Models\Protocol;
 use Modules\Water\Models\ProtocolHistory;
 use Modules\Water\Models\ProtocolStatus;
@@ -281,6 +282,15 @@ class ProtocolService
             $paths = array_map(fn($file) => $this->fileService->uploadFile($file, 'protocol/files'), $files);
             $protocol->$column = json_encode(array_map(fn($path) => ['url' => $path], $paths));
             $protocol->save();
+        }
+    }
+
+    public function change(ProtocolSuperAdminRequest $request)
+    {
+        try {
+            $this->repository->change($request->validated());
+        }catch (\Exception $exception){
+            throw $exception;
         }
     }
 
