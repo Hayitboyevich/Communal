@@ -66,7 +66,8 @@ class ProtocolController extends BaseController
     public function excel($id)
     {
         try {
-            return Excel::download(new ProtocolExport($id), 'protocol.xlsx');
+            $filters = request()->only(['date_from', 'date_to']);
+            return Excel::download(new ProtocolExport($id, $filters), 'protocol.xlsx');
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
@@ -306,6 +307,17 @@ class ProtocolController extends BaseController
             return $this->sendSuccess($data->values(), 'Data retrieved successfully');
 
         } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function getMonth(): JsonResponse
+    {
+        try {
+            $filters = request(['month', 'region_id', 'status']);
+            $data = $this->service->getMonth($this->user, $this->roleId, $filters);
+            return $this->sendSuccess($data, 'Success');
+        }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }

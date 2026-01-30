@@ -93,6 +93,27 @@ class ProtocolService
         }
     }
 
+    public function getMonth($user, $roleId, $filters)
+    {
+        try {
+            $query = $this->repository->all($user, $roleId);
+            return $this->repository
+                ->filter($query, $filters)
+                ->get()
+                ->map(function ($protocol) {
+                    return [
+                        'id' => $protocol->id,
+                        'status' => $protocol->protocol_status_id,
+                        'deadline' => $protocol->deadline,
+                        'is_finished' => $protocol->is_finished
+                    ];
+                });
+
+        }catch (\Exception $exception){
+            throw  $exception;
+        }
+    }
+
     public function fine($protocolId)
     {
         try {

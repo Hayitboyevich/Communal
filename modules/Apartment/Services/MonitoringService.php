@@ -98,6 +98,7 @@ class MonitoringService
                         'status' => $monitoring->monitoring_status_id,
                         'deadline' => $monitoring->violation?->deadline,
                         'send_court' => $monitoring->send_court,
+                        'step' => $monitoring->step
                     ];
                 });
 

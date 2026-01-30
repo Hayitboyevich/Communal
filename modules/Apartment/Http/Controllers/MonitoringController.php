@@ -61,7 +61,7 @@ class MonitoringController extends BaseController
         }
     }
 
-    public function getMonth($id = null): JsonResponse
+    public function getMonth(): JsonResponse
     {
         try {
             $filters = request(['month', 'region_id', 'status']);

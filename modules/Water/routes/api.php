@@ -15,6 +15,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
     Route::controller(ProtocolController::class)->prefix('protocol')->group(function () {
         Route::post('/attach', 'attach');
         Route::get('/report/{id?}', 'protocolReport');
+        Route::get('/month', 'getMonth');
         Route::get('/count', 'count');
         Route::post('/reject', 'reject');
         Route::post('/create/first', 'createFirst');

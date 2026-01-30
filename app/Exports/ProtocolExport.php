@@ -10,7 +10,8 @@ class ProtocolExport implements FromCollection, WithHeadings
 {
 
     public function __construct(
-        protected ?int $regionId
+        protected ?int $regionId,
+        protected ?array $filters,
     ){}
 
     public function collection()
@@ -24,6 +25,12 @@ class ProtocolExport implements FromCollection, WithHeadings
                 'defect',
                 'status',
             ])
+            ->when(isset($this->filters['date_from']), function ($query){
+                $query->whereDate('created_at', '>=', $this->filters['date_from']);
+            })
+            ->when(isset($this->filters['date_to']), function ($query){
+                $query->whereDate('created_at', '<=', $this->filters['date_to']);
+            })
             ->where('region_id', $this->regionId)
             ->get()
             ->map(function ($protocol){
