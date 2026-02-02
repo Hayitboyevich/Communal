@@ -61,7 +61,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                 ->when(isset($filters['month']), function ($query) use ($filters) {
                     $startDate = Carbon::createFromFormat('Y-m', $filters['month'])->startOfMonth();
                     $endDate = Carbon::createFromFormat('Y-m', $filters['month'])->endOfMonth();
-                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                    $query->whereBetween('deadline', [$startDate, $endDate]);
                 })
                 ->when(isset($filters['id']), function ($query) use ($filters) {
                     $query->where('id', $filters['id']);
