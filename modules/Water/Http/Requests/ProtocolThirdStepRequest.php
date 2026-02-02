@@ -19,7 +19,6 @@ class ProtocolThirdStepRequest extends FormRequest
             'comment' => 'required|string',
             'deadline' => 'required|date',
             'image_files' => 'required|array',
-            'is_finished' => 'required|boolean',
             'step' => 'required|integer',
             'category' => 'required|integer',
         ];
@@ -28,7 +27,6 @@ class ProtocolThirdStepRequest extends FormRequest
     public function prepareForValidation()
     {
         $this->merge([
-            'is_finished' => true,
             'protocol_status_id' => ProtocolStatusEnum::FORMED->value,
             'step' => 3,
             'category' => 2
