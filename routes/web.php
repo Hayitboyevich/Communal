@@ -25,4 +25,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/debug-sentry', function () {
+    throw new Exception('Sentry test xatosi!');
+});
+
+
 require __DIR__.'/auth.php';

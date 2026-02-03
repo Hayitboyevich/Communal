@@ -60,8 +60,11 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                 })
                 ->when(isset($filters['month']), function ($query) use ($filters) {
                     $startDate = Carbon::createFromFormat('Y-m', $filters['month'])->startOfMonth();
-                    $endDate = Carbon::createFromFormat('Y-m', $filters['month'])->endOfMonth();
-                    $query->whereBetween('violation.deadline', [$startDate, $endDate]);
+                    $endDate   = Carbon::createFromFormat('Y-m', $filters['month'])->endOfMonth();
+
+                    $query->whereHas('violation', function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('deadline', [$startDate, $endDate]);
+                    });
                 })
                 ->when(isset($filters['id']), function ($query) use ($filters) {
                     $query->where('id', $filters['id']);

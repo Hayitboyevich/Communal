@@ -21,6 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        \Sentry\Laravel\Integration::handles($exceptions);
+
         $exceptions->render(function (AuthenticationException $e) {
             $response['success'] = false;
             $response['code'] = 401;
