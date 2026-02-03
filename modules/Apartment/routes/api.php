@@ -30,6 +30,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::post('/attach', 'attach');
         Route::get('/excel/{id}', 'excel');
         Route::post('/delete/{id}', 'delete');
+        Route::post('/change', 'change');
         Route::get('/{id?}', 'index');
     });
 
@@ -51,6 +52,8 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
         Route::controller(ProgramController::class)->group(function () {
             Route::post('create', 'create');
+            Route::post('edit', 'edit');
+            Route::post('delete', 'delete');
         });
 
         Route::prefix('monitoring')->controller(ProgramMonitoringController::class)->group(function () {
@@ -61,6 +64,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::prefix('object')->controller(ProgramObjectController::class)->group(function () {
             Route::post('create', 'create');
             Route::post('attach', 'attach');
+            Route::get('count', 'count');
             Route::get('checklist/{id}', 'checklist');
             Route::get('{id?}', 'index');
         });
@@ -74,6 +78,8 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(ChecklistController::class)->prefix('checklist')->group(function () {
         Route::post('/create', 'create');
+        Route::post('/edit', 'edit');
+        Route::post('/delete', 'delete');
         Route::get('/{id?}', 'index');
     });
 

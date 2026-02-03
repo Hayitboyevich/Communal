@@ -56,7 +56,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
             })
 
             ->when(!empty($filters['id']), fn ($q) =>
-            $q->where('id', $filters['id'])
+                $q->where('id', $filters['id'])
             )
 
             ->when(isset($filters['month']), function ($query) use ($filters) {

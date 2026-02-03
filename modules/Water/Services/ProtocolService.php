@@ -288,11 +288,39 @@ class ProtocolService
     public function change(ProtocolSuperAdminRequest $request)
     {
         try {
-            $this->repository->change($request->validated());
-        }catch (\Exception $exception){
-            throw $exception;
+            return DB::transaction(function () use ($request) {
+                $data   = [];
+                $meta   = [];
+                $validated = $request->validated();
+                $protocol  = $this->findById($validated['id']);
+
+                $fields = ['deadline', 'protocol_type_id'];
+
+                foreach ($fields as $field) {
+                    if (!empty($validated[$field])) {
+                        $data[$field] = $validated[$field];
+                        $meta[$field] = $protocol->{$field};
+                    }
+                }
+
+                if ($data) {
+                    $this->repository->update($protocol->id, $data);
+
+                    $this->createHistory(
+                        $protocol,
+                        ProtocolHistoryType::CHANGE,
+                        $validated['comment'] ?? null,
+                        $meta
+                    );
+                }
+
+                return $protocol;
+            });
+        } catch (\Throwable $e) {
+            throw $e;
         }
     }
+
 
     public function createHistory($protocol, $type, $comment = "", $meta = null)
     {

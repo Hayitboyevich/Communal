@@ -22,6 +22,8 @@ class MonitoringHistoryType
     const DONE = 100;
     const HMQO = 10;
 
+    const CHANGE = 41;
+
     const ATTACH = 200;
 
     public static function getLabel($type): string
@@ -55,6 +57,8 @@ class MonitoringHistoryType
                 return 'HMQOga yuborildi';
             case self::ATTACH:
                 return 'Inspektor biriktirildi';
+            case self::CHANGE:
+                return 'Admin tominidan ba\'zi o\'zgarishlar qilindi';
             case self::FINE:
                 return 'Mamuriy qilindi';
 

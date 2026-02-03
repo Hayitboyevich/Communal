@@ -21,6 +21,7 @@ use Modules\Water\Enums\ProtocolStatusEnum;
 use Modules\Water\Http\Requests\ProtocolChangeRequest;
 use Modules\Water\Http\Requests\ProtocolFirstStepRequest;
 use Modules\Water\Http\Requests\ProtocolSecondStepRequest;
+use Modules\Water\Http\Requests\ProtocolSuperAdminRequest;
 use Modules\Water\Http\Requests\ProtocolThirdStepRequest;
 use Modules\Water\Http\Resources\FineResource;
 use Modules\Water\Http\Resources\ProtocolListResource;
@@ -372,7 +373,7 @@ class ProtocolController extends BaseController
         }
     }
 
-    public function change(): JsonResponse
+    public function change(ProtocolSuperAdminRequest $request): JsonResponse
     {
         try {
             $data = $this->service->change($request);

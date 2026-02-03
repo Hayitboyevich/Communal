@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Maatwebsite\Excel\Facades\Excel;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
+use Modules\Apartment\Http\Requests\MonitoringAdminRequest;
 use Modules\Apartment\Http\Requests\MonitoringChangeStatusRequest;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
 use Modules\Apartment\Http\Requests\ViolationRequest;
@@ -91,6 +92,16 @@ class MonitoringController extends BaseController
             $monitoring->delete();
             return $this->sendSuccess(null, 'Monitoring deleted successfully.');
         } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function change(MonitoringAdminRequest $request): JsonResponse
+    {
+        try {
+            $data = $this->service->update($request);
+            return $this->sendSuccess(MonitoringResource::make($data), 'Monitoring changed successfully.');
+        }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }

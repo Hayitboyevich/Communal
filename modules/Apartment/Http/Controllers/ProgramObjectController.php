@@ -24,7 +24,7 @@ class ProgramObjectController extends BaseController
             $filters = request()->only(['work_type', 'object_id', 'street', 'quarter', 'apartment', 'region_id', 'district_id']);
             $data = $id
                 ? $this->service->findById($id)
-                : $this->service->getAll($filters)->orderBy('created_at', 'desc')->paginate(request('per_page', 15));
+                : $this->service->getAll($this->user, $this->roleId, $filters)->orderBy('created_at', 'desc')->paginate(request('per_page', 15));
 
 
             $resource = $id
@@ -58,6 +58,18 @@ class ProgramObjectController extends BaseController
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
+    }
+
+    public function count(): JsonResponse
+    {
+        try {
+            $filters = request()->only(['region_id', 'district_id']);
+            $data = $this->service->count($this->user, $this->roleId, $filters);
+            return $this->sendSuccess($data, 'Object count retrieved successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+
     }
 
     public function attach(AttachObjectRequest $request): JsonResponse

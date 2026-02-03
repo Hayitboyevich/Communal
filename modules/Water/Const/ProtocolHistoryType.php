@@ -18,6 +18,7 @@ class ProtocolHistoryType
     const SEND_HMQO = 12;
     const CONFIRMED = 13;
     const FINE = 14;
+    const CHANGE = 15;
 
     public static function getLabel($type): string
     {
@@ -48,6 +49,8 @@ class ProtocolHistoryType
                 return 'HMQOga yuborildi';
             case self::NOT_DEFECT:
                 return 'Kamchilik aniqlanmadi';
+            case self::CHANGE:
+                return 'Admin tomonidan ba\'zi o\'zgarishlar qilindi';
             case self::FINE:
                 return 'Mamuriy qilindi';
             default:

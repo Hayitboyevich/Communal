@@ -14,9 +14,11 @@ use Illuminate\Support\Facades\Http;
 use Modules\Apartment\Const\MonitoringHistoryType;
 use Modules\Apartment\Contracts\MonitoringRepositoryInterface;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
+use Modules\Apartment\Http\Requests\MonitoringAdminRequest;
 use Modules\Apartment\Http\Requests\MonitoringChangeStatusRequest;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
 use Modules\Apartment\Http\Requests\ViolationRequest;
+use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Models\MonitoringHistory;
 use Modules\Apartment\Models\MonitoringStatus;
 use Modules\Water\Const\ProtocolHistoryType;
@@ -63,6 +65,50 @@ class MonitoringService
             throw  $exception;
         }
     }
+
+    public function update(MonitoringAdminRequest $request)
+    {
+        try {
+            return DB::transaction(function () use ($request) {
+
+                $validated  = $request->validated();
+                $monitoring = $this->repository->findById($validated['id']);
+
+                $meta = [];
+
+                if (!empty($validated['deadline']) && $monitoring->violation) {
+                    $meta['deadline'] = $monitoring->violation->deadline;
+
+                    $monitoring->violation->update([
+                        'deadline' => $validated['deadline']
+                    ]);
+                }
+
+                if (!empty($validated['monitoring_type_id'])) {
+                    $meta['monitoring_type_id'] = $monitoring->monitoring_type_id;
+
+                    $this->repository->update(
+                        $monitoring->id,
+                        ['monitoring_type_id' => $validated['monitoring_type_id']]
+                    );
+                }
+
+                if ($meta) {
+                    $this->createHistory(
+                        $monitoring,
+                        MonitoringHistoryType::CHANGE,
+                        $validated['comment'] ?? null,
+                        $meta
+                    );
+                }
+
+                return $monitoring;
+            });
+        } catch (\Throwable $e) {
+            throw $e;
+        }
+    }
+
 
     public function createBasic(MonitoringMyHomeRequest $request)
     {

@@ -6,7 +6,7 @@ interface ProgramObjectInterface
 {
     public function findById(int $id);
 
-    public function getAll();
+    public function getAll($user, $roleId);
 
     public function search($filters, $query);
 
