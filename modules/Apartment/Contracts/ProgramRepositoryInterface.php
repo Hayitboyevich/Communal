@@ -9,4 +9,6 @@ interface ProgramRepositoryInterface
     public function findById(int $id);
 
     public function create(?array $data);
+
+    public function update($id, $data);
 }

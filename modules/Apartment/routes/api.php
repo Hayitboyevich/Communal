@@ -52,8 +52,8 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
         Route::controller(ProgramController::class)->group(function () {
             Route::post('create', 'create');
-            Route::post('edit', 'edit');
-            Route::post('delete', 'delete');
+            Route::post('edit/{id}', 'edit');
+            Route::post('delete/{id}', 'delete');
         });
 
         Route::prefix('monitoring')->controller(ProgramMonitoringController::class)->group(function () {
@@ -63,6 +63,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
         Route::prefix('object')->controller(ProgramObjectController::class)->group(function () {
             Route::post('create', 'create');
+            Route::post('edit', 'edit');
             Route::post('attach', 'attach');
             Route::get('count', 'count');
             Route::get('checklist/{id}', 'checklist');

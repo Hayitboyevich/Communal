@@ -3,6 +3,7 @@
 namespace Modules\Apartment\Services;
 
 use Modules\Apartment\Contracts\ProgramRepositoryInterface;
+use Modules\Apartment\Http\Requests\ProgramEditRequest;
 use Modules\Apartment\Http\Requests\ProgramRequest;
 
 class ProgramService
@@ -18,6 +19,16 @@ class ProgramService
     {
         return $this->repository->create($request->validated());
     }
+
+    public function update($id, ProgramRequest $request)
+    {
+        try {
+            return  $this->repository->update($id, $request->validated());
+        }catch (\Exception $exception){
+            throw $exception;
+        }
+    }
+
 
     public function findById(int $id)
     {

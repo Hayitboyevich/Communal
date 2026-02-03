@@ -23,4 +23,15 @@ class ProgramRepository implements ProgramRepositoryInterface
     {
         return $this->program->create($data);
     }
+
+    public function update($id, $data)
+    {
+        try {
+            $model = $this->findById($id);
+            $model->update($data);
+            return $model;
+        }catch (\Exception $exception){
+            return $exception;
+        }
+    }
 }
