@@ -17,15 +17,11 @@ class CreateApartmentCommand extends Command
         try {
 //            Apartment::truncate();
 
-            $companies =  Company::query()->whereNotIn('company_id', function($query) {
-                $query->select('company_id')->from('apartments');
-            })->pluck('id')->toArray();
+            $companies =  Company::query()->where('company_id', 5462)->pluck('id')->toArray();
 
 //            dd($companies);
 
-            Company::query()->whereNotIn('company_id', function($query) {
-                $query->select('company_id')->from('apartments');
-            })->chunk(100, function ($companies) {
+            Company::query()->where('company_id', 5462)->chunk(100, function ($companies) {
                 foreach ($companies as $company) {
                     try {
                         $data = getData(
