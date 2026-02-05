@@ -8,6 +8,7 @@
     $image5 = null;
     $image6 = null;
     $date = null;
+    $dateDone = null;
 
     if ($monitoring->monitoring_status_id == MonitoringStatusEnum::NOT_DEFECT){
          $files = json_decode($monitoring->additional_files);
@@ -39,7 +40,8 @@
         $text4 = "Ma'lumotnoma";
         $history = $monitoring->histories()->where('type', 30)->first();
         $history2 = $monitoring->histories()->where('type', 32)->first();
-        $date = $history2->created_at;
+        $dateDone = $history2->created_at;
+        $date = $monitoring->violation->created_at;
 
         if ($history && !empty($history?->documents[0])){
             $path = public_path('storage/' . $history->documents[0]->url);
@@ -104,7 +106,6 @@
                 $image2 = 'data:image/' . $type . ';base64,' . base64_encode($data);
             }
         }
-
     }
 
 
@@ -268,7 +269,7 @@
                 <td style="width: 50%">
                     <div style="padding: 0 10px">
                         <span style="color: #8c8c8c">Sana:</span>
-                        <span>{{ $date ? date('d-m-Y', strtotime($date)) : '' }} yil</span>
+                        <span>{{ $dateDone ? date('d-m-Y', strtotime($dateDone)) : '' }} yil</span>
                     </div>
                 </td>
                 <td style="width: 50%">
