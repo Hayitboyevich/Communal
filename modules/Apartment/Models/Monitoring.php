@@ -104,7 +104,7 @@ class Monitoring extends Model
     }
     public function confirmRegulationHistory()
     {
-        return $this->hasOne(MonitoringHistory::class)
+        return $this->hasOne(MonitoringHistory::class, 'guid')
             ->where('type', MonitoringHistoryType::CONFIRM_REGULATION)
             ->latest('created_at');
     }
