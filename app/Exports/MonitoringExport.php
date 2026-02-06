@@ -64,7 +64,7 @@ class MonitoringExport implements FromCollection, WithHeadings
                     date_format($monitoring->created_at, 'Y-m-d') ?? '',
                     $monitoring?->base?->name ?? '',
                     $monitoring?->company?->company_name ?? '',
-                    $monitoring?->apartment?->street_name . ' ' . $monitoring?->apartment?->home_name ?? $monitoring->address ?? '',
+                    $monitoring?->apartment?->street_name . ' ' . $monitoring?->apartment?->home_name. ' ' .$monitoring->address ?? '',
                     $monitoring->address_commit ?? '',
                     $monitoring->additional_comment ?? '',
                     $monitoring?->regulation?->fish ?? $monitoring?->regulation?->organization_name ?? '',
