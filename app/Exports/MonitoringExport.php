@@ -52,7 +52,6 @@ class MonitoringExport implements FromCollection, WithHeadings
             })
             ->get()
             ->map(function ($monitoring) {
-                $address =
                 return [
                     $monitoring->id,
                     $monitoring?->region?->name_uz ?? '',
