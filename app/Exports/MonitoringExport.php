@@ -6,6 +6,7 @@ use App\Models\Region;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Modules\Apartment\Const\MonitoringHistoryType;
 use Modules\Apartment\Models\Monitoring;
 
 class MonitoringExport implements FromCollection, WithHeadings
@@ -30,6 +31,8 @@ class MonitoringExport implements FromCollection, WithHeadings
 
         return Monitoring::query()
             ->with([
+                'confirmRegulationHistory',
+                'histories',
                 'user',
                 'monitoringType',
                 'base',
@@ -52,6 +55,9 @@ class MonitoringExport implements FromCollection, WithHeadings
             })
             ->get()
             ->map(function ($monitoring) {
+                $regulation = $monitoring->histories
+                    ->where('type', MonitoringHistoryType::CONFIRM_REGULATION)
+                    ->first();
                 return [
                     $monitoring->id,
                     $monitoring?->region?->name_uz ?? '',
@@ -74,6 +80,7 @@ class MonitoringExport implements FromCollection, WithHeadings
                     $monitoring->fine ? $monitoring->fine->status_name : '',
                     $monitoring->fine ? $monitoring->fine->main_punishment_amount : '',
                     $monitoring->fine ? $monitoring->fine->paid_amount : '',
+                    optional($monitoring->confirmRegulationHistory)->created_at,
                 ];
             });
     }
@@ -101,7 +108,8 @@ class MonitoringExport implements FromCollection, WithHeadings
             'Qaror seriya va raqami',
             'Mamuriy holati',
             'Jarima miqdori',
-            'To\'langan miqdor'
+            'To\'langan miqdor',
+            'Ko\'rsatma bajarilgan sana'
         ];
     }
 }

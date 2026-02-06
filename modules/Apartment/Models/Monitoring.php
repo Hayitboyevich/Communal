@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Modules\Apartment\Const\MonitoringHistoryType;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
 use Modules\Water\Models\Decision;
 
@@ -101,4 +102,12 @@ class Monitoring extends Model
     {
         return $this->belongsTo(Decision::class, 'decision_id');
     }
+    public function confirmRegulationHistory()
+    {
+        return $this->hasOne(MonitoringHistory::class)
+            ->where('type', MonitoringHistoryType::CONFIRM_REGULATION)
+            ->latest('created_at');
+    }
+
+
 }
