@@ -18,6 +18,7 @@ class ProgramObjectRepository implements ProgramObjectInterface
     {
         switch ($roleId) {
             case UserRoleEnum::APARTMENT_MANAGER->value:
+            case UserRoleEnum::REG_VIEWER->value:
             case UserRoleEnum::APARTMENT_INSPECTOR->value:
                 return $this->model::query()->where('region_id', $user->region_id);
             case UserRoleEnum::APARTMENT_VIEWER->value:

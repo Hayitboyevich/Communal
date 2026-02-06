@@ -36,6 +36,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                 case UserRoleEnum::SUPER_ADMIN->value:
                     return Monitoring::query();
                 case UserRoleEnum::APARTMENT_MANAGER->value:
+                case UserRoleEnum::REG_VIEWER->value:
                     return Monitoring::query()->where('region_id', $user->region_id);
                 default:
                     return Monitoring::query()->whereRaw('1 = 0');

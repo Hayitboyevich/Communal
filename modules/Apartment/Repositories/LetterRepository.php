@@ -22,6 +22,7 @@ class LetterRepository implements LetterInterface
         try {
             switch ($roleId) {
                 case UserRoleEnum::APARTMENT_MANAGER->value:
+                case UserRoleEnum::REG_VIEWER->value:
                     return $this->letter->query()->where('region_id', $user->region_id);
                 case UserRoleEnum::APARTMENT_VIEWER->value:
                     return $this->letter->query();
