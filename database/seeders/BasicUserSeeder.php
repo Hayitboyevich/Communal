@@ -15,7 +15,7 @@ class BasicUserSeeder extends Seeder
         User::query()->create([
             'name' => 'suv nazorati',
             'login' => 'suv_nazorat',
-            'password' => Hash::make('39gvT6l<kdyT'),
+                'password' => Hash::make('39gvT6l<kdyT'),
             'type' => 1,
         ]);
     }
