@@ -210,4 +210,13 @@ class InformationController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
+    public function hybridUpdate($id)
+    {
+        try {
+            return $this->sendSuccess(true, 'Updated successfully.');
+        }  catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1);
+        }
+    }
 }

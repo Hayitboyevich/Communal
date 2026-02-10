@@ -71,8 +71,10 @@ Route::group(['middleware' => ['basic']], function () {
         Route::get('/protocol/{id?}', 'getProtocol');
         Route::post('/monitoring-create', 'monitoringCreate');
         Route::post('/fine-update', 'fineUpdate');
+        Route::get('/hybrid-update/{id}', 'hybridUpdate');
     });
 });
+
 
 
 
