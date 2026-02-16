@@ -8,6 +8,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Maatwebsite\Excel\Facades\Excel;
+use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
 use Modules\Apartment\Models\Monitoring;
 use Modules\Water\Models\Protocol;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -39,7 +40,8 @@ class PdfController extends Controller
             $domain = URL::to('/monitoring-pdf') . '/' . $id;
 
             $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
-            $pdf = PDF::loadView('pdf.monitoring', compact('monitoring', 'qrImage'));
+            $barcode = DNS1D::getBarcodePNG('GASN'.$monitoring->letter->id, 'C39', 2, 40);
+            $pdf = PDF::loadView('pdf.letter', compact('monitoring', 'qrImage', 'barcode'));
 
             return $pdf->stream('monitoring.pdf');
         } catch (\Exception $exception) {

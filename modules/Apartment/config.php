@@ -19,9 +19,13 @@ return [
         'password' => 'EkN`9?@{3v0j',
     ],
     'hybrid' => [
-        'url' => 'https://hybrid.pochta.uz',
-        'grant_type' => 'password',
-        'username' => '998998599402',
-        'password' => '11223344',
+        'url' => 'https://gmtest.post.uz',
+        'grant_type' => 'client_credentials',
+        'client_id' => 'GASNClientId',
+        'client_secret' => 'GASNClientSecret',
+//        'url' => 'https://hybrid.pochta.uz',
+//        'grant_type' => 'password',
+//        'username' => '998998599402',
+//        'password' => '11223344',
     ]
 ];

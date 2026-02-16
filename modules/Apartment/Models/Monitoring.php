@@ -109,5 +109,10 @@ class Monitoring extends Model
             ->latest('created_at');
     }
 
+    public function letter(): HasOne
+    {
+        return $this->hasOne(Letter::class);
+    }
+
 
 }

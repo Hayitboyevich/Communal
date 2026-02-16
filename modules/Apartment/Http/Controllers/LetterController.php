@@ -65,7 +65,7 @@ class LetterController extends BaseController
     public function sendHybrid($id = null): JsonResponse
     {
         try {
-            $data = request()->only(['signature']);
+            $data = request()->only(['id','signature']);
             $letter = $this->service->change($this->user, $id, $data);
             return $this->sendSuccess(LetterResource::make($letter), 'Letter send successfully.');
         }catch (\Exception $exception){

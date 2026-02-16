@@ -8,6 +8,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\URL;
+use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
 use Modules\Apartment\Contracts\LetterInterface;
 use Modules\Apartment\Models\Letter;
 use Modules\Apartment\Models\Monitoring;
@@ -44,18 +45,18 @@ class LetterRepository implements LetterInterface
         DB::beginTransaction();
         try {
             $letter = $this->letter->create($data);
-            $token = $this->authPost();
-            $responseData  = $this->sendPost($letter, $token);
+//            $token = $this->authPost();
+//            $responseData  = $this->sendPost($letter, $token);
 
-            if (!$responseData || !isset($responseData['Id'])) {
-                throw new \Exception('Pochtaga yuborishda muammo yuzaga keldi.');
-            }
+//            if (!$responseData || !isset($responseData['Id'])) {
+//                throw new \Exception('Pochtaga yuborishda muammo yuzaga keldi.');
+//            }
 
-            $letter->update(['letter_id' => $responseData['Id']]);
+//            $letter->update(['letter_id' => $responseData['Id']]);
+//
+//            $hashCode = $this->getHashCode($letter, $token);
 
-            $hashCode = $this->getHashCode($letter, $token);
-
-            $letter->update(['letter_hash_code' => $hashCode]);
+//            $letter->update(['letter_hash_code' => $hashCode]);
 
             DB::commit();
             return $letter;
@@ -69,10 +70,17 @@ class LetterRepository implements LetterInterface
     {
         DB::beginTransaction();
         try {
+            $token = $this->authPost();
             $letter = $this->findById($id);
             $pkcs7b64 = $this->imzoService->signTimestamp($signature);
-            $this->sendMail($letter, $pkcs7b64['pkcs7b64']);
+            $responseData  = $this->sendPost($letter, $token);
+
+            if (!$responseData || !isset($responseData['Id'])) {
+                throw new \Exception('Pochtaga yuborishda muammo yuzaga keldi.');
+            }
+
             $letter->update(['status' => 2, 'pkcs7' => $pkcs7b64['pkcs7b64']]);
+
             DB::commit();
             return $letter;
         }catch (\Exception $exception){
@@ -85,7 +93,7 @@ class LetterRepository implements LetterInterface
     public function getLetter($id)
     {
         $token = $this->authPost();
-        $url = config('apartment.hybrid.url').'/api/mail/'.$id;
+        $url = config('apartment.hybrid.url').'/api/gasn/mail?id='.$id;
 
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token,
@@ -136,13 +144,19 @@ class LetterRepository implements LetterInterface
     private function sendPost($letter, $token)
     {
         try {
-            $url = config('apartment.hybrid.url').'/api/PdfMail';
+            $url = config('apartment.hybrid.url').'/api/gasn/mail/';
             $data = [
-                'Receiver' => $letter->fish,
-                'Address' => $letter->address,
-                'SaotoRegionId' => $letter->region->soato,
+                'Id' => $letter->id,
                 'SaotoAreaId' => $letter->district->soato,
-                'Document64' => $this->generatePdf($letter),
+                'SaotoRegionId' => $letter->region->soato,
+                'ReceiverFullName' => $letter->fish,
+                'ReceiverAddress' => $letter->address,
+                'Base64Content' => $this->generatePdf($letter),
+//                'Receiver' => $letter->fish,
+//                'Address' => $letter->address,
+//                'SaotoRegionId' => $letter->region->soato,
+//                'SaotoAreaId' => $letter->district->soato,
+//                'Document64' => $this->generatePdf($letter),
             ];
 
             $response = Http::withHeaders([
@@ -166,8 +180,9 @@ class LetterRepository implements LetterInterface
         $domain = URL::to('/monitoring-pdf') . '/' . $monitoring->id;
         $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
 
+        $barcode = DNS1D::getBarcodePNG('GASN'.$monitoring->letter->id, 'C39', 2, 40);
 
-        $pdf = PDF::loadView('pdf.monitoring', compact('monitoring', 'qrImage'));
+        $pdf = PDF::loadView('pdf.letter', compact('monitoring', 'qrImage', 'barcode'));
 
         $pdfOutput = $pdf->output();
 
@@ -183,14 +198,14 @@ class LetterRepository implements LetterInterface
 
         $data = [
             'grant_type' => config('apartment.hybrid.grant_type'),
-            'username'   => config('apartment.hybrid.username'),
-            'password'   => config('apartment.hybrid.password'),
+            'client_id'   => config('apartment.hybrid.client_id'),
+            'client_secret'   => config('apartment.hybrid.client_secret'),
         ];
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/x-www-form-urlencoded',
         ])->withBody(http_build_query($data), 'application/x-www-form-urlencoded')
-            ->get($url);
+            ->post($url);
 
         if ($response->successful()) {
             $token = $response->json()['access_token'];
@@ -203,7 +218,7 @@ class LetterRepository implements LetterInterface
     {
         try {
             $token = $this->authPost();
-            $url = config('apartment.hybrid.url').'/api/Receipt?id='.$id;
+            $url = config('apartment.hybrid.url').'/gasn/receipt/get?id=GASN'.$id;
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,

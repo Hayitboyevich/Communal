@@ -30,6 +30,7 @@ use Modules\Water\Models\ProtocolStatus;
 use Modules\Water\Models\ProtocolType;
 use Modules\Water\Services\DecisionService;
 use Modules\Water\Services\ProtocolService;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class InformationController extends BaseController
 {
@@ -211,9 +212,13 @@ class InformationController extends BaseController
         }
     }
 
-    public function hybridUpdate($id)
+    public function hybridUpdate()
     {
         try {
+            $data = request()->all();
+            $letter = $this->service->findById($data['Uid']);
+            if (!$letter) $this->sendError(ErrorMessage::ERROR_1, 'No letter found.');
+
             return $this->sendSuccess(true, 'Updated successfully.');
         }  catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1);

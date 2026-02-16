@@ -32,14 +32,14 @@ class LetterService
     public function change($user, $id, $request)
     {
         try {
-            $data = $this->imzoService->signTimestamp($request['signature']);
-            if (empty($data)) throw new \Exception('E-imzo malumot olishda xatolik yuz berdi');
-
-            $director = $this->checkDirector($data, false);
-
-            if ($director['inn'] != $user->pin) {
-                throw new \Exception('E-imzo egasi mos kelmadi');
-            }
+//            $data = $this->imzoService->signTimestamp($request['signature']);
+//            if (empty($data)) throw new \Exception('E-imzo malumot olishda xatolik yuz berdi');
+//
+//            $director = $this->checkDirector($data, false);
+//
+//            if ($director['inn'] != $user->pin) {
+//                throw new \Exception('E-imzo egasi mos kelmadi');
+//            }
             return $this->repository->change($id, $request['signature']);
         }catch (\Exception $exception){
             throw $exception;
