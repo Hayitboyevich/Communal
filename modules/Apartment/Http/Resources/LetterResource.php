@@ -21,6 +21,7 @@ class LetterResource extends JsonResource
             'address' => $this->address,
             'fish' => $this->fish,
             'letter_id' => $this->letter_id,
+            'created_at' => $this->created_at,
             'inspector' => $this->inspector ? [
                 'id' => $this->inspector->id,
                 'name' => $this->inspector->name,
