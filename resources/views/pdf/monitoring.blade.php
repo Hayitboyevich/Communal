@@ -157,7 +157,6 @@
     </style>
 </head>
 <body>
-<img src="data:image/png;base64,{{ $barcode }}" />
 
 @if($monitoring->monitoring_status_id == MonitoringStatusEnum::DONE)
     <div style="padding: 10px">
