@@ -45,18 +45,6 @@ class LetterRepository implements LetterInterface
         DB::beginTransaction();
         try {
             $letter = $this->letter->create($data);
-//            $token = $this->authPost();
-//            $responseData  = $this->sendPost($letter, $token);
-
-//            if (!$responseData || !isset($responseData['Id'])) {
-//                throw new \Exception('Pochtaga yuborishda muammo yuzaga keldi.');
-//            }
-
-//            $letter->update(['letter_id' => $responseData['Id']]);
-//
-//            $hashCode = $this->getHashCode($letter, $token);
-
-//            $letter->update(['letter_hash_code' => $hashCode]);
 
             DB::commit();
             return $letter;
