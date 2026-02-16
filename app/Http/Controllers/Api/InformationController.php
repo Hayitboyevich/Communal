@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Apartment\Http\Resources\MonitoringResource;
 use Modules\Apartment\Http\Resources\MonitoringTypeResource;
 use Modules\Apartment\Models\MonitoringType;
+use Modules\Apartment\Services\LetterService;
 use Modules\Apartment\Services\MonitoringService;
 use Modules\Water\Http\Requests\FineUpdateRequest;
 use Modules\Water\Http\Resources\DefectResource;
@@ -39,6 +40,7 @@ class InformationController extends BaseController
         protected ProtocolService $service,
         protected MonitoringService $monitoringService,
         protected DecisionService $decisionService,
+        protected LetterService $letterService,
     ){
         parent::__construct();
     }
@@ -216,12 +218,12 @@ class InformationController extends BaseController
     {
         try {
             $data = request()->all();
-            $letter = $this->service->findById($data['Uid']);
+            $letter = $this->letterService->findById($data['Uid']);
             if (!$letter) $this->sendError(ErrorMessage::ERROR_1, 'No letter found.');
 
             return $this->sendSuccess(true, 'Updated successfully.');
         }  catch (\Exception $exception){
-            return $this->sendError(ErrorMessage::ERROR_1);
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 }
