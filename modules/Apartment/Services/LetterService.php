@@ -4,6 +4,7 @@ namespace Modules\Apartment\Services;
 
 use App\Services\EimzoService;
 use App\Services\InvoiceService;
+use Modules\Apartment\Const\LetterStatus;
 use Modules\Apartment\Contracts\LetterInterface;
 use Modules\Apartment\Http\Requests\LetterRequest;
 
@@ -11,12 +12,15 @@ class LetterService
 {
     public function __construct(
         protected LetterInterface $repository,
-        protected EimzoService $imzoService,
-        protected InvoiceService $invoiceService){}
-
-    public function getAll($user, $roleId)
+        protected EimzoService    $imzoService,
+        protected InvoiceService  $invoiceService)
     {
-        return $this->repository->all($user, $roleId);
+    }
+
+    public function getAll($user, $roleId, $filters)
+    {
+        $query =  $this->repository->all($user, $roleId);
+        return $this->repository->search($query, $filters);
     }
 
     public function findById(int $id)
@@ -41,7 +45,7 @@ class LetterService
                 throw new \Exception('E-imzo egasi mos kelmadi');
             }
             return $this->repository->change($id, $request['signature']);
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             throw $exception;
         }
     }
@@ -105,7 +109,7 @@ class LetterService
             ) {
                 throw new \Exception('Direktor topilmadi yoki E-IMZO mos emas');
             }
-        }else{
+        } else {
             $directorPin = $data['pin'];
             $inn = $data['pin'];
         }
@@ -127,9 +131,29 @@ class LetterService
         try {
             return $this->repository->receipt($id);
 
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             throw $exception;
         }
+    }
+
+    public function count($user, $roleId, $filters)
+    {
+        $query = $this->getAll($user, $roleId, $filters);
+        return [
+            'All' => $query->clone()->count(),
+            'New' => $query->clone()->where('status', LetterStatus::New)->count(),
+            'SuccessDelivered' => $query->clone()->where('status', LetterStatus::SuccessDelivered)->count(),
+            'ReceiverDead' => $query->clone()->where('status', LetterStatus::ReceiverDead)->count(),
+            'Process' => $query->clone()->where('status', LetterStatus::Process)->count(),
+            'ReceiverNotLivesThere' => $query->clone()->where('status', LetterStatus::ReceiverNotLivesThere)->count(),
+            'IncompleteAddress' => $query->clone()->where('status', LetterStatus::IncompleteAddress)->count(),
+            'ReceiverRefuse' => $query->clone()->where('status', LetterStatus::ReceiverRefuse)->count(),
+            'NotAtHome' => $query->clone()->where('status', LetterStatus::NotAtHome)->count(),
+            'DidntAppearOnNotice' => $query->clone()->where('status', LetterStatus::DidntAppearOnNotice)->count(),
+            'Defect' => $query->clone()->where('status', LetterStatus::Defect)->count(),
+            'TryPerform' => $query->clone()->where('status', LetterStatus::TryPerform)->count(),
+            'OrganizationWithGivenAddressNotFound' => $query->clone()->where('status', LetterStatus::OrganizationWithGivenAddressNotFound)->count(),
+        ];
     }
 
 }

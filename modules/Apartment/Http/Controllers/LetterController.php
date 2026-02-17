@@ -36,7 +36,7 @@ class LetterController extends BaseController
             $filters = request()->only(['name']);
             $data = $id
                 ? $this->service->findById($id)
-                : $this->service->getAll($this->user, $this->roleId)->orderBy('created_at', 'desc')->paginate(request('per_page', 15));
+                : $this->service->getAll($this->user, $this->roleId, $filters)->orderBy('created_at', 'desc')->paginate(request('per_page', 15));
 
             $resource = $id
                 ? LetterResource::make($data)
@@ -88,6 +88,17 @@ class LetterController extends BaseController
         try {
             $data = $this->service->receipt($id);
             return $this->sendSuccess($data, 'Receipt retrieved successfully.');
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function count(): JsonResponse
+    {
+        try {
+            $filters = request()->only(['region_id', 'district_id', 'inspector']);
+            $data = $this->service->count($this->roleId, $filters);
+            return $this->sendSuccess($data, 'Count retrieved successfully.');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }

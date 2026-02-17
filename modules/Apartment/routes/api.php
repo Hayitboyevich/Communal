@@ -39,6 +39,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::post('/send/hybrid/{id}', 'sendHybrid');
         Route::get('/get/hybrid/{id}', 'getHybrid');
         Route::get('/get/receipt/{id}', 'getReceipt');
+        Route::get('/count', 'count');
         Route::get('/{id?}', 'index');
     });
 

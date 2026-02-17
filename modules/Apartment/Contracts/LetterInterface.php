@@ -15,4 +15,6 @@ interface LetterInterface
     public function getLetter($id);
 
     public function receipt($id);
+
+    public function search($query, $filters);
 }

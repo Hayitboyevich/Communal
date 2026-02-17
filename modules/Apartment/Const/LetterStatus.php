@@ -4,6 +4,7 @@ namespace Modules\Apartment\Const;
 
 class LetterStatus
 {
+    CONST New = 1;
     CONST SuccessDelivered = 3; // yetkazildi
     CONST Process = 2; // jarayonda
     CONST ReceiverDead = 4; // egasi olgan

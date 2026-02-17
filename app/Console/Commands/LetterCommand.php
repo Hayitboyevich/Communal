@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use Modules\Apartment\Const\LetterStatus;
 use Modules\Apartment\Models\Letter;
 
 class LetterCommand extends Command
@@ -14,7 +15,9 @@ class LetterCommand extends Command
     public function handle()
     {
         $letters = Letter::query()
-            ->where('status', '<>', 2)
+                ->where('status', 2)
+            ->whereNotNull('letter_id')
+            ->limit(300)
             ->get();
 
         if ($letters->isEmpty()) {
@@ -36,9 +39,8 @@ class LetterCommand extends Command
 
             if ($response->successful()) {
                 $arr = $response->json();
-
-                if (!empty($arr['IsSent']) && $arr['IsSent']) {
-                    $letter->update(['status' => 2]);
+                if (!empty($arr['Perform']) && $arr['Perform']) {
+                    $letter->update(['status' => LetterStatus::getStatus($arr['Perform']['Type'])]);
                 }
             }
 
