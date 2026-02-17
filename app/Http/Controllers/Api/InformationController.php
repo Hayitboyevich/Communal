@@ -15,6 +15,7 @@ use App\Models\Region;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Modules\Apartment\Const\LetterStatus;
 use Modules\Apartment\Http\Resources\MonitoringResource;
 use Modules\Apartment\Http\Resources\MonitoringTypeResource;
 use Modules\Apartment\Models\MonitoringType;
@@ -220,6 +221,11 @@ class InformationController extends BaseController
             $data = request()->all();
             $letter = $this->letterService->findById($data['Uid']);
             if (!$letter) $this->sendError(ErrorMessage::ERROR_1, 'No letter found.');
+
+            $letter->update([
+                'status' => LetterStatus::getStatus($data['Perform']),
+                'hybrid_content' => json_encode($data),
+            ]);
 
             return $this->sendSuccess(true, 'Updated successfully.');
         }  catch (\Exception $exception){
