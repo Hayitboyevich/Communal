@@ -33,7 +33,7 @@ class LetterController extends BaseController
     public function index($id = null): JsonResponse
     {
         try {
-            $filters = request()->only(['name']);
+            $filters = request()->only(['region_id', 'district_id', 'inspector_id', 'status', 'fish', 'monitoring_id']);
             $data = $id
                 ? $this->service->findById($id)
                 : $this->service->getAll($this->user, $this->roleId, $filters)->orderBy('created_at', 'desc')->paginate(request('per_page', 15));
@@ -97,7 +97,7 @@ class LetterController extends BaseController
     {
         try {
             $filters = request()->only(['region_id', 'district_id', 'inspector']);
-            $data = $this->service->count($this->roleId, $filters);
+            $data = $this->service->count($this->user, $this->roleId, $filters);
             return $this->sendSuccess($data, 'Count retrieved successfully.');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
