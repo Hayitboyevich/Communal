@@ -207,12 +207,12 @@ class LetterRepository implements LetterInterface
     {
         try {
             $token = $this->authPost();
-            $url = config('apartment.hybrid.url').'/gasn/receipt/get?id=GASN'.$id;
+            $url = config('apartment.hybrid.url').'/api/gasn/receipt/get?id='.$id;
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
             ])->get($url);
-             return base64_encode($response->body());
+             return $response->successful() ? base64_encode($response->body()) : null;
         }catch (\Exception $exception){
             throw $exception;
         }

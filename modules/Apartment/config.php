@@ -19,13 +19,13 @@ return [
         'password' => 'EkN`9?@{3v0j',
     ],
     'hybrid' => [
-//        'url' => 'https://gm.post.uz',
-//        'grant_type' => 'client_credentials',
-//        'client_id' => 'Wdxz8JHzR4U58UQINIUOVCSTI0SKMSIWDEdaw8Q',
-//        'client_secret' => 'nAvHP3GQsvgVDFbmegALsmJEw',
-        'url' => 'https://hybrid.pochta.uz',
-        'grant_type' => 'password',
-        'username' => '998998599402',
-        'password' => '11223344',
+        'url' => 'https://gm.post.uz',
+        'grant_type' => 'client_credentials',
+        'client_id' => 'Wdxz8JHzR4U58UQINIUOVCSTI0SKMSIWDEdaw8Q',
+        'client_secret' => 'nAvHP3GQsvgVDFbmegALsmJEw',
+//        'url' => 'https://hybrid.pochta.uz',
+//        'grant_type' => 'password',
+//        'username' => '998998599402',
+//        'password' => '11223344',
     ]
 ];
