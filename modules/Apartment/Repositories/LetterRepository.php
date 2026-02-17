@@ -64,7 +64,7 @@ class LetterRepository implements LetterInterface
             $pkcs7b64 = $this->imzoService->signTimestamp($signature);
             $responseData  = $this->sendPost($letter, $token);
 
-            if (!$responseData || !isset($responseData['Id'])) {
+            if (empty($responseData)) {
                 throw new \Exception('Pochtaga yuborishda muammo yuzaga keldi.');
             }
 
