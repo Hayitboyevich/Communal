@@ -45,6 +45,7 @@ class LetterRepository implements LetterInterface
         DB::beginTransaction();
         try {
             $letter = $this->letter->create($data);
+            $letter->update(['letter_id' => $letter->id]);
 
             DB::commit();
             return $letter;
