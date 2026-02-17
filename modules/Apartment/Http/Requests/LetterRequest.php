@@ -16,8 +16,8 @@ class LetterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'monitoring_id' => 'required|exists:monitorings,id',
-            'regulation_id' => 'required|exists:regulations,id',
+            'monitoring_id' => 'required|exists:monitorings,id|unique',
+            'regulation_id' => 'required|exists:regulations,id|unique',
             'region_id' => 'required|exists:regions,id',
             'district_id' => 'required|exists:districts,id',
             'address' => 'required|string',
