@@ -17,7 +17,6 @@ class ChangeInspectorRequest extends FormRequest
     {
         return [
             'inspector_id' => 'required|exists:users,id',
-            'old_inspector_id' => 'required|exists:users,id',
             'monitoringIds' => 'required|array',
             'comment'=> 'required|string'
         ];

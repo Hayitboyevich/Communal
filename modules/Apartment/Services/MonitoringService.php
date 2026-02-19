@@ -234,7 +234,6 @@ class MonitoringService
         DB::beginTransaction();
         try {
             foreach ($request->monitoringIds as $monitoringId) {
-
                 $monitoring = $this->findById($monitoringId);
                 $oldInspectorId = $monitoring->inspector_id;
                 $this->repository->update($monitoring->id, ['inspector_id' => $request->inspector_id]);
