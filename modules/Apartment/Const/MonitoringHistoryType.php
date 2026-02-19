@@ -22,6 +22,8 @@ class MonitoringHistoryType
     const DONE = 100;
     const HMQO = 10;
 
+    const CHANGE_INSPECTOR = 45;
+
     const CHANGE = 41;
 
     const ATTACH = 200;
@@ -57,6 +59,8 @@ class MonitoringHistoryType
                 return 'HMQOga yuborildi';
             case self::ATTACH:
                 return 'Inspektor biriktirildi';
+            case self::CHANGE_INSPECTOR:
+                return 'Inspektor o\'zgartirildi';
             case self::CHANGE:
                 return 'Admin tominidan ba\'zi o\'zgarishlar qilindi';
             case self::FINE:

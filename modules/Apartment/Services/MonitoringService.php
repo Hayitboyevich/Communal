@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Http;
 use Modules\Apartment\Const\MonitoringHistoryType;
 use Modules\Apartment\Contracts\MonitoringRepositoryInterface;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
+use Modules\Apartment\Http\Requests\ChangeInspectorRequest;
 use Modules\Apartment\Http\Requests\MonitoringAdminRequest;
 use Modules\Apartment\Http\Requests\MonitoringChangeStatusRequest;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
@@ -224,6 +225,25 @@ class MonitoringService
             return$monitoring;
 
         } catch (\Exception $exception) {
+            throw  $exception;
+        }
+    }
+
+    public function changeInspector($user, $roleId, ChangeInspectorRequest $request)
+    {
+        DB::beginTransaction();
+        try {
+            foreach ($request->monitoringIds as $monitoringId) {
+
+                $monitoring = $this->findById($monitoringId);
+                $oldInspectorId = $monitoring->inspector_id;
+                $this->repository->update($monitoring->id, ['inspector_id' => $request->inspector_id]);
+                $this->createHistory($monitoring, MonitoringHistoryType::CHANGE_INSPECTOR, $request['comment'], ['old' =>  $oldInspectorId, 'new' =>  $request->inspector_id]);
+            }
+            DB::commit();
+            return true;
+        }catch (\Exception $exception){
+            DB::rollBack();
             throw  $exception;
         }
     }

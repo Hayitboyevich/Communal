@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Maatwebsite\Excel\Facades\Excel;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
+use Modules\Apartment\Http\Requests\ChangeInspectorRequest;
 use Modules\Apartment\Http\Requests\MonitoringAdminRequest;
 use Modules\Apartment\Http\Requests\MonitoringChangeStatusRequest;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
@@ -92,6 +93,16 @@ class MonitoringController extends BaseController
             $monitoring->delete();
             return $this->sendSuccess(null, 'Monitoring deleted successfully.');
         } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function changeInspector(ChangeInspectorRequest $request): JsonResponse
+    {
+        try {
+            $this->service->changeInspector($this->user, $this->roleId, $request);
+            return $this->sendSuccess(true, 'Monitoring changed successfully.');
+        }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
