@@ -103,6 +103,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::get('monitoring-status/{id?}', 'monitoringStatus');
         Route::get('/apartment/{id?}', 'apartment');
         Route::get('/work-type/{id?}', 'workType');
+        Route::get('/fines', 'fines');
     });
 
 });

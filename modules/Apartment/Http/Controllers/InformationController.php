@@ -108,4 +108,14 @@ class InformationController extends BaseController
         }
     }
 
+    public function fines()
+    {
+        try {
+            $inn = request('inn');
+
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
+        }
+    }
+
 }
