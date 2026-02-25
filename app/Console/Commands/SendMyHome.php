@@ -27,6 +27,7 @@ class SendMyHome extends Command
         try {
             $monitorings = Monitoring::query()
                 ->where('monitoring_type_id', 3)
+                ->whereNull('send_home')
                 ->where(function ($query) {
                     $query->where('is_administrative', true)
                         ->orWhereIn('step', [3,4]);

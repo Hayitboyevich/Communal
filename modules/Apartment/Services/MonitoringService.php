@@ -449,6 +449,8 @@ class MonitoringService
                     'id' => $monitoring->monitoring_status_id,
                     'name' => $monitoring->status->name,
                 ] : null,
+                'bsk_name' => $monitoring->bsk_name,
+                'bsk_inn' => $monitoring->bsk_inn,
                 'user' => $monitoring->user ? [
                     'id' => $monitoring->user_id,
                     'name' => $monitoring->user->full_name
