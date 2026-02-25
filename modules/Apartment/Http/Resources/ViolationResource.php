@@ -17,8 +17,8 @@ class ViolationResource extends JsonResource
             'type' => $this->type,
             'desc' => $this->desc,
             'deadline' => $this->deadline,
-            'images' => $this->images ? ImageResource::collection($this->images) : null,
-            'files' => $this->documents ? DocumentResource::collection($this->documents) : null,
+//            'images' => $this->images ? ImageResource::collection($this->images) : null,
+//            'files' => $this->documents ? DocumentResource::collection($this->documents) : null,
         ];
     }
 }

@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\FileService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\URL;
 use Modules\Apartment\Const\MonitoringHistoryType;
 use Modules\Apartment\Contracts\MonitoringRepositoryInterface;
 use Modules\Apartment\Enums\MonitoringStatusEnum;
@@ -19,11 +20,14 @@ use Modules\Apartment\Http\Requests\MonitoringAdminRequest;
 use Modules\Apartment\Http\Requests\MonitoringChangeStatusRequest;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
 use Modules\Apartment\Http\Requests\ViolationRequest;
+use Modules\Apartment\Http\Resources\RegulationResource;
+use Modules\Apartment\Http\Resources\ViolationResource;
 use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Models\MonitoringHistory;
 use Modules\Apartment\Models\MonitoringStatus;
 use Modules\Water\Const\ProtocolHistoryType;
 use Modules\Water\Const\Step;
+use Modules\Water\Http\Resources\FineResource;
 use Modules\Water\Models\ProtocolStatus;
 use Modules\Water\Services\HistoryService;
 use Illuminate\Http\Request;
@@ -387,6 +391,10 @@ class MonitoringService
                     $this->saveFiles($violation, $data['docs'], 'violation/files');
                 }
             }
+            $monitoring = $this->repository->findById($id);
+            if ($monitoring->monitoring_type_id == 3){
+                $this->sendMyHome($monitoring->id);
+            }
 
         } catch (\Exception $exception) {
             throw  $exception;
@@ -428,6 +436,45 @@ class MonitoringService
             comment: $comment,
             additionalInfo: $meta
         );
+    }
+
+    public function sendMyHome($monitoringId)
+    {
+        try {
+            $monitoring = $this->findById($monitoringId);
+            $data =  [
+                'monitoringId' => $monitoring->id,
+                'created_at' => $monitoring->created_at,
+                'status' => $monitoring->status ? [
+                    'id' => $monitoring->monitoring_status_id,
+                    'name' => $monitoring->status->name,
+                ] : null,
+                'user' => $monitoring->user ? [
+                    'id' => $monitoring->user_id,
+                    'name' => $monitoring->user->full_name
+                ] : null,
+                'company' => $monitoring->company ? [
+                    'id' => $monitoring->company_id,
+                    'name' => $monitoring->company->company_name
+                ] : null,
+                'apartment' => $monitoring->apartment ? [
+                    'id' => $monitoring->apartment_id,
+                    'name' => $monitoring->apartment->home_name
+                ] : null,
+                'lat' => $monitoring->lat,
+                'long' => $monitoring->long,
+                'address' => $monitoring->address_commit,
+                'regulations' => $monitoring->regulation ? RegulationResource::make($monitoring->regulation) : null,
+                'violations' => $monitoring->violation ? ViolationResource::make($monitoring->violation) : null,
+                'fine' => $monitoring->fine ? FineResource::make($monitoring->fine) : null,
+                'pdf' => URL::to('/monitoring-pdf') . '/' . $monitoring->id
+            ];
+
+            return Http::withBasicAuth('Gasn_2026_ADM@as45', 'dyuZh7ZtAtdVUaDI')
+                ->post('https://api-meninguyim.kommunal.uz/api/get-info-administrative', $data);
+        }catch (\Exception $exception){
+            return null;
+        }
     }
 
 }

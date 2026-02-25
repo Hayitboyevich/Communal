@@ -40,8 +40,7 @@ class PdfController extends Controller
             $domain = URL::to('/monitoring-pdf') . '/' . $id;
 
             $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
-            $barcode = DNS1D::getBarcodePNG('GASN'.$monitoring->letter->id, 'C39', 2, 40);
-            $pdf = PDF::loadView('pdf.letter', compact('monitoring', 'qrImage', 'barcode'));
+            $pdf = PDF::loadView('pdf.monitoring', compact('monitoring', 'qrImage'));
 
             return $pdf->stream('monitoring.pdf');
         } catch (\Exception $exception) {
