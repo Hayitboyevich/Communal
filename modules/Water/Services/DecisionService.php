@@ -46,6 +46,8 @@ class DecisionService
             }
             if ($request['project_id'] == FineType::APARTMENT) {
                 $this->monitoringService->fine($request['guid']);
+                $this->monitoringService->sendMyHome($request['guid']);
+
             }
             DB::commit();
         }catch (\Exception $exception){
