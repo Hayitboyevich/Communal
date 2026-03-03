@@ -29,6 +29,7 @@ class UserRepository implements UserRepositoryInterface
                     ]);
                 });
             case UserRoleEnum::APARTMENT_VIEWER->value:
+            case UserRoleEnum::SUPER_ADMIN->value:
                 return User::query()->whereHas('roles', function ($query) use ($user) {
                     $query->whereIn('role_id', [UserRoleEnum::APARTMENT_INSPECTOR->value]);
                 });
