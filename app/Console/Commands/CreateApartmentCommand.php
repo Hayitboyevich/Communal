@@ -37,7 +37,7 @@ class CreateApartmentCommand extends Command
                         }
 
                         foreach ($data['data'] as $item) {
-                            Apartment::updateOrCreate(
+                            Apartment::query()->updateOrCreate(
                                 [
                                     'company_id' => $company->company_id,
                                     'street_id'  => $item['street_id'] ?? null,

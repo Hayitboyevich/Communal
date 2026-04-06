@@ -20,5 +20,11 @@ return [
         'url' => 'https://api-data.shaffofqurilish.uz/api',
         'login' => 'COlaXTRoaCtu',
         'password' => 'rthS[o@[1Mc3fJ15J79T',
-    ]
+    ],
+
+    'uzwater' => [
+        'url' => 'https://api.shaffofqurilish.uz/api/v1/request/uzwater-subinfo-by-acc',
+        'login' => 'dev@gasn',
+        'password' => 'EkN`9?@{3v0j',
+    ],
 ];

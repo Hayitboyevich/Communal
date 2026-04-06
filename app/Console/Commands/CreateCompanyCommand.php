@@ -20,13 +20,15 @@ class CreateCompanyCommand extends Command
     public function handle()
     {
         try {
-            Company::query()->truncate();
-            Apartment::query()->truncate();
+//            Company::query()->truncate();
+//            Apartment::query()->truncate();
             $data = getData(
                 config('apartment.company.url'),
                 config('apartment.company.login'),
                 config('apartment.company.password')
             );
+
+
 
             $total = count($data['data'] ?? []);
 
@@ -34,7 +36,6 @@ class CreateCompanyCommand extends Command
             $bar->start();
 
             foreach ($data['data'] as $item) {
-
                 $region = Region::query()
                     ->where('soato', $item['country_soato'])
                     ->first();

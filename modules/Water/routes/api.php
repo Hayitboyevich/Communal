@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Water\Http\Controllers\DetailController;
 use Modules\Water\Http\Controllers\ProtocolController;
 use Modules\Water\Http\Controllers\ProtocolStatusController;
 use Modules\Water\Http\Controllers\ProtocolTypeController;
@@ -50,6 +51,10 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(DefectController::class)->prefix('defect')->group(function () {
         Route::get('/', 'index');
+    });
+
+    Route::controller(DetailController::class)->prefix('detail')->group(function () {
+        Route::get('sub-info', 'subInfo');
     });
 
     Route::controller(CardController::class)->prefix('card')->group(function () {
