@@ -286,6 +286,8 @@ class MonitoringController extends BaseController
     public function excel($id)
     {
         try {
+            ini_set('memory_limit', '-1');
+            ini_set('max_execution_time', 0);
             $filters = \request()->only(['date_from', 'date_to']);
             return Excel::download(new MonitoringExport($id, $filters), 'protocol.xlsx');
         } catch (\Exception $exception) {

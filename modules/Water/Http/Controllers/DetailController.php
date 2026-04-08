@@ -24,7 +24,7 @@ class DetailController extends BaseController
             )
                 ->timeout(5)
                 ->post(config('water.uzwater.url'), ['pid' => $pid]);
-            
+
             if ($response->successful()) {
                 return $this->sendSuccess($response->json(), 'success');
             } else {
