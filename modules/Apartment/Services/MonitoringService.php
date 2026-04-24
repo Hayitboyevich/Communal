@@ -479,4 +479,44 @@ class MonitoringService
         }
     }
 
+    public function sendHome($monitoring)
+    {
+        try {
+            $data =  [
+                'monitoringId' => $monitoring->id,
+                'created_at' => $monitoring->created_at,
+                'status' => $monitoring->status ? [
+                    'id' => $monitoring->monitoring_status_id,
+                    'name' => $monitoring->status->name,
+                ] : null,
+                'bsk_name' => $monitoring->bsk_name,
+                'bsk_inn' => $monitoring->bsk_inn,
+                'user' => $monitoring->user ? [
+                    'id' => $monitoring->user_id,
+                    'name' => $monitoring->user->full_name
+                ] : null,
+                'company' => $monitoring->company ? [
+                    'id' => $monitoring->company_id,
+                    'name' => $monitoring->company->company_name
+                ] : null,
+                'apartment' => $monitoring->apartment ? [
+                    'id' => $monitoring->apartment_id,
+                    'name' => $monitoring->apartment->home_name
+                ] : null,
+                'lat' => $monitoring->lat,
+                'long' => $monitoring->long,
+                'address' => $monitoring->address_commit,
+                'regulations' => $monitoring->regulation ? RegulationResource::make($monitoring->regulation) : null,
+                'violations' => $monitoring->violation ? ViolationResource::make($monitoring->violation) : null,
+                'fine' => $monitoring->fine ? FineResource::make($monitoring->fine) : null,
+                'pdf' => URL::to('/monitoring-pdf') . '/' . $monitoring->id
+            ];
+
+            return Http::withBasicAuth('uyjoynazorat', "nC{'LQ2hfuotx#hVqFm7")
+                ->post('https://api-meninguyim.kommunal.uz/api/external/uy-joy-nazorat/status-update', $data);
+        }catch (\Exception $exception){
+            return null;
+        }
+    }
+
 }

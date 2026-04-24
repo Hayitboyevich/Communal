@@ -41,7 +41,8 @@ class MonitoringMyHomeRequest extends FormRequest
             'type' => 'required',
             'category' => 'required',
             'file_path' => 'sometimes',
-            'desc' => 'sometimes'
+            'desc' => 'sometimes',
+            'my_home_integration' => 'required'
         ];
     }
 
@@ -60,6 +61,7 @@ class MonitoringMyHomeRequest extends FormRequest
 //            'monitoring_base_id' => 5,
             'type' => Step::ONE,
             'category' => Step::TWO,
+            'my_home_integration' => true
         ]);
     }
 
