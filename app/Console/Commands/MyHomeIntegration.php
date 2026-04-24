@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Services\MonitoringService;
-use Modules\Water\Const\Step;
 
 class SendMyHome extends Command
 {

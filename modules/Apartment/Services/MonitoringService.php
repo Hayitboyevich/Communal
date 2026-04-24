@@ -240,7 +240,7 @@ class MonitoringService
             foreach ($request->monitoringIds as $monitoringId) {
                 $monitoring = $this->findById($monitoringId);
                 $oldInspectorId = $monitoring->user_id;
-                $this->repository->update($monitoring->id, ['user_id' => $request->inspector_id]);
+                $this->repository->update($monitoring->id, ['user_id' => $request->inspector_id, 'send_my_home' => null]);
                 $this->createHistory($monitoring, MonitoringHistoryType::CHANGE_INSPECTOR, $request['comment'], ['old' =>  $oldInspectorId, 'new' =>  $request->inspector_id]);
             }
             DB::commit();

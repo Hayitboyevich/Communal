@@ -133,6 +133,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                     'monitoring_status_id' => $data['monitoring_status_id'],
                     'additional_comment' => $data['additional_comment'] ?? null,
                     'step' => $data['step'],
+                    'send_my_home' =>null,
                 ]);
 
                 $this->createHistory($originalMonitoring, MonitoringHistoryType::VIOLATION_NOT_DETECTED);
@@ -148,6 +149,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'monitoring_status_id' => $data['monitoring_status_id'],
                             'additional_comment' => $data['additional_comment'] ?? null,
                             'step' => $data['step'],
+                            'send_my_home' =>null
                         ]);
 
                         $regulation = Regulation::create([
@@ -245,6 +247,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $monitoring = $this->findById($id);
             $monitoring->update([
                 'monitoring_status_id' => MonitoringStatusEnum::NOT_DEFECT->value,
+                'send_my_home' =>null
             ]);
             return $monitoring;
         } catch (\Exception $exception) {
@@ -259,6 +262,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $monitoring->update([
                 'monitoring_status_id' => MonitoringStatusEnum::ENTER_RESULT->value,
                 'step' => Step::ONE,
+                'send_my_home' =>null
             ]);
 
             //history yoziladi
@@ -274,7 +278,12 @@ class MonitoringRepository implements MonitoringRepositoryInterface
         try {
             $monitoring = $this->findById($id);
             $this->createHistory($monitoring, MonitoringHistoryType::REGULATION_FORMED);
-            $monitoring->update(['monitoring_status_id' => MonitoringStatusEnum::FORMED->value, 'type' => 2, 'step' => Step::THREE]);
+            $monitoring->update([
+                'monitoring_status_id' => MonitoringStatusEnum::FORMED->value,
+                'type' => 2,
+                'step' => Step::THREE,
+                'send_my_home' => null
+            ]);
             $violation = new Violation();
             $violation->regulation_id = $data['regulation_id'];
             $violation->monitoring_id = $data['monitoring_id'];
@@ -297,7 +306,8 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $monitoring = $this->findById($monitoringId);
             $monitoring->update([
                 'user_id' => $userId,
-                'monitoring_status_id' => MonitoringStatusEnum::ENTER_RESULT->value
+                'monitoring_status_id' => MonitoringStatusEnum::ENTER_RESULT->value,
+                'send_my_home' => null
             ]);
             return $monitoring;
         } catch (\Exception $exception) {
@@ -309,7 +319,10 @@ class MonitoringRepository implements MonitoringRepositoryInterface
     {
         try {
             $monitoring = $this->findById($id);
-            $monitoring->update(['monitoring_status_id' => $status]);
+            $monitoring->update([
+                'monitoring_status_id' => $status,
+                'send_my_home' => null
+            ]);
             return $monitoring;
         } catch (\Exception $exception) {
             throw $exception;
