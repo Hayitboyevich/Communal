@@ -72,6 +72,7 @@ class MonitoringResource extends JsonResource
             'bsk_type' => $this->bsk_type,
             'address' => $this->address,
             'created_at' => $this->created_at,
+            'desc' => $this->desc,
             'additional_comment' => $this->additional_comment,
             'additional_files' => collect(json_decode($this->additional_files, true))->map(function ($file) {
                 return [

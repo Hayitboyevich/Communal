@@ -41,24 +41,27 @@ class MonitoringMyHomeRequest extends FormRequest
             'type' => 'required',
             'category' => 'required',
             'file_path' => 'sometimes',
+            'desc' => 'sometimes',
+            'my_home_integration' => 'required'
         ];
     }
 
     protected function prepareForValidation()
     {
-        $violationType = ViolationType::query()->where('my_home_id', $this->monitoring_type_id)->first();
-        $place = $violationType ? Place::query()->find($violationType->place_id) : null;
-        $monitoringType = $place ? MonitoringType::query()->find($place->monitoring_type_id) : null;
+//        $violationType = ViolationType::query()->where('my_home_id', $this->monitoring_type_id)->first();
+//        $place = $violationType ? Place::query()->find($violationType->place_id) : null;
+//        $monitoringType = $place ? MonitoringType::query()->find($place->monitoring_type_id) : null;
 
         $this->merge([
             'monitoring_status_id' => MonitoringStatusEnum::NEW->value,
-            'monitoring_type_id' => $monitoringType ? $monitoringType->id : null,
+//            'monitoring_type_id' => $monitoringType ? $monitoringType->id : null,
             'region_id' => Region::query()->where('soato', $this->region)->first()?->id,
             'district_id' => District::query()->where('soato', $this->district)->first()?->id,
             'step' => Step::ONE,
-            'monitoring_base_id' => 5,
+//            'monitoring_base_id' => 5,
             'type' => Step::ONE,
             'category' => Step::TWO,
+            'my_home_integration' => true
         ]);
     }
 
