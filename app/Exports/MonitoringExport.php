@@ -73,7 +73,11 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
             $monitoring->fine ? $monitoring->fine->status_name : '',
             $monitoring->fine ? $monitoring->fine->main_punishment_amount : '',
             $monitoring->fine ? $monitoring->fine->paid_amount : '',
+            $monitoring->fine ? $monitoring->fine->created_time : '',
+            $monitoring->fine ? $monitoring->fine->updated_time : '',
+            $monitoring->fine ? $monitoring->fine->execution_date : '',
             $monitoring->my_home_integration ? 'true' : 'false',
+            $monitoring->send_court ? 'Sudga yuborilgan' : '',
             optional($monitoring->confirmRegulationHistory)->created_at,
         ];
     }
@@ -107,7 +111,11 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
             'Mamuriy holati',
             'Jarima miqdori',
             'To\'langan miqdor',
+            'Bayonnoma tizimga kiritilgan sana',
+            'Bayonnoma yangilangan sana',
+            'Qaror ijrosi sanasi',
             'Mening uyimdan kelgan',
+            'Sud',
             'Ko\'rsatma bajarilgan sana'
         ];
     }
