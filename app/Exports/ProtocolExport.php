@@ -35,6 +35,7 @@ class ProtocolExport implements FromCollection, WithHeadings
             ->get()
             ->map(function ($protocol){
                 return [
+                    $protocol?->id,
                     $protocol?->district?->name_uz ?? '',
                     $protocol?->status?->name ?? '',
                     $protocol?->inspector?->full_name ?? '',
@@ -66,6 +67,7 @@ class ProtocolExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
+            'ID',
             'Tuman',
             'Holati',
             'Inspektor',
