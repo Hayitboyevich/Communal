@@ -69,6 +69,8 @@ class MonitoringResource extends JsonResource
             'bsk_inn' => $this->bsk_inn,
             'lat' => $this->lat,
             'long' => $this->long,
+            'my_home_integration' => $this->my_home_integration,
+            'data_type' => $this->data_type,
             'bsk_type' => $this->bsk_type,
             'address' => $this->address,
             'created_at' => $this->created_at,
