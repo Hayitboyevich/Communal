@@ -17,8 +17,9 @@ class MonitoringCreateSecondRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'monitoring_status_id' => 'required|exists:protocol_statuses,id',
+            'monitoring_status_id' => 'required|exists:monitoring_statuses,id',
             'regulations' => 'sometimes',
+            'data_type' => 'sometimes',
             'additional_comment' => 'required_if:monitoring_status_id,3',
             'additional_files' => 'required_if:monitoring_status_id,3',
         ];

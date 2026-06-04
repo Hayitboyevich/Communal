@@ -133,6 +133,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                     'monitoring_status_id' => $data['monitoring_status_id'],
                     'additional_comment' => $data['additional_comment'] ?? null,
                     'step' => $data['step'],
+                    'data_type' => $data['data_type'] ?? null,
                     'send_my_home' =>null,
                 ]);
 
