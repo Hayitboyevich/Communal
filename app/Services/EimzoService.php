@@ -12,8 +12,10 @@ use Illuminate\Support\Facades\Http;
 
 class EimzoService
 {
-    private const URL = "http://10.100.1.191:8080";
+//    private const URL = "http://10.100.1.191:8080";
 //    private const URL = "http://172.18.0.43:9091";
+    private const URL = "http://imzo.shaffofqurilish.uz";
+
 
     public function __construct(protected  InvoiceService $invoiceService, protected Client $client){}
 
@@ -28,8 +30,10 @@ class EimzoService
 
     private function postHeadrs($pkcs7)
     {
-        $user_ip = empty($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['REMOTE_ADDR'] : $_SERVER['HTTP_X_REAL_IP'];
-        $host = $_SERVER['HTTP_HOST'];
+//        $user_ip = empty($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['REMOTE_ADDR'] : $_SERVER['HTTP_X_REAL_IP'];
+        $user_ip = '127.0.0.1';
+//        $host = $_SERVER['HTTP_HOST'];
+        $host = 'imzo.shaffofqurilish.uz';
         return [
             'headers' => [
                 'Host' => $host,
@@ -102,24 +106,44 @@ class EimzoService
         $host = $_SERVER['HTTP_HOST'];
         $headers = ['Host: ' . $host, 'X-Real-IP: ' . $user_ip];
         $url = self::URL . "/backend/auth";
-        $ch = curl_init();
+//        $ch = curl_init();
+//
+//        curl_setopt($ch, CURLOPT_URL, $url);
+//        curl_setopt($ch, CURLOPT_POST, 1);
+//        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+//        curl_setopt($ch, CURLOPT_POSTFIELDS, $pkcs7);
+//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+//        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+//        $response = curl_exec($ch);
+//        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+//        curl_close($ch);
 
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $pkcs7);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+        $ch = curl_init($url);
+
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $pkcs7,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: text/plain',
+                'X-Real-IP: 127.0.0.1',
+                'Expect:'
+            ],
+            CURLOPT_CONNECTTIMEOUT => 3,
+            CURLOPT_TIMEOUT => 20,
+        ]);
+
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
         curl_close($ch);
+        $res = json_decode($response, true);
 
         if ($httpCode != 200) {
             return null;
         }
-        $res = json_decode($response, true);
-
+//        $res = json_decode($response, true);
         switch ($res['status']) {
             case 1:
                 $userInfo = $res['subjectCertificateInfo']['subjectName'];
@@ -146,9 +170,14 @@ class EimzoService
                     $address = $userInfo["L"];
                     $person_data['address'] = $address;
                     $identification_number = $userInfo['1.2.860.3.16.1.1'];
+                    $get_company_info = $this->invoiceService->getCompanyInfo($identification_number);
+                    if ($get_company_info) {
+                        $person_data['director_full_name'] = $get_company_info['director'];
+                    }
 
                 }
-                return ['person_data' => $person_data, 'identification_number' => $identification_number];
+                return ['person_data' => $person_data, 'identification_number' => $identification_number, 'pin' => $userInfo['1.2.860.3.16.1.2']];
+
             case -1:
                 return "Sertifikat holatini tekshirib bo‘lmadi.";
             case -5:
@@ -164,7 +193,10 @@ class EimzoService
             default:
                 return "Noma'lum xato. Qayta urinib ko'ring.";
         }
+
+
     }
+
 
     private function checkStatus($result)
     {
