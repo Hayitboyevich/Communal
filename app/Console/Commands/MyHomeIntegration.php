@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Services\MonitoringService;
 
-class SendMyHome extends Command
+class MyHomeIntegration extends Command
 {
 
     public function __construct(protected MonitoringService $service)

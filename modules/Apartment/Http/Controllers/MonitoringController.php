@@ -295,6 +295,18 @@ class MonitoringController extends BaseController
         }
     }
 
+    public function location()
+    {
+        try {
+            $filters = request()->only(['status', 'type', 'category', 'is_administrative', 'region_id', 'inspector_id',  'district_id', 'month', 'id', 'monitoring_type']);
+            $all = $this->service->getAll($this->user, $this->roleId, $filters)->select(['id', 'lat', 'long'])->get();
+            return $this->sendSuccess($all, 'Data retrieved successfully');
+
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
 
     public function history($id): JsonResponse
     {
