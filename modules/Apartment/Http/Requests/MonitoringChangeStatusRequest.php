@@ -22,6 +22,8 @@ class MonitoringChangeStatusRequest extends FormRequest
             'images' => 'sometimes',
             'comment' => 'sometimes',
             'is_administrative' => 'sometimes',
+            'treatment_number' => 'sometimes',
+            'treatment_date' => 'sometimes',
             'send_court' => 'sometimes',
             'send_mib' => 'sometimes',
             'send_chora' => 'sometimes',

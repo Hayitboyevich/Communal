@@ -266,6 +266,11 @@ class MonitoringService
                     comment: $request['comment'] ?? null
                 );
             } elseif ($statusId ==MonitoringStatusEnum::COURT->value) {
+                $this->repository->update($monitoring->id,
+                    [
+                        'treatment_number' => $request['treatment_number'] ?? null,
+                        'treatment_date' => $request['treatment_date'] ?? null,
+                    ]);
                 $historyId = $this->createHistory(
                     $monitoring,
                     type: MonitoringHistoryType::SEND_COURT,

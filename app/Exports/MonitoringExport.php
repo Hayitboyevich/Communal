@@ -78,6 +78,8 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
             $monitoring->fine ? $monitoring->fine->execution_date : '',
             $monitoring->my_home_integration ? 'true' : 'false',
             $monitoring->send_court ? 'Sudga yuborilgan' : '',
+            $monitoring->treatment_number ?? '',
+            $monitoring->treatment_date ?? '',
             optional($monitoring->confirmRegulationHistory)->created_at,
         ];
     }
@@ -116,6 +118,8 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
             'Qaror ijrosi sanasi',
             'Mening uyimdan kelgan',
             'Sud',
+            'Davo ariza raqami',
+            'Davo ariza sanasi',
             'Ko\'rsatma bajarilgan sana'
         ];
     }
