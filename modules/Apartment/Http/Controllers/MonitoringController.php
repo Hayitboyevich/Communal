@@ -299,7 +299,11 @@ class MonitoringController extends BaseController
     {
         try {
             $filters = request()->only(['status', 'type', 'category', 'is_administrative', 'region_id', 'inspector_id',  'district_id', 'month', 'id', 'monitoring_type']);
-            $all = $this->service->getAll($this->user, $this->roleId, $filters)->select(['id', 'lat', 'long'])->get();
+            $all = $this->service->getAll($this->user, $this->roleId, $filters)->select(['id', 'lat', 'long'])
+                ->with([
+                    'status:id,name'
+                ])
+                ->get();;
             return $this->sendSuccess($all, 'Data retrieved successfully');
 
         }catch (\Exception $exception){
