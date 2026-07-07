@@ -23,7 +23,11 @@ class MonitoringAdminRequest extends FormRequest
             'id' => 'required|integer|exists:monitorings,id',
             'monitoring_type_id' => 'sometimes|integer|exists:monitoring_types,id',
             'deadline' => 'sometimes',
+            'long_term' => 'sometimes',
+            'long_term_type' => 'sometimes',
             'comment' => 'required',
+            'docs' => 'sometimes',
+            'images' => 'sometimes',
         ];
     }
 

@@ -73,45 +73,71 @@ class MonitoringService
 
     public function update(MonitoringAdminRequest $request)
     {
-        try {
-            return DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request) {
 
-                $validated  = $request->validated();
-                $monitoring = $this->repository->findById($validated['id']);
+            $validated = $request->validated();
+            $monitoring = $this->repository->findById($validated['id']);
 
-                $meta = [];
+            $meta = [];
+            $monitoringData = [];
 
-                if (!empty($validated['deadline']) && $monitoring->violation) {
-                    $meta['deadline'] = $monitoring->violation->deadline;
+            if (!empty($validated['deadline']) && $monitoring->violation) {
+                $meta['deadline'] = $monitoring->violation->deadline;
 
-                    $monitoring->violation->update([
-                        'deadline' => $validated['deadline']
-                    ]);
+                $monitoring->violation->update([
+                    'deadline' => $validated['deadline'],
+                ]);
+            }
+
+            if (!empty($validated['monitoring_type_id'])) {
+                $meta['monitoring_type_id'] = $monitoring->monitoring_type_id;
+
+                $monitoringData['monitoring_type_id'] = $validated['monitoring_type_id'];
+            }
+
+            if (array_key_exists('long_term', $validated)) {
+                $meta['long_term'] = $monitoring->long_term;
+                $meta['long_term_type'] = $validated['long_term_type'] ?? null;
+
+                $monitoringData['long_term'] = $validated['long_term'];
+                $monitoringData['long_term_type'] = $validated['long_term_type'] ?? null;
+            }
+
+            if ($monitoringData) {
+                $this->repository->update($monitoring->id, $monitoringData);
+            }
+
+            if ($meta) {
+                $historyId = $this->createHistory(
+                    $monitoring,
+                    MonitoringHistoryType::CHANGE,
+                    $validated['comment'] ?? null,
+                    $meta
+                );
+
+                if ($historyId) {
+                    $monitoringHistory = MonitoringHistory::find($historyId);
+
+                    if (!empty($validated['images'])) {
+                        $this->saveImages(
+                            $monitoringHistory,
+                            $validated['images'],
+                            'monitoring-history/images'
+                        );
+                    }
+
+                    if (!empty($validated['docs'])) {
+                        $this->saveFiles(
+                            $monitoringHistory,
+                            $validated['docs'],
+                            'monitoring-history/files'
+                        );
+                    }
                 }
+            }
 
-                if (!empty($validated['monitoring_type_id'])) {
-                    $meta['monitoring_type_id'] = $monitoring->monitoring_type_id;
-
-                    $this->repository->update(
-                        $monitoring->id,
-                        ['monitoring_type_id' => $validated['monitoring_type_id']]
-                    );
-                }
-
-                if ($meta) {
-                    $this->createHistory(
-                        $monitoring,
-                        MonitoringHistoryType::CHANGE,
-                        $validated['comment'] ?? null,
-                        $meta
-                    );
-                }
-
-                return $monitoring;
-            });
-        } catch (\Throwable $e) {
-            throw $e;
-        }
+            return $monitoring->fresh(['violation']);
+        });
     }
 
 

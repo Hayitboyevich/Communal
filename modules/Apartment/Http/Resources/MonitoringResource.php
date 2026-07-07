@@ -77,6 +77,8 @@ class MonitoringResource extends JsonResource
             'treatment_number' => $this->treatment_number,
             'treatment_date' => $this->treatment_date,
             'desc' => $this->desc,
+            'long_term' => $this->long_term,
+            'long_term_type' => $this->long_term_type,
             'additional_comment' => $this->additional_comment,
             'additional_files' => collect(json_decode($this->additional_files, true))->map(function ($file) {
                 return [
