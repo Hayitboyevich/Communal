@@ -77,6 +77,14 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
             $monitoring->fine ? $monitoring->fine->updated_time : '',
             $monitoring->fine ? $monitoring->fine->execution_date : '',
             $monitoring->my_home_integration ? 'true' : 'false',
+            $monitoring->long_term ? 'Uzoq muddatli' : '',
+            $monitoring->long_term_type == 1
+                ? 'Vafot etgan'
+                : ($monitoring->long_term_type == 2
+                ? 'Chet elda'
+                : ($monitoring->long_term_type == 3
+                    ? 'Boshqa holat'
+                    : '')),
             $monitoring->send_court ? 'Sudga yuborilgan' : '',
             $monitoring->treatment_number ?? '',
             $monitoring->treatment_date ?? '',
@@ -117,6 +125,8 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
             'Bayonnoma yangilangan sana',
             'Qaror ijrosi sanasi',
             'Mening uyimdan kelgan',
+            'Uzoq muddatli ko\'rsatma',
+            'Uzoq muddatli sababi',
             'Sud',
             'Davo ariza raqami',
             'Davo ariza sanasi',
