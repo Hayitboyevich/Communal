@@ -241,10 +241,12 @@ class InformationController extends BaseController
 
             $apartment = Apartment::query()->where('home_id', $homeId)->first();
 
-            if (!$apartment) $this->sendError(ErrorMessage::ERROR_1, 'No apartment found.');
+            if (!$apartment)  return $this->sendError(ErrorMessage::ERROR_1, 'No apartment found.');
+
+            if ($apartment->home_integration)  return $this->sendError(ErrorMessage::ERROR_1, 'The apartment is already available.');
 
             $apartment->update([
-                'home_integration' => true
+                'home_integration' => 1
             ]);
 
             return $this->sendSuccess(true, 'Updated successfully.');
