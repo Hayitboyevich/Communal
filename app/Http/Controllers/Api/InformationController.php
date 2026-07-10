@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Apartment\Const\LetterStatus;
 use Modules\Apartment\Http\Resources\MonitoringResource;
 use Modules\Apartment\Http\Resources\MonitoringTypeResource;
+use Modules\Apartment\Models\Apartment;
 use Modules\Apartment\Models\MonitoringType;
 use Modules\Apartment\Services\LetterService;
 use Modules\Apartment\Services\MonitoringService;
@@ -229,6 +230,26 @@ class InformationController extends BaseController
 
             return $this->sendSuccess(true, 'Updated successfully.');
         }  catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function apartmentUpdate()
+    {
+        try {
+            $homeId = request('home_id');
+
+            $apartment = Apartment::query()->where('home_id', $homeId)->first();
+
+            if (!$apartment) $this->sendError(ErrorMessage::ERROR_1, 'No apartment found.');
+
+            $apartment->update([
+                'home_integration' => true
+            ]);
+
+            return $this->sendSuccess(true, 'Updated successfully.');
+
+        }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
