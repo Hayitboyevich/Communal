@@ -2,7 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Imports\ApartmentImport;
 use Illuminate\Console\Command;
+use Maatwebsite\Excel\Facades\Excel;
 use Modules\Apartment\Models\Apartment;
 use Modules\Apartment\Models\Company;
 
@@ -15,13 +17,12 @@ class CreateApartmentCommand extends Command
     public function handle()
     {
         try {
-//            Apartment::truncate();
 
-            $companies =  Company::query()->where('company_id', 5462)->pluck('id')->toArray();
-
-//            dd($companies);
-
-            Company::query()->where('company_id', 5462)->chunk(100, function ($companies) {
+            Apartment::query()->truncate();
+            $types = storage_path() . "/excel/homes.xlsx";
+            Excel::import(new ApartmentImport(), $types);
+            dd(1111);
+            Company::query()->whereNull('is_updated')->chunk(100, function ($companies) {
                 foreach ($companies as $company) {
                     try {
                         $data = getData(
@@ -33,6 +34,7 @@ class CreateApartmentCommand extends Command
 
                         if (!isset($data['data']) || !is_array($data['data']) || empty($data['data'])) {
                             logger()->error("API bo'sh qaytardi", ['company_id' => $company->company_id, 'response' => $data]);
+                            $company->update(['is_updated' => false]);
                             continue;
                         }
 
@@ -50,9 +52,14 @@ class CreateApartmentCommand extends Command
                             );
                         }
 
+                        $company->update(['is_updated' => true]);
+
+
+
                         sleep(1);
 
                     } catch (\Exception $ex) {
+                        $company->update(['is_updated' => false]);
                         logger()->error('Company ID: ' . $company->company_id . ' da xatolik: ' . $ex->getMessage());
                         continue;
                     }

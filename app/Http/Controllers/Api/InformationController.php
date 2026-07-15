@@ -19,6 +19,7 @@ use Modules\Apartment\Const\LetterStatus;
 use Modules\Apartment\Http\Resources\MonitoringResource;
 use Modules\Apartment\Http\Resources\MonitoringTypeResource;
 use Modules\Apartment\Models\Apartment;
+use Modules\Apartment\Models\Monitoring;
 use Modules\Apartment\Models\MonitoringType;
 use Modules\Apartment\Services\LetterService;
 use Modules\Apartment\Services\MonitoringService;
@@ -250,6 +251,31 @@ class InformationController extends BaseController
             ]);
 
             return $this->sendSuccess(true, 'Updated successfully.');
+
+        }catch (\Exception $exception){
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function apartmentStatistic($apartmentId)
+    {
+        try {
+            $query = Monitoring::query()
+                ->join('regulations', 'regulations.monitoring_id', '=', 'monitorings.id')
+                ->whereHas('violation')
+                ->where('monitorings.apartment_id', $apartmentId)
+                ->selectRaw("
+                    regulations.violation_type_id,
+                    COUNT(*) as regulation_count,
+                    COUNT(*) FILTER (WHERE monitorings.is_administrative) as administrative,
+                    COUNT(*) FILTER (WHERE monitorings.send_court) as send_court,
+                    COUNT(*) FILTER (WHERE monitorings.step = 4) as done
+                ")
+                ->groupBy('regulations.violation_type_id')
+                ->get();
+
+            return $this->sendSuccess($query, 'Object statistics');
+
 
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());

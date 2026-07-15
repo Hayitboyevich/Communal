@@ -73,6 +73,7 @@ Route::group(['middleware' => ['basic']], function () {
         Route::post('/fine-update', 'fineUpdate');
         Route::post('/hybrid-update', 'hybridUpdate');
         Route::post('/apartment-update', 'apartmentUpdate');
+        Route::get('/apartment-statictic/{id}', 'apartmentStatistic');
     });
 });
 

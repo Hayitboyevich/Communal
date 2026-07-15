@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Imports\CompanyImport;
 use App\Jobs\ProcessCompany;
 use App\Models\District;
 use App\Models\Region;
 use Illuminate\Console\Command;
+use Maatwebsite\Excel\Facades\Excel;
 use Modules\Apartment\Models\Apartment;
 use Modules\Apartment\Models\Company;
 
@@ -20,8 +22,11 @@ class CreateCompanyCommand extends Command
     public function handle()
     {
         try {
+
 //            Company::query()->truncate();
-//            Apartment::query()->truncate();
+//            $types = storage_path() . "/excel/companies.xlsx";
+//            Excel::import(new CompanyImport(), $types);
+
             $data = getData(
                 config('apartment.company.url'),
                 config('apartment.company.login'),
@@ -31,6 +36,8 @@ class CreateCompanyCommand extends Command
 
 
             $total = count($data['data'] ?? []);
+
+            dd($total);
 
             $bar = $this->output->createProgressBar($total);
             $bar->start();

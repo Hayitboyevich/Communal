@@ -72,21 +72,40 @@ if (!function_exists('getData'))
 {
     function getData(string $url, ?string $login = null, $password = null, $param = null)
     {
-        try {
-            $baseUrl = $param ? $url.$param : $url;
-            $response = Http::withBasicAuth(
-                $login,
-                $password
-            )
-                ->timeout(5)
-                ->post($baseUrl);
 
-            if ($response->successful()) {
-                return $response->json() ?? null;
-            } else {
-                return null;
+        try {
+            $client = new \GuzzleHttp\Client([
+                'timeout' => 5,
+                'connect_timeout' => 5,
+                'verify' => false,
+                'http_errors' => false,
+            ]);
+
+
+
+            $baseUrl = $param ? $url . $param : $url;
+
+            $response = $client->post($baseUrl, [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode($login . ':' . $password),
+                    'Accept' => 'application/json',
+                ],
+            ]);
+
+            $status = $response->getStatusCode();
+
+            if ($status >= 200 && $status < 300) {
+                return json_decode($response->getBody()->getContents(), true);
             }
-        } catch (Exception $e) {
+
+            return null;
+
+        } catch (\Throwable $e) {
+            \Log::error('External API Error', [
+                'url' => $baseUrl ?? $url,
+                'message' => $e->getMessage(),
+            ]);
+
             return null;
         }
     }
