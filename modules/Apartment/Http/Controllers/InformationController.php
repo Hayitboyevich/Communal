@@ -6,6 +6,7 @@ use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
 use App\Models\Place;
 use Illuminate\Http\JsonResponse;
+use Modules\Apartment\Http\Requests\ApartmentHiddenEconomyRequest;
 use Modules\Apartment\Http\Resources\ApartmentResource;
 use Modules\Apartment\Http\Resources\CompanyResource;
 use Modules\Apartment\Http\Resources\MonitoringBaseResource;
@@ -27,8 +28,8 @@ class InformationController extends BaseController
     {
         try {
             return $this->sendSuccess(PlaceResource::collection(Place::query()->where('monitoring_type_id', $id)->get()), 'Place list');
-        }catch (\Exception $exception){
-            return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
+        } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
@@ -36,16 +37,17 @@ class InformationController extends BaseController
     {
         try {
             return $this->sendSuccess(ViolationTypeResource::collection(ViolationType::query()->where('place_id', $id)->get()), 'Violation type list');
-        }catch (\Exception $exception){
-            return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
+        } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
     public function monitoringType($id = null): JsonResponse
     {
         try {
             return $this->sendSuccess(MonitoringTypeResource::collection(MonitoringType::all()), 'Monitoring type list');
-        }catch (\Exception $exception){
-            return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
+        } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
@@ -53,8 +55,8 @@ class InformationController extends BaseController
     {
         try {
             return $this->sendSuccess(MonitoringBaseResource::collection(MonitoringBase::all()), 'Monitoring base list');
-        }catch (\Exception $exception){
-            return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
+        } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
@@ -74,8 +76,8 @@ class InformationController extends BaseController
                 })
                 ->get();
             return $this->sendSuccess(CompanyResource::collection($companies), 'Company list');
-        }catch (\Exception $exception){
-            return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
+        } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
@@ -84,27 +86,27 @@ class InformationController extends BaseController
         try {
             $apartments = Apartment::query()->where('company_id', request('company_id'))->get();
             return $this->sendSuccess(ApartmentResource::collection($apartments), 'Apartment list');
-        }catch (\Exception $exception){
-            return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
-        }
-    }
-
-    public function monitoringStatus($id=null): JsonResponse
-    {
-        try {
-            return $this->sendSuccess(MonitoringStatusResource::collection(MonitoringStatus::all()), 'Monitoring Status List');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
-    public function workType($id=null): JsonResponse
+    public function monitoringStatus($id = null): JsonResponse
+    {
+        try {
+            return $this->sendSuccess(MonitoringStatusResource::collection(MonitoringStatus::all()), 'Monitoring Status List');
+        } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+    }
+
+    public function workType($id = null): JsonResponse
     {
         try {
             $data = WorkType::all();
             return $this->sendSuccess($data, 'Work Type List');
-        }catch (\Exception $exception){
-            return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
+        } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
 
@@ -113,9 +115,24 @@ class InformationController extends BaseController
         try {
             $inn = request('inn');
 
-        }catch (\Exception $exception){
-            return $this->sendError(ErrorMessage::ERROR_1,$exception->getMessage());
+        } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
+    }
+
+    public function apartmentHiddenEconomy(ApartmentHiddenEconomyRequest $request,$id = null)
+    {
+        $validated = $request->validated();
+        $aparments = $id ? Apartment::query()->where('id', $id)->get() :
+            Apartment::query()->with(['monitorings' => function ($query) use ($validated) {
+                $query->when($validated['monitoring_type_id'] == 1, function ($query) {
+                    $query->where('monitoring_type_id', 1);
+
+                });
+            }])
+                ->limit(10)
+                ->get();
+        return $this->sendSuccess($aparments, 'Apartment list');
     }
 
 }

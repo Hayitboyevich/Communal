@@ -107,4 +107,12 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::get('/fines', 'fines');
     });
 
+//    Route::group(['prefix' => 'hidden-economy/apartments'], function () {
+//        Route::get('/{id?}', [InformationController::class, 'apartmentHiddenEconomy']);
+//    });
+
 });
+
+//Route::group(['prefix' => 'hidden-economy/apartments'], function () {
+//    Route::get('/{id?}', [InformationController::class, 'apartmentHiddenEconomy']);
+//});
