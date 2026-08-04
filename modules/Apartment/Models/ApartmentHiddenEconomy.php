@@ -17,6 +17,6 @@ class ApartmentHiddenEconomy extends Model
 
     public function monitoring()
     {
-        return $this->belongsTo(Monitoring::class);
+        return $this->hasOne(Monitoring::class, 'apartment_hidden_economy_id', 'id');
     }
 }
