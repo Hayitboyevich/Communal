@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Apartment\Http\Controllers\ApartmentHiddenEconomyController;
 use Modules\Apartment\Http\Controllers\MonitoringController;
 use Modules\Apartment\Http\Controllers\MonitoringStatusController;
 use Modules\Apartment\Http\Controllers\InformationController;
@@ -109,5 +110,6 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::group(['prefix' => 'hidden-economy/apartments'], function () {
         Route::get('/{id?}', [InformationController::class, 'apartmentHiddenEconomy']);
+        Route::get('attach-inspector', [ApartmentHiddenEconomyController::class, 'attachInspector']);
     });
 });
