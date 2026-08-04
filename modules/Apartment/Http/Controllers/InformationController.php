@@ -120,19 +120,28 @@ class InformationController extends BaseController
         }
     }
 
-    public function apartmentHiddenEconomy(ApartmentHiddenEconomyRequest $request,$id = null)
+    public function apartmentHiddenEconomy(ApartmentHiddenEconomyRequest $request, $id = null)
     {
         $validated = $request->validated();
-        $aparments = $id ? Apartment::query()->where('id', $id)->get() :
-            Apartment::query()->with(['monitorings' => function ($query) use ($validated) {
-                $query->when($validated['monitoring_type_id'] == 1, function ($query) {
-                    $query->where('monitoring_type_id', 1);
-
+        $monitoring_type_id = $validated['monitoring_type_id'];
+        $per_page = $validated['per_page'] ?? 10;
+        $page = $validated['page'] ?? 1;
+        $place_id = $validated['place_id']?? null;
+        $apartments = $id ? Apartment::query()->where('id', $id)->get() :
+            Apartment::query()->with(['monitorings' => function ($query) use ($place_id, $monitoring_type_id) {
+                $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id) {
+                    $query->where('monitoring_type_id', $monitoring_type_id)
+                        ->whereHas('regulation', function ($query) {
+                            $query->whereIn('place_id', [1, 2]);
+                        })->with('regulation');
+                })->when($monitoring_type_id == 2, function ($query) use ($monitoring_type_id, $place_id) {
+                    $query->where('monitoring_type_id', $monitoring_type_id)
+                        ->whereHas('regulation', function ($query) use ($place_id) {
+                            $query->whereIn('place_id', $place_id);
+                        })->with('regulation');
                 });
-            }])
-                ->limit(10)
-                ->get();
-        return $this->sendSuccess($aparments, 'Apartment list');
+            }, 'company.region', 'company.district'])->paginate($per_page, ['*'], 'page', $page);
+        return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
     }
 
 }

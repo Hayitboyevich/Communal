@@ -16,7 +16,7 @@ class ApartmentHiddenEconomyRequest extends FormRequest
     {
         return [
             'monitoring_type_id' => 'required|exists:monitoring_types,id|in:1,2',
-            'place_id' => [Rule::requiredIf(function () {return $this->monitoring_type_id == 2;}), 'array', 'min:1', 'max:2'],
+            'place_id' => [Rule::requiredIf(fn () => $this->monitoring_type_id == 2),Rule::prohibitedIf(fn () => $this->monitoring_type_id == 1), 'array', 'min:1', 'max:2'],
             'place_id.*' => 'integer|exists:places,id|in:8,9,10',
         ];
     }
