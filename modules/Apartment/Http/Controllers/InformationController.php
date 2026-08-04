@@ -160,14 +160,13 @@ class InformationController extends BaseController
                     $query->when(!empty($place_id) && in_array(10, $place_id), function ($query) use ($place_id) {
                         $query->where(['monitoring_type_id' => 2, 'hidden_economy_type' => 3]);
                     });
-                })->with(['company.region', 'company.district', 'apartmentHiddenEconomy.monitoringType',
-                    'apartmentHiddenEconomy.monitoringType'])
+                })->with(['company.region', 'company.district', 'apartmentHiddenEconomy.monitoringType'])
                     ->paginate($per_page, ['*'], 'page', $page);
                 return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
             }
 
         }
-        return $this->sendSuccess(Apartment::query()->with(['company.region', 'company.district'])->where('home_id', $id)->first(), 'Apartment retrieved successfully.');
+        return $this->sendSuccess(Apartment::query()->with(['company.region', 'company.district', 'apartmentHiddenEconomy.monitoringType'])->where('home_id', $id)->first(), 'Apartment retrieved successfully.');
     }
 
 }
