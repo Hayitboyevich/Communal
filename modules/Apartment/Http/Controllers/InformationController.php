@@ -140,7 +140,9 @@ class InformationController extends BaseController
                             $query->whereIn('place_id', $place_id);
                         })->with('regulation');
                 });
-            }, 'company.region', 'company.district'])->paginate($per_page, ['*'], 'page', $page);
+            }, 'company.region', 'company.district',
+                'monitorngs.monitoringType', 'monitorings.status',
+                'monitorings.base', 'monitorings.documents'])->paginate($per_page, ['*'], 'page', $page);
         return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
     }
 
