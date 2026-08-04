@@ -122,13 +122,13 @@ class InformationController extends BaseController
 
     public function apartmentHiddenEconomy(ApartmentHiddenEconomyRequest $request, $id = null)
     {
-        $validated = $request->validated();
-        $monitoring_type_id = $validated['monitoring_type_id'];
-        $per_page = $validated['per_page'] ?? 10;
-        $page = $validated['page'] ?? 1;
-        $place_id = $validated['place_id']?? null;
-        $apartments = $id ? Apartment::query()->where('id', $id)->get() :
-            Apartment::query()->with(['monitorings' => function ($query) use ($place_id, $monitoring_type_id) {
+        if (!$id) {
+            $validated = $request->validated();
+            $monitoring_type_id = $validated['monitoring_type_id'];
+            $per_page = $validated['per_page'] ?? 10;
+            $page = $validated['page'] ?? 1;
+            $place_id = $validated['place_id']?? null;
+            $apartments = Apartment::query()->with(['monitorings' => function ($query) use ($place_id, $monitoring_type_id) {
                 $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id) {
                     $query->where('monitoring_type_id', $monitoring_type_id)
                         ->whereHas('regulation', function ($query) {
@@ -143,7 +143,10 @@ class InformationController extends BaseController
             }, 'company.region', 'company.district',
                 'monitorings.monitoringType', 'monitorings.status',
                 'monitorings.base', 'monitorings.documents'])->paginate($per_page, ['*'], 'page', $page);
-        return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
+            return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
+
+        }
+        return $this->sendSuccess(Apartment::query()->with(['company.region', 'company.district'])->where('home_id', $id)->first(), 'Apartment retrieved successfully.');
     }
 
 }
