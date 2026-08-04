@@ -23,6 +23,6 @@ class Apartment extends Model
 
     public function apartmentHiddenEconomy()
     {
-        return $this->hasMany(ApartmentHiddenEconomy::class, 'home_id', 'home_id');
+        return $this->hasMany(ApartmentHiddenEconomy::class, 'home_id', 'home_id')->first();
     }
 }
