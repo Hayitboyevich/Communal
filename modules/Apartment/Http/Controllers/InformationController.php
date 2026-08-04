@@ -124,8 +124,8 @@ class InformationController extends BaseController
 
     public function apartmentHiddenEconomy(ApartmentHiddenEconomyRequest $request, $id = null)
     {
-        $user = $this->user;
-        $roleId = $this->roleId;
+        $user = 3;
+        $roleId = 8;
         if (!$id) {
             $validated = $request->validated();
             $monitoring_type_id = $validated['monitoring_type_id'];
@@ -147,7 +147,7 @@ class InformationController extends BaseController
                     });
                 }, 'company.region', 'company.district',
                     'monitorings.monitoringType', 'monitorings.status',
-                    'monitorings.base', 'monitorings.documents',
+                    'monitorings.base', 'monitorings.user', 'monitorings.documents',
                     'apartmentHiddenEconomy' => function ($query) use ($place_id, $monitoring_type_id) {
                         $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id) {
                             $query->where('monitoring_type_id', $monitoring_type_id);
@@ -160,17 +160,24 @@ class InformationController extends BaseController
                 return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
             } elseif ($roleId == UserRoleEnum::APARTMENT_INSPECTOR->value) {
                 $apartments = Apartment::query()->whereHas('apartmentHiddenEconomy', function ($query) use ($place_id, $user) {
-                    $query->where('user_id', $user->id);
-                    $query->when(is_null($place_id), function ($query) {
+                    $query->where('user_id', $user);
+                })->with(['company.region', 'company.district', 'apartmentHiddenEconomy' => function ($query) use ($place_id, $user) {
+                    $query->where('user_id', $user);
+
+                    if (is_null($place_id)) {
                         $query->where('monitoring_type_id', 1);
-                    });
-                    $query->when(!empty($place_id) && in_array(8, $place_id) && in_array(9, $place_id), function ($query) use ($place_id) {
-                        $query->where(['monitoring_type_id' => 2, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value]);
-                    });
-                    $query->when(!empty($place_id) && in_array(10, $place_id), function ($query) use ($place_id) {
-                        $query->where(['monitoring_type_id' => 2, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value]);
-                    });
-                })->with(['company.region', 'company.district', 'apartmentHiddenEconomy.monitoringType'])
+                    } elseif (in_array(8, $place_id) && in_array(9, $place_id)) {
+                        $query->where([
+                            'monitoring_type_id' => 2,
+                            'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value,
+                        ]);
+                    } elseif (in_array(10, $place_id)) {
+                        $query->where([
+                            'monitoring_type_id' => 2,
+                            'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value,
+                        ]);
+                    }
+                }, 'apartmentHiddenEconomy.monitoringType'])
                     ->paginate($per_page, ['*'], 'page', $page);
                 return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
             }
