@@ -177,7 +177,7 @@ class InformationController extends BaseController
                             'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value,
                         ]);
                     }
-                }, 'apartmentHiddenEconomy.monitoringType', 'apartmentHiddenEconomy.monitoring.status'])
+                }, 'apartmentHiddenEconomy.monitoringType', 'apartmentHiddenEconomy.monitorings.status'])
                     ->paginate($per_page, ['*'], 'page', $page);
                 return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
             }
