@@ -9,4 +9,9 @@ class ApartmentHiddenEconomy extends Model
 {
     use softDeletes;
     protected $guarded = [];
+
+    public function monitoringType()
+    {
+        return $this->belongsTo(MonitoringType::class);
+    }
 }

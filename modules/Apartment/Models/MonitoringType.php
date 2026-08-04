@@ -7,4 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class MonitoringType extends Model
 {
     protected $guarded = false;
+
+    public function place()
+    {
+        
+    }
 }

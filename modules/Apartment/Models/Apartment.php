@@ -20,4 +20,9 @@ class Apartment extends Model
     {
         return $this->hasMany(Monitoring::class, 'apartment_id', 'home_id');
     }
+
+    public function apartmentHiddenEconomy()
+    {
+        return $this->hasMany(ApartmentHiddenEconomy::class, 'home_id', 'home_id');
+    }
 }
