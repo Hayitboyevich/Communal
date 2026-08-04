@@ -124,8 +124,8 @@ class InformationController extends BaseController
 
     public function apartmentHiddenEconomy(ApartmentHiddenEconomyRequest $request, $id = null)
     {
-        $user = 3;
-        $roleId = 8;
+        $user = $this->user;
+        $roleId = $this->roleId;
         if (!$id) {
             $validated = $request->validated();
             $monitoring_type_id = $validated['monitoring_type_id'];
@@ -162,7 +162,7 @@ class InformationController extends BaseController
                 $apartments = Apartment::query()->whereHas('apartmentHiddenEconomy', function ($query) use ($place_id, $user) {
                     $query->where('user_id', $user);
                 })->with(['company.region', 'company.district', 'apartmentHiddenEconomy' => function ($query) use ($place_id, $user) {
-                    $query->where('user_id', $user);
+                    $query->where('user_id', $user->id);
 
                     if (is_null($place_id)) {
                         $query->where('monitoring_type_id', 1);
