@@ -141,7 +141,7 @@ class InformationController extends BaseController
                         })->with('regulation');
                 });
             }, 'company.region', 'company.district',
-                'monitorngs.monitoringType', 'monitorings.status',
+                'monitorings.monitoringType', 'monitorings.status',
                 'monitorings.base', 'monitorings.documents'])->paginate($per_page, ['*'], 'page', $page);
         return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
     }
