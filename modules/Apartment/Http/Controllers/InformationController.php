@@ -160,7 +160,7 @@ class InformationController extends BaseController
                 return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
             } elseif ($roleId == UserRoleEnum::APARTMENT_INSPECTOR->value) {
                 $apartments = Apartment::query()->whereHas('apartmentHiddenEconomy', function ($query) use ($place_id, $user) {
-                    $query->where('user_id', $user);
+                    $query->where('user_id', $user->id);
                 })->with(['company.region', 'company.district', 'apartmentHiddenEconomy' => function ($query) use ($place_id, $user) {
                     $query->where('user_id', $user->id);
 
