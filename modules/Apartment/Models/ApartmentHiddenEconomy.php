@@ -14,4 +14,9 @@ class ApartmentHiddenEconomy extends Model
     {
         return $this->belongsTo(MonitoringType::class);
     }
+
+    public function monitoring()
+    {
+        return $this->belongsTo(Monitoring::class);
+    }
 }

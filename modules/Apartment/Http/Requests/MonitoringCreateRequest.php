@@ -40,6 +40,7 @@ class MonitoringCreateRequest extends FormRequest
             'bsk_inn' => 'sometimes',
             'address' => 'sometimes',
             'category' => 'required',
+            'apartment_hidden_economy_id' => 'sometimes|integer|exists:apartment_hidden_economies,id',
         ];
     }
 

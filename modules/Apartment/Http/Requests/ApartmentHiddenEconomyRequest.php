@@ -21,6 +21,10 @@ class ApartmentHiddenEconomyRequest extends FormRequest
                 'place_id.*' => 'integer|exists:places,id|in:8,9,10',
                 'per_page' => 'integer|sometimes',
                 'page' => 'integer|sometimes',
+                'region_id' => 'integer|sometimes|exists:regions,id',
+                'district_id' => 'integer|sometimes|exists:districts,id',
+                'company_id' => 'integer|sometimes|exists:companies,id',
+                'home_id' => 'integer|sometimes|exists:apartments,home_id',
             ];
         }
         return [];
