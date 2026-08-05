@@ -188,10 +188,11 @@ class InformationController extends BaseController
                         fn($q) => $q->where('is_administrative', $validated['is_administrative'])))
                     ->when(!empty($validated['district_id']), fn($q) => $q->whereHas('company',
                         fn($q) => $q->where('district_id', $validated['district_id'])))
-                    ->when(!empty($validated['district_id']), fn($q) => $q->where('home_id',
-                        fn($q) => $q->where('home_id', $validated['home_id'])))
-                    ->when(!empty($validated['street_name']), fn($q) => $q->where('street_name',
-                        fn($q) => $q->where('street_name', 'ILIKE', "%{$validated['street_name']}%")))
+                    ->when(!empty($validated['id']), fn($q) => $q->where('home_id', $validated['id']))
+                    ->when(!empty($validated['address']), fn($q) => $q->whereRaw(
+                        "CONCAT(street_name, ' ', home_name) ILIKE ?",
+                        ["%{$validated['address']}%"]
+                    ))
                     ->with(['company.region', 'company.district', 'apartmentHiddenEconomy' => function ($query) use ($place_id, $user) {
                         $query->where('user_id', $user->id);
 
