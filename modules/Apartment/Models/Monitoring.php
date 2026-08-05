@@ -31,6 +31,11 @@ class Monitoring extends Model
         return $this->morphMany(Document::class, 'documentable');
     }
 
+    public function apartmentHiddenEconomy()
+    {
+        return $this->belongsTo(ApartmentHiddenEconomy::class, 'apartment_hidden_economy_id', 'id');
+    }
+
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');

@@ -134,23 +134,30 @@ class InformationController extends BaseController
             $place_id = $validated['place_id'] ?? null;
             if ($roleId == UserRoleEnum::APARTMENT_MANAGER->value) {
                 $apartments = Apartment::query()
-                    ->when(!empty($validated['region_id']), fn($q) => $q->whereHas('company',
-                        fn($q) => $q->where('region_id', $validated['region_id'])))
-                    ->when(!empty($validated['district_id']), fn($q) => $q->whereHas('company',
-                        fn($q) => $q->where('district_id', $validated['district_id'])))
-                    ->when(!empty($validated['company_id']), fn($q) => $q->where('company_id', $validated['company_id']))
-                    ->when(!empty($validated['home_id']), fn($q) => $q->where('home_id', $validated['home_id']))
                     ->with(['monitorings' => function ($query) use ($place_id, $validated, $monitoring_type_id) {
-                        $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id) {
+                        $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id, $validated) {
                             $query->where('monitoring_type_id', $monitoring_type_id)
-                                ->whereHas('regulation', function ($query) {
-                                    $query->whereIn('place_id', [1, 2]);
-                                })->with('regulation');
+                                ->where(function ($query) use ($monitoring_type_id, $validated) {
+                                    $query->whereHas('regulation', function ($query) {
+                                        $query->whereIn('place_id', [1, 2]);
+                                    })->orWhereHas('apartmentHiddenEconomy', function ($query) use ($monitoring_type_id) {
+                                        $query->where('monitoring_type_id', $monitoring_type_id);
+                                    })->with('regulation');
+                                });
                         })->when($monitoring_type_id == 2, function ($query) use ($monitoring_type_id, $validated, $place_id) {
                             $query->where('monitoring_type_id', $monitoring_type_id)
-                                ->whereHas('regulation', function ($query) use ($place_id) {
-                                    $query->whereIn('place_id', $place_id);
-                                })->with('regulation');
+                                ->where(function ($query) use ($monitoring_type_id, $validated, $place_id) {
+                                    $query->whereHas('regulation', function ($query) use ($place_id) {
+                                        $query->whereIn('place_id', $place_id);
+                                    })->orWhereHas('apartmentHiddenEconomy', function ($query) use ($monitoring_type_id) {
+                                        $query->when(!empty($place_id) && in_array(8, $place_id) && in_array(9, $place_id), function ($query) use ($monitoring_type_id) {
+                                            $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value]);
+                                        })->when(!empty($place_id) && in_array(10, $place_id), function ($query) use ($monitoring_type_id) {
+                                            $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value]);
+                                        });
+                                    })
+                                        ->with('regulation');
+                                });
                         });
                     }, 'company.region', 'company.district',
                         'monitorings.monitoringType', 'monitorings.status',
@@ -163,7 +170,21 @@ class InformationController extends BaseController
                             })->when(!empty($place_id) && in_array(10, $place_id), function ($query) use ($monitoring_type_id, $place_id) {
                                 $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value]);
                             });
-                        }])->paginate($per_page, ['*'], 'page', $page);
+                        }])
+                    ->when(!empty($validated['region_id']), fn($q) => $q->whereHas('company',
+                        fn($q) => $q->where('region_id', $validated['region_id'])))
+                    ->when(!empty($validated['district_id']), fn($q) => $q->whereHas('company',
+                        fn($q) => $q->where('district_id', $validated['district_id'])))
+                    ->when(!empty($validated['company_id']), fn($q) => $q->where('company_id', $validated['company_id']))
+                    ->when(!empty($validated['home_id']), fn($q) => $q->where('home_id', $validated['home_id']))
+                    ->paginate($per_page, ['*'], 'page', $page);
+                $apartments->getCollection()->transform(function ($apartment) {
+                    $apartment->setRelation(
+                        'apartmentHiddenEconomy',
+                        $apartment->apartmentHiddenEconomy->first()
+                    );
+                    return $apartment;
+                });
                 return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
             } elseif ($roleId == UserRoleEnum::APARTMENT_INSPECTOR->value) {
                 $apartments = Apartment::whereHas('apartmentHiddenEconomy', function ($query) use ($place_id, $user) {
