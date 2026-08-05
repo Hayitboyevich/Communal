@@ -159,7 +159,10 @@ class InformationController extends BaseController
                                         ->with('regulation');
                                 });
                         });
-                    }, 'company.region', 'company.district',
+                    }, 'company' => function ($query) use ($user) {
+                        $query->where('region_id', $user->region_id);
+                    },
+                        'company.region', 'company.district',
                         'monitorings.monitoringType', 'monitorings.status',
                         'monitorings.base', 'monitorings.user', 'monitorings.documents',
                         'apartmentHiddenEconomy' => function ($query) use ($place_id, $monitoring_type_id) {
