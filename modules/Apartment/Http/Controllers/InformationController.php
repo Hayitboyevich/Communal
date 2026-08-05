@@ -125,14 +125,14 @@ class InformationController extends BaseController
     public function apartmentHiddenEconomy(ApartmentHiddenEconomyRequest $request, $id = null)
     {
         $user = $this->user;
-        $roleId = $this->roleId;
+        $role_id = $this->roleId;
         if (!$id) {
             $validated = $request->validated();
             $monitoring_type_id = $validated['monitoring_type_id'];
             $per_page = $validated['per_page'] ?? 10;
             $page = $validated['page'] ?? 1;
             $place_id = $validated['place_id'] ?? null;
-            if ($roleId == UserRoleEnum::APARTMENT_MANAGER->value) {
+            if ($role_id == UserRoleEnum::APARTMENT_MANAGER->value or $role_id == UserRoleEnum::APARTMENT_VIEWER->value) {
                 $monitorings_filter = function ($query) use ($place_id, $validated, $monitoring_type_id) {
                     $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id, $validated) {
                         $query->where('monitoring_type_id', $monitoring_type_id)
@@ -175,7 +175,8 @@ class InformationController extends BaseController
                         fn($q) => $q->where(function ($q) use ($monitorings_filter, $hidden_economy_filter) {
                             $q->whereHas('monitorings', $monitorings_filter)->orWhereHas('apartmentHiddenEconomy', $hidden_economy_filter);
                         })
-                    )->whereHas('company', fn($q) => $q->where('region_id', $user->region_id))
+                    )->when($role_id == UserRoleEnum::APARTMENT_MANAGER->value,
+                        fn($q) => $q->whereHas('company', fn($q) => $q->where('region_id', $user->region_id)))
                     ->with(['monitorings' => $monitorings_filter, 'company.region', 'company.district',
                         'monitorings.monitoringType', 'monitorings.status',
                         'monitorings.base', 'monitorings.user', 'monitorings.documents',
@@ -195,7 +196,7 @@ class InformationController extends BaseController
                     return $apartment;
                 });
                 return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
-            } elseif ($roleId == UserRoleEnum::APARTMENT_INSPECTOR->value) {
+            } elseif ($role_id == UserRoleEnum::APARTMENT_INSPECTOR->value) {
                 $apartments = Apartment::whereHas('apartmentHiddenEconomy', function ($query) use ($place_id, $user) {
                     $query->where('user_id', $user->id);
                     if (is_null($place_id)) {
