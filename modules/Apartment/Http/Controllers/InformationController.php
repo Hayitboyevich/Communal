@@ -178,6 +178,13 @@ class InformationController extends BaseController
                     ->when(!empty($validated['company_id']), fn($q) => $q->where('company_id', $validated['company_id']))
                     ->when(!empty($validated['home_id']), fn($q) => $q->where('home_id', $validated['home_id']))
                     ->paginate($per_page, ['*'], 'page', $page);
+                $apartments->getCollection()->transform(function ($apartment) {
+                    $apartment->setRelation(
+                        'apartmentHiddenEconomy',
+                        $apartment->apartmentHiddenEconomy->first()
+                    );
+                    return $apartment;
+                });
                 return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
             } elseif ($roleId == UserRoleEnum::APARTMENT_INSPECTOR->value) {
                 $apartments = Apartment::whereHas('apartmentHiddenEconomy', function ($query) use ($place_id, $user) {
