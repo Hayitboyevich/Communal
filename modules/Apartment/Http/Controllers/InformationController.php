@@ -165,9 +165,22 @@ class InformationController extends BaseController
                             });
                         }])->paginate($per_page, ['*'], 'page', $page);
                 return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
-            } elseif ($roleId == UserRoleEnum::APARTMENT_INSPECTOR->value) {
-                $apartments = Apartment::query()->whereHas('apartmentHiddenEconomy', function ($query) use ($place_id, $user) {
-                    $query->where('user_id', $user->id);
+            } elseif (8 == UserRoleEnum::APARTMENT_INSPECTOR->value) {
+                $apartments = Apartment::whereHas('apartmentHiddenEconomy', function ($query) use ($place_id, $user) {
+                    $query->where('user_id', 3);
+                    if (is_null($place_id)) {
+                        $query->where('monitoring_type_id', 1);
+                    } elseif (in_array(8, $place_id) && in_array(9, $place_id)) {
+                        $query->where([
+                            'monitoring_type_id' => 2,
+                            'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value,
+                        ]);
+                    } elseif (in_array(10, $place_id)) {
+                        $query->where([
+                            'monitoring_type_id' => 2,
+                            'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value,
+                        ]);
+                    }
                 })
                     ->when(!empty($validated['type']), fn($q) => $q->whereHas('monitoring',
                         fn($q) => $q->where('type', $validated['type'])))
@@ -180,7 +193,7 @@ class InformationController extends BaseController
                     ->when(!empty($validated['street_name']), fn($q) => $q->where('street_name',
                         fn($q) => $q->where('street_name', 'ILIKE', "%{$validated['street_name']}%")))
                     ->with(['company.region', 'company.district', 'apartmentHiddenEconomy' => function ($query) use ($place_id, $user) {
-                        $query->where('user_id', $user->id);
+                        $query->where('user_id', 3);
 
                         if (is_null($place_id)) {
                             $query->where('monitoring_type_id', 1);
