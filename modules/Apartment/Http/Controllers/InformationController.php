@@ -133,7 +133,7 @@ class InformationController extends BaseController
             $page = $validated['page'] ?? 1;
             $place_id = $validated['place_id'] ?? null;
             if ($roleId == UserRoleEnum::APARTMENT_MANAGER->value) {
-                $monitoringsFilter = function ($query) use ($place_id, $validated, $monitoring_type_id) {
+                $monitorings_filter = function ($query) use ($place_id, $validated, $monitoring_type_id) {
                     $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id, $validated) {
                         $query->where('monitoring_type_id', $monitoring_type_id)
                             ->where(function ($query) use ($monitoring_type_id, $validated) {
@@ -159,7 +159,7 @@ class InformationController extends BaseController
                             });
                     });
                 };
-                $hiddenEconomyFilter = function ($query) use ($place_id, $monitoring_type_id) {
+                $hidden_economy_filter = function ($query) use ($place_id, $monitoring_type_id) {
                     $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id) {
                         $query->where('monitoring_type_id', $monitoring_type_id);
                     })->when(!empty($place_id) && in_array(8, $place_id) && in_array(9, $place_id), function ($query) use ($monitoring_type_id, $place_id) {
@@ -170,16 +170,16 @@ class InformationController extends BaseController
                 };
                 $apartments = Apartment::query()
                     ->when(!empty($validated['status']) and $validated['status'] == 1,
-                        fn($q) => $q->whereDoesntHave('monitorings', $monitoringsFilter)->whereDoesntHave('apartmentHiddenEconomy', $hiddenEconomyFilter)
+                        fn($q) => $q->whereDoesntHave('monitorings', $monitorings_filter)->whereDoesntHave('apartmentHiddenEconomy', $hidden_economy_filter)
                     )->when(!empty($validated['status']) and $validated['status'] == 2,
-                        fn($q) => $q->where(function ($q) use ($monitoringsFilter, $hiddenEconomyFilter) {
-                            $q->whereHas('monitorings', $monitoringsFilter)->orWhereHas('apartmentHiddenEconomy', $hiddenEconomyFilter);
+                        fn($q) => $q->where(function ($q) use ($monitorings_filter, $hidden_economy_filter) {
+                            $q->whereHas('monitorings', $monitorings_filter)->orWhereHas('apartmentHiddenEconomy', $hidden_economy_filter);
                         })
                     )->whereHas('company', fn($q) => $q->where('region_id', $user->region_id))
-                    ->with(['monitorings' => $monitoringsFilter, 'company.region', 'company.district',
+                    ->with(['monitorings' => $monitorings_filter, 'company.region', 'company.district',
                         'monitorings.monitoringType', 'monitorings.status',
                         'monitorings.base', 'monitorings.user', 'monitorings.documents',
-                        'apartmentHiddenEconomy' => $hiddenEconomyFilter])
+                        'apartmentHiddenEconomy' => $hidden_economy_filter])
                     ->when(!empty($validated['region_id']), fn($q) => $q->whereHas('company',
                         fn($q) => $q->where('region_id', $validated['region_id'])))
                     ->when(!empty($validated['district_id']), fn($q) => $q->whereHas('company',
