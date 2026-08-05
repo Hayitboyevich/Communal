@@ -141,50 +141,62 @@ class InformationController extends BaseController
                     ->when(!empty($validated['company_id']), fn($q) => $q->where('company_id', $validated['company_id']))
                     ->when(!empty($validated['home_id']), fn($q) => $q->where('home_id', $validated['home_id']))
                     ->with(['monitorings' => function ($query) use ($place_id, $validated, $monitoring_type_id) {
-                    $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id) {
-                        $query->where('monitoring_type_id', $monitoring_type_id)
-                            ->whereHas('regulation', function ($query) {
-                                $query->whereIn('place_id', [1, 2]);
-                            })->with('regulation');
-                    })->when($monitoring_type_id == 2, function ($query) use ($monitoring_type_id, $validated, $place_id) {
-                        $query->where('monitoring_type_id', $monitoring_type_id)
-                            ->whereHas('regulation', function ($query) use ($place_id) {
-                                $query->whereIn('place_id', $place_id);
-                            })->with('regulation');
-                    });
-                }, 'company.region', 'company.district',
-                    'monitorings.monitoringType', 'monitorings.status',
-                    'monitorings.base', 'monitorings.user', 'monitorings.documents',
-                    'apartmentHiddenEconomy' => function ($query) use ($place_id, $monitoring_type_id) {
                         $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id) {
-                            $query->where('monitoring_type_id', $monitoring_type_id);
-                        })->when(!empty($place_id) && in_array(8, $place_id) && in_array(9, $place_id), function ($query) use ($monitoring_type_id, $place_id) {
-                            $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value]);
-                        })->when(!empty($place_id) && in_array(10, $place_id), function ($query) use ($monitoring_type_id, $place_id) {
-                            $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value]);
+                            $query->where('monitoring_type_id', $monitoring_type_id)
+                                ->whereHas('regulation', function ($query) {
+                                    $query->whereIn('place_id', [1, 2]);
+                                })->with('regulation');
+                        })->when($monitoring_type_id == 2, function ($query) use ($monitoring_type_id, $validated, $place_id) {
+                            $query->where('monitoring_type_id', $monitoring_type_id)
+                                ->whereHas('regulation', function ($query) use ($place_id) {
+                                    $query->whereIn('place_id', $place_id);
+                                })->with('regulation');
                         });
-                    }])->paginate($per_page, ['*'], 'page', $page);
+                    }, 'company.region', 'company.district',
+                        'monitorings.monitoringType', 'monitorings.status',
+                        'monitorings.base', 'monitorings.user', 'monitorings.documents',
+                        'apartmentHiddenEconomy' => function ($query) use ($place_id, $monitoring_type_id) {
+                            $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id) {
+                                $query->where('monitoring_type_id', $monitoring_type_id);
+                            })->when(!empty($place_id) && in_array(8, $place_id) && in_array(9, $place_id), function ($query) use ($monitoring_type_id, $place_id) {
+                                $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value]);
+                            })->when(!empty($place_id) && in_array(10, $place_id), function ($query) use ($monitoring_type_id, $place_id) {
+                                $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value]);
+                            });
+                        }])->paginate($per_page, ['*'], 'page', $page);
                 return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
             } elseif ($roleId == UserRoleEnum::APARTMENT_INSPECTOR->value) {
                 $apartments = Apartment::query()->whereHas('apartmentHiddenEconomy', function ($query) use ($place_id, $user) {
                     $query->where('user_id', $user->id);
-                })->with(['company.region', 'company.district', 'apartmentHiddenEconomy' => function ($query) use ($place_id, $user) {
-                    $query->where('user_id', $user->id);
+                })
+                    ->when(!empty($validated['type']), fn($q) => $q->whereHas('monitoring',
+                        fn($q) => $q->where('type', $validated['type'])))
+                    ->when(!empty($validated['is_administrative']), fn($q) => $q->whereHas('monitoring',
+                        fn($q) => $q->where('is_administrative', $validated['is_administrative'])))
+                    ->when(!empty($validated['district_id']), fn($q) => $q->whereHas('company',
+                        fn($q) => $q->where('district_id', $validated['district_id'])))
+                    ->when(!empty($validated['district_id']), fn($q) => $q->where('home_id',
+                        fn($q) => $q->where('home_id', $validated['home_id'])))
+                    ->when(!empty($validated['street_name']), fn($q) => $q->where('street_name',
+                        fn($q) => $q->where('street_name', 'ILIKE', "%{$validated['street_name']}%")))
+                    ->with(['company.region', 'company.district', 'apartmentHiddenEconomy' => function ($query) use ($place_id, $user) {
+                        $query->where('user_id', $user->id);
 
-                    if (is_null($place_id)) {
-                        $query->where('monitoring_type_id', 1);
-                    } elseif (in_array(8, $place_id) && in_array(9, $place_id)) {
-                        $query->where([
-                            'monitoring_type_id' => 2,
-                            'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value,
-                        ]);
-                    } elseif (in_array(10, $place_id)) {
-                        $query->where([
-                            'monitoring_type_id' => 2,
-                            'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value,
-                        ]);
-                    }
-                }, 'apartmentHiddenEconomy.monitoringType', 'apartmentHiddenEconomy.monitoring.status'])
+                        if (is_null($place_id)) {
+                            $query->where('monitoring_type_id', 1);
+                        } elseif (in_array(8, $place_id) && in_array(9, $place_id)) {
+                            $query->where([
+                                'monitoring_type_id' => 2,
+                                'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value,
+                            ]);
+                        } elseif (in_array(10, $place_id)) {
+                            $query->where([
+                                'monitoring_type_id' => 2,
+                                'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value,
+                            ]);
+                        }
+                    }, 'apartmentHiddenEconomy.monitoringType',
+                        'apartmentHiddenEconomy.monitoring.status'])
                     ->orderBy('id', 'desc')
                     ->paginate($per_page, ['*'], 'page', $page);
                 $apartments->getCollection()->transform(function ($apartment) {
