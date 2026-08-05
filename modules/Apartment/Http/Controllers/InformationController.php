@@ -133,45 +133,53 @@ class InformationController extends BaseController
             $page = $validated['page'] ?? 1;
             $place_id = $validated['place_id'] ?? null;
             if ($roleId == UserRoleEnum::APARTMENT_MANAGER->value) {
+                $monitoringsFilter = function ($query) use ($place_id, $validated, $monitoring_type_id) {
+                    $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id, $validated) {
+                        $query->where('monitoring_type_id', $monitoring_type_id)
+                            ->where(function ($query) use ($monitoring_type_id, $validated) {
+                                $query->whereHas('regulation', function ($query) {
+                                    $query->whereIn('place_id', [1, 2]);
+                                })->orWhereHas('apartmentHiddenEconomy', function ($query) use ($monitoring_type_id) {
+                                    $query->where('monitoring_type_id', $monitoring_type_id);
+                                })->with('regulation');
+                            });
+                    })->when($monitoring_type_id == 2, function ($query) use ($monitoring_type_id, $validated, $place_id) {
+                        $query->where('monitoring_type_id', $monitoring_type_id)
+                            ->where(function ($query) use ($monitoring_type_id, $validated, $place_id) {
+                                $query->whereHas('regulation', function ($query) use ($place_id) {
+                                    $query->whereIn('place_id', $place_id);
+                                })->orWhereHas('apartmentHiddenEconomy', function ($query) use ($monitoring_type_id) {
+                                    $query->when(!empty($place_id) && in_array(8, $place_id) && in_array(9, $place_id), function ($query) use ($monitoring_type_id) {
+                                        $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value]);
+                                    })->when(!empty($place_id) && in_array(10, $place_id), function ($query) use ($monitoring_type_id) {
+                                        $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value]);
+                                    });
+                                })
+                                    ->with('regulation');
+                            });
+                    });
+                };
+                $hiddenEconomyFilter = function ($query) use ($place_id, $monitoring_type_id) {
+                    $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id) {
+                        $query->where('monitoring_type_id', $monitoring_type_id);
+                    })->when(!empty($place_id) && in_array(8, $place_id) && in_array(9, $place_id), function ($query) use ($monitoring_type_id, $place_id) {
+                        $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value]);
+                    })->when(!empty($place_id) && in_array(10, $place_id), function ($query) use ($monitoring_type_id, $place_id) {
+                        $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value]);
+                    });
+                };
                 $apartments = Apartment::query()
-                    ->whereHas('company', fn($q) => $q->where('region_id', $user->region_id))
-                    ->with(['monitorings' => function ($query) use ($place_id, $validated, $monitoring_type_id) {
-                        $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id, $validated) {
-                            $query->where('monitoring_type_id', $monitoring_type_id)
-                                ->where(function ($query) use ($monitoring_type_id, $validated) {
-                                    $query->whereHas('regulation', function ($query) {
-                                        $query->whereIn('place_id', [1, 2]);
-                                    })->orWhereHas('apartmentHiddenEconomy', function ($query) use ($monitoring_type_id) {
-                                        $query->where('monitoring_type_id', $monitoring_type_id);
-                                    })->with('regulation');
-                                });
-                        })->when($monitoring_type_id == 2, function ($query) use ($monitoring_type_id, $validated, $place_id) {
-                            $query->where('monitoring_type_id', $monitoring_type_id)
-                                ->where(function ($query) use ($monitoring_type_id, $validated, $place_id) {
-                                    $query->whereHas('regulation', function ($query) use ($place_id) {
-                                        $query->whereIn('place_id', $place_id);
-                                    })->orWhereHas('apartmentHiddenEconomy', function ($query) use ($monitoring_type_id) {
-                                        $query->when(!empty($place_id) && in_array(8, $place_id) && in_array(9, $place_id), function ($query) use ($monitoring_type_id) {
-                                            $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value]);
-                                        })->when(!empty($place_id) && in_array(10, $place_id), function ($query) use ($monitoring_type_id) {
-                                            $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value]);
-                                        });
-                                    })
-                                        ->with('regulation');
-                                });
-                        });
-                    }, 'company.region', 'company.district',
+                    ->when(!empty($validated['status']) and $validated['status'] == 1,
+                        fn($q) => $q->whereDoesntHave('monitorings', $monitoringsFilter)->whereDoesntHave('apartmentHiddenEconomy', $hiddenEconomyFilter)
+                    )->when(!empty($validated['status']) and $validated['status'] == 2,
+                        fn($q) => $q->where(function ($q) use ($monitoringsFilter, $hiddenEconomyFilter) {
+                            $q->whereHas('monitorings', $monitoringsFilter)->orWhereHas('apartmentHiddenEconomy', $hiddenEconomyFilter);
+                        })
+                    )->whereHas('company', fn($q) => $q->where('region_id', $user->region_id))
+                    ->with(['monitorings' => $monitoringsFilter, 'company.region', 'company.district',
                         'monitorings.monitoringType', 'monitorings.status',
                         'monitorings.base', 'monitorings.user', 'monitorings.documents',
-                        'apartmentHiddenEconomy' => function ($query) use ($place_id, $monitoring_type_id) {
-                            $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id) {
-                                $query->where('monitoring_type_id', $monitoring_type_id);
-                            })->when(!empty($place_id) && in_array(8, $place_id) && in_array(9, $place_id), function ($query) use ($monitoring_type_id, $place_id) {
-                                $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value]);
-                            })->when(!empty($place_id) && in_array(10, $place_id), function ($query) use ($monitoring_type_id, $place_id) {
-                                $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value]);
-                            });
-                        }])
+                        'apartmentHiddenEconomy' => $hiddenEconomyFilter])
                     ->when(!empty($validated['region_id']), fn($q) => $q->whereHas('company',
                         fn($q) => $q->where('region_id', $validated['region_id'])))
                     ->when(!empty($validated['district_id']), fn($q) => $q->whereHas('company',

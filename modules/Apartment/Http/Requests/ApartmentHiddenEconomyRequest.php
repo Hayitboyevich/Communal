@@ -28,7 +28,8 @@ class ApartmentHiddenEconomyRequest extends FormRequest
                 'home_id' => 'integer|sometimes|exists:apartments,home_id',
                 'type' => 'sometimes|in:2',
                 'is_administrative' => 'sometimes|in:true',
-                'address' => 'sometimes|string'
+                'address' => 'sometimes|string',
+                'status' => 'sometimes',
             ];
         }
         return [];
