@@ -165,9 +165,9 @@ class InformationController extends BaseController
                             });
                         }])->paginate($per_page, ['*'], 'page', $page);
                 return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
-            } elseif (8 == UserRoleEnum::APARTMENT_INSPECTOR->value) {
+            } elseif ($roleId == UserRoleEnum::APARTMENT_INSPECTOR->value) {
                 $apartments = Apartment::whereHas('apartmentHiddenEconomy', function ($query) use ($place_id, $user) {
-                    $query->where('user_id', 3);
+                    $query->where('user_id', $user->id);
                     if (is_null($place_id)) {
                         $query->where('monitoring_type_id', 1);
                     } elseif (in_array(8, $place_id) && in_array(9, $place_id)) {
@@ -182,9 +182,9 @@ class InformationController extends BaseController
                         ]);
                     }
                 })
-                    ->when(!empty($validated['type']), fn($q) => $q->whereHas('monitoring',
+                    ->when(!empty($validated['type']), fn($q) => $q->whereHas('apartmentHiddenEconomy.monitoring',
                         fn($q) => $q->where('type', $validated['type'])))
-                    ->when(!empty($validated['is_administrative']), fn($q) => $q->whereHas('monitoring',
+                    ->when(!empty($validated['is_administrative']), fn($q) => $q->whereHas('apartmentHiddenEconomy.monitoring',
                         fn($q) => $q->where('is_administrative', $validated['is_administrative'])))
                     ->when(!empty($validated['district_id']), fn($q) => $q->whereHas('company',
                         fn($q) => $q->where('district_id', $validated['district_id'])))
@@ -193,7 +193,7 @@ class InformationController extends BaseController
                     ->when(!empty($validated['street_name']), fn($q) => $q->where('street_name',
                         fn($q) => $q->where('street_name', 'ILIKE', "%{$validated['street_name']}%")))
                     ->with(['company.region', 'company.district', 'apartmentHiddenEconomy' => function ($query) use ($place_id, $user) {
-                        $query->where('user_id', 3);
+                        $query->where('user_id', $user->id);
 
                         if (is_null($place_id)) {
                             $query->where('monitoring_type_id', 1);
