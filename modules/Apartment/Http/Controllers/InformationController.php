@@ -134,6 +134,7 @@ class InformationController extends BaseController
             $place_id = $validated['place_id'] ?? null;
             if ($roleId == UserRoleEnum::APARTMENT_MANAGER->value) {
                 $apartments = Apartment::query()
+                    ->whereHas('company', fn($q) => $q->where('region_id', $user->region_id))
                     ->with(['monitorings' => function ($query) use ($place_id, $validated, $monitoring_type_id) {
                         $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id, $validated) {
                             $query->where('monitoring_type_id', $monitoring_type_id)
@@ -159,10 +160,7 @@ class InformationController extends BaseController
                                         ->with('regulation');
                                 });
                         });
-                    }, 'company' => function ($query) use ($user) {
-                        $query->where('region_id', $user->region_id);
-                    },
-                        'company.region', 'company.district',
+                    }, 'company.region', 'company.district',
                         'monitorings.monitoringType', 'monitorings.status',
                         'monitorings.base', 'monitorings.user', 'monitorings.documents',
                         'apartmentHiddenEconomy' => function ($query) use ($place_id, $monitoring_type_id) {
