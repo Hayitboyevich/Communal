@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Constants\ErrorMessage;
+use App\Enums\UserStatusEnum;
 use App\Http\Controllers\BaseController;
 use App\Http\Resources\DistrictResource;
 use App\Http\Resources\RegionResource;
@@ -66,6 +67,8 @@ class AuthController extends BaseController
         $credentials = $request->only('login', 'password');
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
+            if ($user->user_status_id != UserStatusEnum::ACTIVE->value)
+                return $this->sendError(error: 'Access denied!User is not active.', code: 403);
             $token = JWTAuth::claims(['role_id' => $request->role_id])->fromUser($user);
             $role = Role::query()->find($request->role_id);
             $success['token'] = $token;
