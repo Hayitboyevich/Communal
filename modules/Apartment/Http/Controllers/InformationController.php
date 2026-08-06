@@ -168,7 +168,7 @@ class InformationController extends BaseController
                         $query->where(['monitoring_type_id' => $monitoring_type_id, 'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value]);
                     });
                 };
-                $apartments = Apartment::query()
+                $apartments = Apartment::query()->where('home_integration', 1)
                     ->when(!empty($validated['status']) and $validated['status'] == 1,
                         fn($q) => $q->whereDoesntHave('monitorings', $monitorings_filter)->whereDoesntHave('apartmentHiddenEconomy', $hidden_economy_filter)
                     )->when(!empty($validated['status']) and $validated['status'] == 2,
@@ -197,7 +197,8 @@ class InformationController extends BaseController
                 });
                 return $this->sendSuccess($apartments->items(), 'Apartment list', meta: pagination($apartments));
             } elseif ($role_id == UserRoleEnum::APARTMENT_INSPECTOR->value) {
-                $apartments = Apartment::whereHas('apartmentHiddenEconomy', function ($query) use ($place_id, $user) {
+                $apartments = Apartment::query()->where('home_integration', 1)
+                    ->whereHas('apartmentHiddenEconomy', function ($query) use ($place_id, $user) {
                     $query->where('user_id', $user->id);
                     if (is_null($place_id)) {
                         $query->where('monitoring_type_id', 1);
