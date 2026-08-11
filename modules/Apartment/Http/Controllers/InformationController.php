@@ -132,9 +132,9 @@ class InformationController extends BaseController
             $per_page = $validated['per_page'] ?? 10;
             $page = $validated['page'] ?? 1;
             $place_id = $validated['place_id'] ?? null;
-            if ($place_id == [8]){
+            if (in_array(8, $place_id)){
                 $place_id = [10];
-            } elseif ($place_id == [9,10]){
+            } elseif (in_array(10, $place_id) && in_array(9, $place_id)){
                 $place_id = [8,9];
             }
             if ($role_id == UserRoleEnum::APARTMENT_MANAGER->value or $role_id == UserRoleEnum::APARTMENT_VIEWER->value) {
