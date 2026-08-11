@@ -132,6 +132,11 @@ class InformationController extends BaseController
             $per_page = $validated['per_page'] ?? 10;
             $page = $validated['page'] ?? 1;
             $place_id = $validated['place_id'] ?? null;
+            if ($place_id == [8]){
+                $place_id = [10];
+            } elseif ($place_id == [9,10]){
+                $place_id = [8,9];
+            }
             if ($role_id == UserRoleEnum::APARTMENT_MANAGER->value or $role_id == UserRoleEnum::APARTMENT_VIEWER->value) {
                 $monitorings_filter = function ($query) use ($place_id, $validated, $monitoring_type_id) {
                     $query->when($monitoring_type_id == 1, function ($query) use ($monitoring_type_id, $validated) {
