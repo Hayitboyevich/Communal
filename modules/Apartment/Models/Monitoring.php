@@ -10,6 +10,7 @@ use App\Models\Region;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Video;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -26,6 +27,20 @@ class Monitoring extends Model
     protected $casts = [
         'monitoring_status_id' => MonitoringStatusEnum::class,
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'additional_files' => 'array',
+        ];
+    }
+
+    protected function additionalFiles(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => json_decode($value)
+        );
+    }
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');
