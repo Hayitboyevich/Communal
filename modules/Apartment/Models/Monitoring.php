@@ -28,19 +28,19 @@ class Monitoring extends Model
         'monitoring_status_id' => MonitoringStatusEnum::class,
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'additional_files' => 'array',
-        ];
-    }
+//    protected function casts(): array
+//    {
+//        return [
+//            'additional_files' => 'array',
+//        ];
+//    }
 
-    protected function additionalFiles(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => json_decode($value)
-        );
-    }
+//    protected function additionalFiles(): Attribute
+//    {
+//        return Attribute::make(
+//            get: fn ($value) => json_decode($value)
+//        );
+//    }
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');
