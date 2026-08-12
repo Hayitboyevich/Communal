@@ -348,7 +348,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
     {
         if (!empty($files)) {
             $paths = array_map(fn($file) => $this->fileService->uploadFile($file, $filePath), $files);
-            $monitoring->$column = json_encode(array_map(fn($path) => ['url' => $path], $paths));
+            $monitoring->$column = array_map(fn($path) => ['url' => $path], $paths);
             $monitoring->save();
         }
     }
