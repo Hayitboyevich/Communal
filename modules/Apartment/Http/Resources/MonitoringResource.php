@@ -80,7 +80,11 @@ class MonitoringResource extends JsonResource
             'long_term' => $this->long_term,
             'long_term_type' => $this->long_term_type,
             'additional_comment' => $this->additional_comment,
-            'additional_files' => $this->additional_files,
+            'additional_files' => collect(json_decode($this->additional_files, true))->map(function ($file) {
+                return [
+                    'url' => url('storage/'.$file['url']),
+                ];
+            }),
             'type' => $this->type,
             'regulations' => $this->regulation ? RegulationResource::make($this->regulation) : null,
             'violations' => $this->violation ? ViolationResource::make($this->violation) : null,
