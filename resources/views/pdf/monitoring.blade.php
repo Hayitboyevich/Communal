@@ -11,9 +11,9 @@
     $dateDone = null;
 
     if ($monitoring->monitoring_status_id == MonitoringStatusEnum::NOT_DEFECT){
-         $files = json_decode($monitoring->additional_files);
+         $files = json_decode($monitoring->getRawOriginal('additional_files'), true) ?? [];
         if (!empty($files[0])){
-           $path = public_path('storage/' . $files[0]->url);
+           $path = public_path('storage/' . $files[0]['url']);
             if (file_exists($path)) {
                 $type = pathinfo($path, PATHINFO_EXTENSION);
                 $data = file_get_contents($path);
@@ -21,7 +21,7 @@
             }
         }
          if (!empty($files[1])){
-           $path = public_path('storage/' . $files[1]->url);
+           $path = public_path('storage/' . $files[1]['url']);
             if (file_exists($path)) {
                 $type = pathinfo($path, PATHINFO_EXTENSION);
                 $data = file_get_contents($path);

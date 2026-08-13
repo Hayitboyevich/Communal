@@ -34,6 +34,15 @@ class Monitoring extends Model
         ];
     }
 
+    public function getAdditionalFilesAttribute($value): array
+    {
+        $files = is_string($value) ? json_decode($value, true) : ($value ?? []);
+
+        return collect($files)->map(fn($file) => [
+            'url' => url('storage/' . $file['url']),
+        ])->all();
+    }
+
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');
