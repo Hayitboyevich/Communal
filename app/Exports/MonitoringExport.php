@@ -55,13 +55,13 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
         $check_array = [1,2,8,9,10];
         $hidden_economy = function () use ($monitoring,$check_array) {
             if ($monitoring->apartmentHiddenEconomy) {
-                return true;
+                return 'true';
             } elseif ($monitoring->regulation){
                 if (in_array($monitoring->regulation->place_id, $check_array)) {
-                    return true;
+                    return 'true';
                 }
-                return false;
-            } else return false;
+                return 'false';
+            } else return 'false';
         };
         return [
             $monitoring->id,
