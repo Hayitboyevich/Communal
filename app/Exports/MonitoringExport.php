@@ -39,6 +39,7 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
                 'regulation.violationType',
                 'violation',
                 'fine',
+                'apartmentHiddenEconomy'
             ])
             ->where('region_id', $this->regionId)
             ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
@@ -51,6 +52,17 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
 
     public function map($monitoring): array
     {
+        $check_array = [1,2,8,9,10];
+        $hidden_economy = function () use ($monitoring,$check_array) {
+            if ($monitoring->apartmentHiddenEconomy) {
+                return true;
+            } elseif ($monitoring->regulation){
+                if (in_array($monitoring->regulation->place_id, $check_array)) {
+                    return true;
+                }
+                return false;
+            } else return false;
+        };
         return [
             $monitoring->id,
             $monitoring?->region?->name_uz ?? '',
@@ -88,6 +100,7 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
             $monitoring->send_court ? 'Sudga yuborilgan' : '',
             $monitoring->treatment_number ?? '',
             $monitoring->treatment_date ?? '',
+            $hidden_economy(),
             optional($monitoring->confirmRegulationHistory)->created_at,
         ];
     }
@@ -130,6 +143,7 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
             'Sud',
             'Davo ariza raqami',
             'Davo ariza sanasi',
+            'Yashirin iqtisodiyot',
             'Ko\'rsatma bajarilgan sana'
         ];
     }
