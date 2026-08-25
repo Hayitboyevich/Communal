@@ -34,7 +34,7 @@ class ApartmentHiddenEconomyController extends BaseController
     public function export(ApartmentHiddenEconomyExportRequest $request)
     {
         try {
-            if ($this->roleId == UserRoleEnum::APARTMENT_MANAGER->value) {
+            if (!$this->roleId == UserRoleEnum::APARTMENT_MANAGER->value) {
                 return $this->sendError(ErrorMessage::ERROR_1, 'Forbidden', 403);
             }
 
