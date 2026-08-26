@@ -108,14 +108,9 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::get('/fines', 'fines');
     });
 
-//    Route::group(['prefix' => 'hidden-economy/apartments'], function () {
-//        Route::get('/export', [ApartmentHiddenEconomyController::class, 'export']);apartment-statictic
-//        Route::get('/{id?}', [InformationController::class, 'apartmentHiddenEconomy']);
-//        Route::post('attach-inspector', [ApartmentHiddenEconomyController::class, 'attachInspector']);
-//    });
-});
-Route::group(['prefix' => 'hidden-economy/apartments'], function () {
-    Route::get('/export', [ApartmentHiddenEconomyController::class, 'export']);
-    Route::get('/{id?}', [InformationController::class, 'apartmentHiddenEconomy']);
-    Route::post('attach-inspector', [ApartmentHiddenEconomyController::class, 'attachInspector']);
+    Route::group(['prefix' => 'hidden-economy/apartments'], function () {
+        Route::get('/export', [ApartmentHiddenEconomyController::class, 'export']);
+        Route::get('/{id?}', [InformationController::class, 'apartmentHiddenEconomy']);
+        Route::post('attach-inspector', [ApartmentHiddenEconomyController::class, 'attachInspector']);
+    });
 });
