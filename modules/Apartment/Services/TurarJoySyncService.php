@@ -13,9 +13,11 @@ class TurarJoySyncService
             $response = Http::withBasicAuth(
                 config('services.turar_joy_sync.login'),
                 config('services.turar_joy_sync.password')
-            )->post(config('services.turar_joy_sync.url'), [
-                'home_id' => $homeId,
-            ]);
+            )->withOptions([
+                'query' => [
+                    'home_id' => $homeId,
+                ],
+            ])->post(config('services.turar_joy_sync.url'));
 
             $this->notifyTelegram($homeId, $response->successful(), $response->successful() ? null : $response->body());
 
