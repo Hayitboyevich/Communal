@@ -344,6 +344,12 @@ class MonitoringController extends BaseController
     {
         try {
             $this->service->createSecond($id, $request);
+
+            $monitoring = $this->service->findById($id);
+            if ($monitoring->apartment?->home_integration) {
+                $this->turarJoySyncService->sync($monitoring->apartment->home_id);
+            }
+
             return $this->sendSuccess([], 'Monitoring created successfully.');
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
@@ -354,6 +360,12 @@ class MonitoringController extends BaseController
     {
         try {
             $this->service->createThird($id, $request);
+
+            $monitoring = $this->service->findById($id);
+            if ($monitoring->apartment?->home_integration) {
+                $this->turarJoySyncService->sync($monitoring->apartment->home_id);
+            }
+
             return $this->sendSuccess([], 'Monitoring violation successfully.');
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
