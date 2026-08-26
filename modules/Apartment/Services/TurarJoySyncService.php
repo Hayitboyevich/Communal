@@ -17,17 +17,17 @@ class TurarJoySyncService
                 'home_id' => $homeId,
             ]);
 
-            $this->notifyTelegram($homeId, $response->successful());
+            $this->notifyTelegram($homeId, $response->successful(), $response->successful() ? null : $response->body());
 
             return $response;
         } catch (\Exception $exception) {
             Log::info($exception->getMessage());
-            $this->notifyTelegram($homeId, false);
+            $this->notifyTelegram($homeId, false, $exception->getMessage());
             return null;
         }
     }
 
-    private function notifyTelegram(int $homeId, bool $sent): void
+    private function notifyTelegram(int $homeId, bool $sent, ?string $error = null): void
     {
         try {
             $emoji = $sent ? '✅' : '❌';
@@ -37,6 +37,10 @@ class TurarJoySyncService
                 . "🏠 Home ID: <code>{$homeId}</code>\n"
                 . "📌 Holat: <b>{$status}</b>\n"
                 . "🕒 Vaqt: " . now()->format('Y-m-d H:i:s');
+
+            if ($error) {
+                $text .= "\n⚠️ Xato: <code>" . htmlspecialchars(mb_substr($error, 0, 500), ENT_QUOTES) . "</code>";
+            }
 
             Http::post('https://api.telegram.org/bot' . config('services.turar_joy_sync.telegram_bot_token') . '/sendMessage', [
                 'chat_id' => config('services.turar_joy_sync.telegram_channel_id'),
