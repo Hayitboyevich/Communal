@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class TurarJoySyncService
 {
-    public function sync(int $homeId)
+    public function sync(int $homeId, string $source = 'create')
     {
         try {
             $response = Http::withBasicAuth(
@@ -19,17 +19,17 @@ class TurarJoySyncService
                 ],
             ])->post(config('services.turar_joy_sync.url'));
 
-            $this->notifyTelegram($homeId, $response->successful(), $response->status(), $response->json() ?? $response->body());
+            $this->notifyTelegram($homeId, $source, $response->successful(), $response->status(), $response->json() ?? $response->body());
 
             return $response;
         } catch (\Exception $exception) {
             Log::info($exception->getMessage());
-            $this->notifyTelegram($homeId, false, null, $exception->getMessage());
+            $this->notifyTelegram($homeId, $source, false, null, $exception->getMessage());
             return null;
         }
     }
 
-    private function notifyTelegram(int $homeId, bool $sent, ?int $statusCode, $result = null): void
+    private function notifyTelegram(int $homeId, string $source, bool $sent, ?int $statusCode, $result = null): void
     {
         try {
             $emoji = $sent ? '✅' : '❌';
@@ -37,6 +37,7 @@ class TurarJoySyncService
 
             $text = "{$emoji} <b>Turar joy sync</b>\n"
                 . "🏠 Home ID: <code>{$homeId}</code>\n"
+                . "🔖 Funksiya: <b>{$source}</b>\n"
                 . "📌 Holat: <b>{$status}</b>\n"
                 . "🕒 Vaqt: " . now()->format('Y-m-d H:i:s');
 
