@@ -56,9 +56,4 @@ class ApartmentHiddenEconomyController extends BaseController
         }
     }
 
-    public function checkBot()
-    {
-        return $this->turarJoySyncService->sync(30380);
-    }
-
 }
