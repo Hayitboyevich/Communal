@@ -47,4 +47,12 @@ return [
         "password" => env('BANK_PASSWORD', 'EkN`9?@{3v0j'),
     ],
 
+    'turar_joy_sync' => [
+        'url' => env('TURAR_JOY_SYNC_URL', 'https://back-turarjoy.kommunal.uz/api/gasn/sync'),
+        'login' => env('TURAR_JOY_SYNC_LOGIN'),
+        'password' => env('TURAR_JOY_SYNC_PASSWORD'),
+        'telegram_bot_token' => env('TURAR_JOY_SYNC_TELEGRAM_BOT_TOKEN'),
+        'telegram_channel_id' => env('TURAR_JOY_SYNC_TELEGRAM_CHANNEL_ID'),
+    ],
+
 ];

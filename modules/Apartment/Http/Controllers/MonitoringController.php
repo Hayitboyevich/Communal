@@ -25,6 +25,7 @@ use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
 use Modules\Apartment\Http\Requests\ViolationRequest;
 use Modules\Apartment\Http\Resources\MonitoringResource;
 use Modules\Apartment\Models\Monitoring;
+use Modules\Apartment\Services\TurarJoySyncService;
 use Modules\Apartment\Services\MonitoringService;
 use Illuminate\Http\Request;
 use Modules\Water\Const\Step;
@@ -34,7 +35,8 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class MonitoringController extends BaseController
 {
     public function __construct(
-        protected MonitoringService $service
+        protected MonitoringService    $service,
+        protected TurarJoySyncService  $turarJoySyncService
     )
     {
         parent::__construct();
@@ -327,6 +329,11 @@ class MonitoringController extends BaseController
     {
         try {
             $monitoring = $this->service->create($request);
+
+            if ($monitoring->apartment?->home_integration) {
+                $this->turarJoySyncService->sync($monitoring->apartment->home_id);
+            }
+
             return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring created successfully.');
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
