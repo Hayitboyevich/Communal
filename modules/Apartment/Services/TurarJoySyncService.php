@@ -19,17 +19,17 @@ class TurarJoySyncService
                 ],
             ])->post(config('services.turar_joy_sync.url'));
 
-            $this->notifyTelegram($homeId, $response->successful(), $response->successful() ? null : $response->body());
+            $this->notifyTelegram($homeId, $response->successful(), $response->status(), $response->json() ?? $response->body());
 
             return $response;
         } catch (\Exception $exception) {
             Log::info($exception->getMessage());
-            $this->notifyTelegram($homeId, false, $exception->getMessage());
+            $this->notifyTelegram($homeId, false, null, $exception->getMessage());
             return null;
         }
     }
 
-    private function notifyTelegram(int $homeId, bool $sent, ?string $error = null): void
+    private function notifyTelegram(int $homeId, bool $sent, ?int $statusCode, $result = null): void
     {
         try {
             $emoji = $sent ? '✅' : '❌';
@@ -40,8 +40,16 @@ class TurarJoySyncService
                 . "📌 Holat: <b>{$status}</b>\n"
                 . "🕒 Vaqt: " . now()->format('Y-m-d H:i:s');
 
-            if ($error) {
-                $text .= "\n⚠️ Xato: <code>" . htmlspecialchars(mb_substr($error, 0, 500), ENT_QUOTES) . "</code>";
+            if ($statusCode) {
+                $text .= "\n🔢 Status kod: <code>{$statusCode}</code>";
+            }
+
+            if (!empty($result)) {
+                $resultText = is_string($result)
+                    ? $result
+                    : json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+                $text .= "\n📩 Javob:\n<pre>" . htmlspecialchars(mb_substr($resultText, 0, 1000), ENT_QUOTES) . "</pre>";
             }
 
             Http::post('https://api.telegram.org/bot' . config('services.turar_joy_sync.telegram_bot_token') . '/sendMessage', [
