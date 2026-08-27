@@ -40,7 +40,7 @@ class ApartmentHiddenEconomyController extends BaseController
             $validated = $request->validated();
 
             return Excel::download(
-                new ApartmentHiddenEconomyExport(1, $validated),
+                new ApartmentHiddenEconomyExport($this->user->region_id, $validated),
                 'apartment-hidden-economy.xlsx'
             );
         } catch (\Throwable $e) {
