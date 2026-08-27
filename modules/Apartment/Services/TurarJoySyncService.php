@@ -2,12 +2,36 @@
 
 namespace Modules\Apartment\Services;
 
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Modules\Apartment\Models\Apartment;
 
 class TurarJoySyncService
 {
-    public function sync(int $homeId, string $source = 'create')
+    private const DEBOUNCE_SECONDS = 120;
+
+    public function sync(Apartment $apartment, string $source = 'create'): void
+    {
+        $apartment->update([
+            'turar_joy_sync_sources' => $this->mergeSources($apartment, $source),
+            'turar_joy_sync_ready_at' => now()->addSeconds(self::DEBOUNCE_SECONDS),
+        ]);
+    }
+
+    public function syncNow(Apartment $apartment, string $source): void
+    {
+        $sources = $this->mergeSources($apartment, $source);
+
+        $apartment->update([
+            'turar_joy_sync_sources' => null,
+            'turar_joy_sync_ready_at' => null,
+        ]);
+
+        $this->dispatch($apartment->home_id, $sources);
+    }
+
+    public function dispatch(int $homeId, string $sources): ?Response
     {
         try {
             $response = Http::withBasicAuth(
@@ -19,17 +43,25 @@ class TurarJoySyncService
                 ],
             ])->post(config('services.turar_joy_sync.url'));
 
-            $this->notifyTelegram($homeId, $source, $response->successful(), $response->status(), $response->json() ?? $response->body());
+            $this->notifyTelegram($homeId, $sources, $response->successful(), $response->status(), $response->json() ?? $response->body());
 
             return $response;
         } catch (\Exception $exception) {
             Log::info($exception->getMessage());
-            $this->notifyTelegram($homeId, $source, false, null, $exception->getMessage());
+            $this->notifyTelegram($homeId, $sources, false, null, $exception->getMessage());
             return null;
         }
     }
 
-    private function notifyTelegram(int $homeId, string $source, bool $sent, ?int $statusCode, $result = null): void
+    private function mergeSources(Apartment $apartment, string $source): string
+    {
+        $sources = array_filter(explode(',', $apartment->turar_joy_sync_sources ?? ''));
+        $sources[] = $source;
+
+        return implode(',', array_unique($sources));
+    }
+
+    private function notifyTelegram(int $homeId, string $sources, bool $sent, ?int $statusCode, $result = null): void
     {
         try {
             $emoji = $sent ? '✅' : '❌';
@@ -37,7 +69,7 @@ class TurarJoySyncService
 
             $text = "{$emoji} <b>Turar joy sync</b>\n"
                 . "🏠 Home ID: <code>{$homeId}</code>\n"
-                . "🔖 Funksiya: <b>{$source}</b>\n"
+                . "🔖 Funksiya: <b>{$sources}</b>\n"
                 . "📌 Holat: <b>{$status}</b>\n"
                 . "🕒 Vaqt: " . now()->format('Y-m-d H:i:s');
 

@@ -34,4 +34,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->call(function () {
 
         })->everyMinute();
+
+        $schedule->command('app:turar-joy-sync')->everyMinute()->withoutOverlapping();
     })->create();

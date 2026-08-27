@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Apartment extends Model
 {
+    protected $fillable = [
+        'turar_joy_sync_sources',
+        'turar_joy_sync_ready_at',
+    ];
     protected $guarded = false;
 
 

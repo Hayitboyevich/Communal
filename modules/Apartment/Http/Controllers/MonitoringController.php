@@ -331,7 +331,7 @@ class MonitoringController extends BaseController
             $monitoring = $this->service->create($request);
 
             if ($monitoring->apartment?->home_integration) {
-                $this->turarJoySyncService->sync($monitoring->apartment->home_id, 'create');
+                $this->turarJoySyncService->sync($monitoring->apartment, 'create');
             }
 
             return $this->sendSuccess(MonitoringResource::make($monitoring), 'Monitoring created successfully.');
@@ -347,7 +347,7 @@ class MonitoringController extends BaseController
 
             $monitoring = $this->service->findById($id);
             if ($monitoring->apartment?->home_integration) {
-                $this->turarJoySyncService->sync($monitoring->apartment->home_id, 'second');
+                $this->turarJoySyncService->sync($monitoring->apartment, 'second');
             }
 
             return $this->sendSuccess([], 'Monitoring created successfully.');
@@ -363,7 +363,7 @@ class MonitoringController extends BaseController
 
             $monitoring = $this->service->findById($id);
             if ($monitoring->apartment?->home_integration) {
-                $this->turarJoySyncService->sync($monitoring->apartment->home_id, 'third');
+                $this->turarJoySyncService->syncNow($monitoring->apartment, 'third');
             }
 
             return $this->sendSuccess([], 'Monitoring violation successfully.');
