@@ -65,6 +65,7 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
         };
         return [
             $monitoring->id,
+            $monitoring?->apartment?->home_id ?? '',
             $monitoring?->region?->name_uz ?? '',
             $monitoring?->district?->name_uz ?? '',
             $monitoring?->status?->name ?? '',
@@ -114,6 +115,7 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
     {
         return [
             'ID',
+            'Home_ID',
             'Viloyat',
             'Tuman',
             'Holati',
