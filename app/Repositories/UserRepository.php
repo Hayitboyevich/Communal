@@ -13,15 +13,15 @@ class UserRepository implements UserRepositoryInterface
     {
         switch ($roleId) {
             case UserRoleEnum::HR->value:
-                return User::query()->whereHas('roles', function ($query) use ($user) {
+                return User::query()->with(['documents'])->whereHas('roles', function ($query) use ($user) {
                     $query->whereIn('role_id', [UserRoleEnum::INSPECTOR->value, UserRoleEnum::MANAGER->value]);
                 });
             case UserRoleEnum::CADASTR_HR->value:
-                return User::query()->whereHas('roles', function ($query) use ($user) {
+                return User::query()->with(['documents'])->whereHas('roles', function ($query) use ($user) {
                     $query->whereIn('role_id', [UserRoleEnum::CADASTR_USER->value]);
                 });
             case UserRoleEnum::APARTMENT_HR->value:
-                return User::query()->whereHas('roles', function ($query) use ($user) {
+                return User::query()->with(['documents'])->whereHas('roles', function ($query) use ($user) {
                     $query->whereIn('role_id', [
                         UserRoleEnum::APARTMENT_INSPECTOR->value,
                         UserRoleEnum::APARTMENT_MANAGER->value,
@@ -35,7 +35,7 @@ class UserRepository implements UserRepositoryInterface
                     $query->whereIn('role_id', [UserRoleEnum::APARTMENT_INSPECTOR->value]);
                 });
             case UserRoleEnum::WATER_HR->value:
-                return User::query()->whereHas('roles', function ($query) use ($user) {
+                return User::query()->with(['documents'])->whereHas('roles', function ($query) use ($user) {
                     $query->whereIn('role_id', [UserRoleEnum::WATER_INSPECTOR->value]);
                 });
             case UserRoleEnum::MANAGER->value:

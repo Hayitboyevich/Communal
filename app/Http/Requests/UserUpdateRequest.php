@@ -29,7 +29,7 @@ class UserUpdateRequest extends FormRequest
             'role_id' => 'sometimes',
             'user_status_id' => 'sometimes',
             'files' => 'sometimes',
-            'docs' => 'sometimes',
+            'docs' => 'required|file|mimes:pdf,zip,doc,docx',
             'image' => 'sometimes',
         ];
     }
