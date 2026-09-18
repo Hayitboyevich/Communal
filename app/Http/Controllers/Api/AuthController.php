@@ -95,6 +95,8 @@ class AuthController extends BaseController
         list($pin, $accessToken) = explode(':', $decodedData);
 
         $user = User::query()->where('pin', $pin)->first();
+        if ($user->user_status_id != UserStatusEnum::ACTIVE->value)
+            return $this->sendError(error: 'Access denied!User is not active.', code: 422);
         if ($user){
             Auth::login($user);
             $user = Auth::user();
