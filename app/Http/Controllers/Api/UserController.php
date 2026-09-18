@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Constants\ErrorMessage;
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GetPersonInfoByPassposrtRequest;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserResource;
@@ -73,10 +74,11 @@ class UserController extends BaseController
         }
     }
 
-    public function info(): JsonResponse
+    public function info(GetPersonInfoByPassposrtRequest $request): JsonResponse
     {
+        $validated = $request->validated();
         try {
-            $data = $this->service->getInfo(request('pin'), request('birth_date'), request('type'));
+            $data = $this->service->getInfo($validated['pin'], $validated['birth_date'], $request->identifierType());
 
             return $this->sendSuccess($data, 'Passport Information Get Successfully');
 
