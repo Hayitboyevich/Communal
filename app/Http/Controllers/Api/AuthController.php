@@ -84,7 +84,7 @@ class AuthController extends BaseController
 
             return $this->sendSuccess($success, 'User logged in successfully.');
         }else{
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Unauthorized', "message" => 'Invalid credentials'], 401);
         }
     }
 

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Contracts\UserRepositoryInterface;
 use App\Enums\UserRoleEnum;
+use App\Enums\UserStatusEnum;
 use App\Models\User;
 
 class UserRepository implements UserRepositoryInterface
@@ -38,10 +39,10 @@ class UserRepository implements UserRepositoryInterface
                     $query->whereIn('role_id', [UserRoleEnum::WATER_INSPECTOR->value]);
                 });
             case UserRoleEnum::MANAGER->value:
-                return User::query()->where('region_id', $user->region_id);
+                return User::query()->where('region_id', $user->region_id)->where('user_status_id', UserStatusEnum::ACTIVE->value);
 
             case UserRoleEnum::RES_VIEWER->value:
-                return User::query()->whereHas('roles', function ($query) use ($user) {
+                return User::query()->where('user_status_id', UserStatusEnum::ACTIVE->value)->whereHas('roles', function ($query) use ($user) {
                     $query->whereIn('role_id', [UserRoleEnum::INSPECTOR->value]);
                 });
             case UserRoleEnum::APARTMENT_MANAGER->value:
@@ -50,7 +51,8 @@ class UserRepository implements UserRepositoryInterface
                     ->whereHas('roles', function ($query) {
                         $query->where('role_id', UserRoleEnum::APARTMENT_INSPECTOR->value);
                     })
-                    ->where('region_id', $user->region_id);
+                    ->where('region_id', $user->region_id)
+                    ->where('user_status_id', UserStatusEnum::ACTIVE->value);
 
             default:
                 return User::query()->whereRaw('1 = 0');
