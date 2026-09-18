@@ -25,6 +25,7 @@ class UserResource extends JsonResource
             'region' => $this->region ? RegionResource::make($this->region) : null,
             'district' => $this->district ? DistrictResource::make($this->district) : null,
             'roles' => $this->roles ? RoleResource::collection($this->roles) : null,
+            'documents' => $this->documents ? DocumentResource::collection($this->documents) : null,
         ];
     }
 }
