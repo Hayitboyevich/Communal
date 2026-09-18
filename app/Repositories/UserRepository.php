@@ -11,14 +11,6 @@ class UserRepository implements UserRepositoryInterface
 {
     public function all($user, $roleId)
     {
-        return User::query()->where('id', 655)->with('documents')->whereHas('roles', function ($query) use ($user) {
-        $query->whereIn('role_id', [
-            UserRoleEnum::APARTMENT_INSPECTOR->value,
-            UserRoleEnum::APARTMENT_MANAGER->value,
-            UserRoleEnum::REG_VIEWER->value,
-            UserRoleEnum::APARTMENT_VIEWER->value,
-        ]);
-    });
         switch ($roleId) {
             case UserRoleEnum::HR->value:
                 return User::query()->with(['documents'])->whereHas('roles', function ($query) use ($user) {
