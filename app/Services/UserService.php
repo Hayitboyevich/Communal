@@ -95,6 +95,7 @@ class UserService
             $user = $this->repository->update($id, $request->except(['role_id', 'image', 'images', 'docs']));
 
             $user->roles()->syncWithoutDetaching($request->role_id);
+            $comment = 'Foydalanuvchi o\'zgartirildi';
 
             if (!empty($request->image)) {
                 $path = $this->fileService->uploadImage($request->image, 'user/images');
@@ -110,6 +111,12 @@ class UserService
                 $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->docs);
                 $user->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
             }
+            $eimzoSign = $this->eimzoService->signTimestamp($request['pkcs7']);
+            if (!in_array(Auth::user()?->pin, Arr::wrap(Arr::get($eimzoSign, 'pin', [])))) {
+                return response()->json(['message' => 'Elektron kalit egasi va foydalanuvchi PINFLi mos emas!'], 404);
+            }
+            $this->createUserActionHistory(user_id: $user->id, comment: $comment, date: now(), status: (int)$request['$request'], type: UserActionHistory::TYPE_UPDATE, additional_info: $eimzoSign['pkcs7b64']);
+
             DB::commit();
             return $user;
         } catch (\Exception $exception) {

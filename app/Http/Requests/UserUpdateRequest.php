@@ -32,6 +32,7 @@ class UserUpdateRequest extends FormRequest
             'docs' => 'required|array',
             'docs.*' => 'file|mimes:pdf,zip,doc,docx',
             'image' => 'sometimes',
+            'pkcs7' => 'required|string'
         ];
     }
 }
