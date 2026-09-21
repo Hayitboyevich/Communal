@@ -9,24 +9,32 @@ use App\Http\Resources\RoleResource;
 use App\Models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Modules\Apartment\Models\UserActionHistory;
+use Modules\Water\Services\HistoryService;
 
 class UserService
 {
+    private HistoryService $historyService;
+
     public function __construct(
-        protected Client $client,
+        protected Client                  $client,
         protected UserRepositoryInterface $repository,
         protected FileService             $fileService,
-        protected EimzoService             $eimzoService,
+        protected EimzoService            $eimzoService,
     )
-    {}
+    {
+        $this->historyService = new HistoryService('user_action_histories');
+    }
 
-    public function getAll($user, $roleId,$filters)
+    public function getAll($user, $roleId, $filters)
     {
         try {
-           $query =  $this->repository->all($user, $roleId);
-           return $this->repository->search($query, $filters);
-        }catch (\Exception $exception){
+            $query = $this->repository->all($user, $roleId);
+            return $this->repository->search($query, $filters);
+        } catch (\Exception $exception) {
             throw $exception;
         }
     }
@@ -42,7 +50,8 @@ class UserService
         try {
 
             $user = User::query()->where('pin', $request['pin'])->first();
-            if (!$user){
+            $comment = null;
+            if (!$user) {
                 $user = $this->repository->create($request->except(['role_id', 'image', 'images', 'docs']));
                 if ($request->hasFile('image')) {
                     $path = $this->fileService->uploadImage($request->file('image'), 'user/images');
@@ -57,12 +66,17 @@ class UserService
                     $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->docs);
                     $user->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
                 }
+                $comment = 'Foydalanuvchi qo\'shildi';
             }
 
             foreach ($request->role_id as $role) {
                 $user->roles()->syncWithoutDetaching([$role]);
             }
-
+            $eimzoSign = $this->eimzoService->signTimestamp($request['pkcs7']);
+            if (!in_array(Auth::user()?->pin, Arr::wrap(Arr::get($eimzoSign, 'pin', [])))) {
+                return response()->json(['message' => 'Elektron kalit egasi va foydalanuvchi PINFLi mos emas!'], 404);
+            }
+            $this->createUserActionHistory(user_id: $user->id, comment: $comment, date: now(), status: 1, type: UserActionHistory::TYPE_CREATE, additional_info: $eimzoSign['pkcs7b64']);
             DB::commit();
             return $user;
         } catch (\Exception $exception) {
@@ -94,7 +108,6 @@ class UserService
                 $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->docs);
                 $user->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
             }
-
             DB::commit();
             return $user;
         } catch (\Exception $exception) {
@@ -145,19 +158,24 @@ class UserService
     public function getInspectors($user, $roleId, $filters)
     {
         $query = $this->repository->all($user, $roleId);
-        return  $this->repository->search($query, $filters);
+        return $this->repository->search($query, $filters);
     }
 
     public function challenge($pin)
     {
         $user = $this->repository->findByPin($pin);
-        if ($user){
+        if ($user) {
             $data = $this->eimzoService->getChallenge();
             $info['challenge'] = $data;
             $info['roles'] = RoleResource::collection($user->roles);
             return $info;
         }
         return null;
+    }
+
+    public function createUserActionHistory(int $user_id, ?string $comment, ?string $date, int $status, int $type, mixed $additional_info = null): void
+    {
+        $this->historyService->createHistory(guid: $user_id, status: $status, type: $type, date: $date, comment: $comment, additionalInfo: $additional_info);
     }
 
 }

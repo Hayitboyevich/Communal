@@ -32,6 +32,7 @@ class UserCreateRequest extends FormRequest
             'docs.*' => 'file|mimes:pdf,zip,doc,docx',
             'images' => 'sometimes',
             'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'pkcs7' => 'required|string'
         ];
     }
 
