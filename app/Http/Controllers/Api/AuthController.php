@@ -10,6 +10,7 @@ use App\Http\Resources\RegionResource;
 use App\Http\Resources\RoleResource;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\EimzoService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,6 +21,10 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends BaseController
 {
+    public function __construct(private EimzoService $eimzoService)
+    {
+        parent::__construct();
+    }
 
     public function checkUser(): JsonResponse
     {
@@ -117,5 +122,13 @@ class AuthController extends BaseController
         }else{
             return $this->sendError('Kirish huquqi mavjud emas', code: 401);
         }
+    }
+
+    public function checkEimzoDetached()
+    {
+        $pkcs7 = request('pkcs7');
+        $signTimestamp = $this->eimzoService->signTimestamp($pkcs7);
+        dd($signTimestamp, $signTimestamp['pkcs7b64']);
+        return $this->sendSuccess($this->eimzoService->attached($signTimestamp['pkcs7b64']), 'Eimzo detached successfully.');
     }
 }

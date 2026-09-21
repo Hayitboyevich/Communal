@@ -76,6 +76,8 @@ Route::group(['middleware' => ['basic']], function () {
         Route::post('/apartment-update', 'apartmentUpdate');
         Route::get('/apartment-statictic/{id}', 'apartmentStatistic');
     });
+
+    Route::post('check-eimzo', [AuthController::class, 'checkEimzoDetached']);
 });
 
 
