@@ -128,11 +128,12 @@ class UserService
 
             $data = [
                 'effected_user_id' => $userHistory->guid,
-                'effected_user' => $userHistory->guid ? User::query()->find($userHistory->content->user, ['name', 'surname', 'middle_name']) : null,
+                'effected_user' => $userHistory->guid ? User::query()->find($userHistory->guid, ['name', 'surname', 'middle_name']) : null,
                 'effected_user_roles' =>  User::query()->find($userHistory->guid)->roles()->get(['roles.id', 'roles.name'])->toArray(),
                 'changed_user_id' => $userHistory->content->user ?? null,
                 'changed_user' => $userHistory->content->user ? User::query()->find($userHistory->content->user, ['name', 'surname', 'middle_name']) : null,
                 'changed_user_role' => $userHistory->content->role ? Role::query()->find($userHistory->content->role, ['name', 'description']) : null,
+                'comment' => $comment,
             ];
 //            CreateNotifiacation::dispatch($data, $this->userId)->afterCommit();
             $this->notificationService->createNotification($data, $this->userId);
