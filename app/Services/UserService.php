@@ -30,6 +30,7 @@ class UserService
         protected UserRepositoryInterface $repository,
         protected FileService             $fileService,
         protected EimzoService            $eimzoService,
+        protected NotificationService     $notificationService,
     )
     {
         $this->historyService = new HistoryService('user_action_histories');
@@ -133,7 +134,8 @@ class UserService
                 'changed_user' => $userHistory->content->user ? User::query()->find($userHistory->content->user, ['name', 'surname', 'middle_name']) : null,
                 'changed_user_role' => $userHistory->content->role ? Role::query()->find($userHistory->content->role, ['name', 'description']) : null,
             ];
-            CreateNotifiacation::dispatch($data, $this->userId)->afterCommit();
+//            CreateNotifiacation::dispatch($data, $this->userId)->afterCommit();
+            $this->notificationService->createNotification($data, $this->userId);
 
             DB::commit();
             return $user;
