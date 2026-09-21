@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\UserRepositoryInterface;
+use App\Enums\UserStatusEnum;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\DocumentResource;
@@ -91,7 +92,12 @@ class UserService
     {
         DB::beginTransaction();
         try {
-            $comment = 'Foydalanuvchi o\'zgartirildi';
+            $userStatusId = Arr::get($request, 'user_status_id');
+            $comment = match (UserStatusEnum::tryFrom((int) $userStatusId)) {
+                UserStatusEnum::INACTIVE => 'Foydalanuvchi ta\'tilga chiqarildi!',
+                UserStatusEnum::RELEASED => 'Foydalanuvchi o\'chirildi!',
+                default => 'Foydalanuvchi yangilandi!',
+            };
             $eimzoSign = $this->eimzoService->signTimestamp($request['pkcs7']);
             if (!in_array(Auth::user()?->pin, Arr::wrap(Arr::get($eimzoSign, 'pin', [])))) {
                 return response()->json(['message' => 'Elektron kalit egasi va foydalanuvchi PINFLi mos emas!'], 404);
