@@ -102,7 +102,7 @@ class UserService
             if (!in_array(Auth::user()?->pin, Arr::wrap(Arr::get($eimzoSign, 'pin', [])))) {
                 return response()->json(['message' => 'Elektron kalit egasi va foydalanuvchi PINFLi mos emas!'], 404);
             }
-            $user = $this->repository->update($id, $request->except(['role_id', 'image', 'images', 'docs']));
+            $user = $this->repository->update($id, $request->except(['role_id', 'image', 'images', 'docs', 'pkcs7']));
             $userHistoryId = $this->createUserActionHistory(user_id: $user->id, comment: $comment, date: now(), status: (int)$request['$request'], type: UserActionHistory::TYPE_UPDATE, additional_info: $eimzoSign['pkcs7b64']);
             $userHistory = UserActionHistory::query()->find($userHistoryId);
             $user->roles()->syncWithoutDetaching($request->role_id);
