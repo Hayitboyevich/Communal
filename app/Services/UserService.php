@@ -52,7 +52,7 @@ class UserService
         try {
 
             $user = User::query()->where('pin', $request['pin'])->first();
-            $comment = null;
+            $comment = 'Foydalanuvchi qo\'shildi';
             if (!$user) {
                 $user = $this->repository->create($request->except(['role_id', 'image', 'images', 'docs']));
                 if ($request->hasFile('image')) {
@@ -68,7 +68,6 @@ class UserService
                     $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->docs);
                     $user->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
                 }
-                $comment = 'Foydalanuvchi qo\'shildi';
             }
 
             foreach ($request->role_id as $role) {
