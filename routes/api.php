@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DistrictController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\RegionController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
@@ -20,6 +21,8 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::post('check-eimzo', [AuthController::class, 'checkEimzoDetached']);
 Route::get('users/history/{id}', [UserController::class, 'actionHistory']);
+Route::post('users/create', [UserController::class, 'create']);
+
 Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(UserController::class)->prefix('user')->group(function () {
@@ -56,6 +59,11 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
     Route::controller(DistrictController::class)->prefix('district')->group(function () {
         Route::get('/', 'list');
         Route::get('/{id}', 'getDistrict');
+    });
+
+    Route::controller(NotificationController::class)->prefix('notification')->group(function () {
+        Route::get('list', 'sendList');
+        Route::post('mark-read', 'read');
     });
 
 });

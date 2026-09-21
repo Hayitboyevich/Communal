@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Contracts\UserRepositoryInterface;
+use App\Enums\UserRoleEnum;
 use App\Enums\UserStatusEnum;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\DocumentResource;
 use App\Http\Resources\RoleResource;
+use App\Jobs\CreateNotifiacation;
 use App\Models\Role;
 use App\Models\User;
 use GuzzleHttp\Client;
@@ -21,6 +23,7 @@ use Modules\Water\Services\HistoryService;
 class UserService
 {
     private HistoryService $historyService;
+    private int $userId = 485;
 
     public function __construct(
         protected Client                  $client,
@@ -93,7 +96,7 @@ class UserService
         DB::beginTransaction();
         try {
             $userStatusId = Arr::get($request, 'user_status_id');
-            $comment = match (UserStatusEnum::tryFrom((int) $userStatusId)) {
+            $comment = match (UserStatusEnum::tryFrom((int)$userStatusId)) {
                 UserStatusEnum::INACTIVE => 'Foydalanuvchi ta\'tilga chiqarildi!',
                 UserStatusEnum::RELEASED => 'Foydalanuvchi o\'chirildi!',
                 default => 'Foydalanuvchi yangilandi!',
@@ -121,6 +124,16 @@ class UserService
                 $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->docs);
                 $userHistory->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
             }
+
+            $data = [
+                'effected_user_id' => $userHistory->guid,
+                'effected_user' => $userHistory->guid ? User::query()->find($userHistory->content->user, ['name', 'surname', 'middle_name']) : null,
+                'effected_user_roles' =>  User::query()->find($userHistory->guid)->roles()->get(['roles.id', 'roles.name'])->toArray(),
+                'changed_user_id' => $userHistory->content->user ?? null,
+                'changed_user' => $userHistory->content->user ? User::query()->find($userHistory->content->user, ['name', 'surname', 'middle_name']) : null,
+                'changed_user_role' => $userHistory->content->role ? Role::query()->find($userHistory->content->role, ['name', 'description']) : null,
+            ];
+            CreateNotifiacation::dispatch($data, $this->userId)->afterCommit();
 
             DB::commit();
             return $user;

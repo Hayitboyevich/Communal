@@ -104,4 +104,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(UserActionHistory::class, 'guid')->orderBy('created_at', 'desc');
     }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id');
+    }
 }
