@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Modules\Apartment\Models\UserActionHistory;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -97,5 +98,10 @@ class User extends Authenticatable implements JWTSubject
     public function inspectors(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id')->where('roles.id', UserRoleEnum::INSPECTOR->value);
+    }
+
+    public function actionHistories()
+    {
+        return $this->hasMany(UserActionHistory::class, 'guid')->orderBy('created_at', 'desc');
     }
 }

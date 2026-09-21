@@ -30,6 +30,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::post('/challenge', 'challenge');
         Route::get('/inspector/{id?}', 'inspector');
         Route::post('/organization', 'organization');
+        Route::get('/history/{id}', 'actionHistory');
     });
 
     Route::controller(VersionController::class)->prefix('version')->group(function () {

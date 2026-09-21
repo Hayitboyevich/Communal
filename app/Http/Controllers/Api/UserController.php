@@ -13,6 +13,7 @@ use App\Http\Resources\UserStatusResource;
 use App\Models\User;
 use App\Models\UserStatus;
 use App\Services\UserService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
 
@@ -39,7 +40,7 @@ class UserController extends BaseController
                 $id ? 'User retrieved successfully.' : 'Users retrieved successfully.',
                 $id ? null : pagination($users)
             );
-        }catch (\Exception $exception){
+        }catch (Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -48,7 +49,7 @@ class UserController extends BaseController
     {
         try {
             return $this->sendSuccess(UserStatusResource::collection(UserStatus::all()), 'User status retrieved successfully.');
-        }catch (\Exception $exception){
+        }catch (Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -59,7 +60,7 @@ class UserController extends BaseController
             $user = $this->service->create($request);
             return $this->sendSuccess(new UserResource($user), 'User created successfully.');
 
-        }catch (\Exception $exception){
+        }catch (Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -69,7 +70,7 @@ class UserController extends BaseController
         try {
             $user = $this->service->update($id, $request);
             return $this->sendSuccess(new UserResource($user), 'User updated successfully.');
-        }catch (\Exception $exception){
+        }catch (Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -82,7 +83,7 @@ class UserController extends BaseController
 
             return $this->sendSuccess($data, 'Passport Information Get Successfully');
 
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -98,7 +99,7 @@ class UserController extends BaseController
                 return response()->json($response->json());
             }
             return $this->sendError(ErrorMessage::ERROR_1);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -109,7 +110,7 @@ class UserController extends BaseController
             $pin = request('pin');
             $data = $this->service->challenge($pin);
             return $this->sendSuccess($data, 'Passport Information Get Successfully');
-        }catch (\Exception $exception){
+        }catch (Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -122,8 +123,16 @@ class UserController extends BaseController
             $users = $this->service->getInspectors($this->user, $this->roleId, $filters)->get();
 
            return $this->sendSuccess(UserResource::collection($users), 'Inspectors retrieved successfully.');
-        }catch (\Exception $exception){
+        }catch (Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function actionHistory($id)
+    {
+        return $this->sendSuccess($this->service->getActionHistory($id), 'Action History');
     }
 }

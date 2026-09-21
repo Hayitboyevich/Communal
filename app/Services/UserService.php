@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Contracts\UserRepositoryInterface;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Http\Resources\DocumentResource;
 use App\Http\Resources\RoleResource;
+use App\Models\Role;
 use App\Models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
@@ -173,7 +175,27 @@ class UserService
         return null;
     }
 
-    public function createUserActionHistory(int $user_id, ?string $comment, ?string $date, int $status, int $type, mixed $additional_info = null): void
+    public function getActionHistory($id)
+    {
+        try {
+            $user = $this->repository->find($id);
+            return $user?->actionHistories->map(function ($item) {
+                [
+                    'id' => $item->id,
+                    'comment' => $item->content->comment,
+                    'user' => $item->content->user ? User::query()->find($item->content->user, ['name', 'surname', 'middle_name']) : null,
+                    'role' => $item->content->role ? Role::query()->find($item->content->role, ['name', 'description']) : null,
+                    'type' => $item->type == UserActionHistory::TYPE_CREATE ? 'create' : ($item->type == UserActionHistory::TYPE_UPDATE ? 'update' : 'delete'),
+                    'files' => $item->documents ? DocumentResource::collection($item->documents) : null,
+                    'created_at' => $item->created_at,
+                ];
+            });
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    private function createUserActionHistory(int $user_id, ?string $comment, ?string $date, int $status, int $type, mixed $additional_info = null): void
     {
         $this->historyService->createHistory(guid: $user_id, status: $status, type: $type, date: $date, comment: $comment, additionalInfo: $additional_info);
     }
