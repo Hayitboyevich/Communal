@@ -128,7 +128,6 @@ class AuthController extends BaseController
     {
         $pkcs7 = request('pkcs7');
         $signTimestamp = $this->eimzoService->signTimestamp($pkcs7);
-        dd($signTimestamp, $signTimestamp['pkcs7b64']);
         return $this->sendSuccess($this->eimzoService->attached($signTimestamp['pkcs7b64']), 'Eimzo detached successfully.');
     }
 }
