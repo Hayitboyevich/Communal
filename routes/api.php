@@ -19,6 +19,7 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 Route::post('check-eimzo', [AuthController::class, 'checkEimzoDetached']);
+Route::get('users/history/{id}', [UserController::class, 'actionHistory']);
 Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(UserController::class)->prefix('user')->group(function () {

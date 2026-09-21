@@ -56,16 +56,16 @@ class UserService
             if (!$user) {
                 $user = $this->repository->create($request->except(['role_id', 'image', 'images', 'docs']));
                 if ($request->hasFile('image')) {
-                    $path = $this->fileService->uploadImage($request->file('image'), 'user/images');
+                    $path = $this->fileService->uploadImage($request->file('image'), 'user-history/images');
                     $user->update(['image' => $path]);
                 }
 
                 if ($request->images) {
-                    $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/images'), $request->images);
+                    $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user-history/images'), $request->images);
                     $user->images()->createMany(array_map(fn($path) => ['url' => $path], $paths));
                 }
                 if ($request->docs) {
-                    $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user/files'), $request->docs);
+                    $paths = array_map(fn($file) => $this->fileService->uploadImage($file, 'user-history/files'), $request->docs);
                     $user->documents()->createMany(array_map(fn($path) => ['url' => $path], $paths));
                 }
             }
@@ -186,7 +186,7 @@ class UserService
         try {
             $user = $this->repository->find($id);
             return $user?->actionHistories->map(function ($item) {
-                [
+                return [
                     'id' => $item->id,
                     'comment' => $item->content->comment,
                     'user' => $item->content->user ? User::query()->find($item->content->user, ['name', 'surname', 'middle_name']) : null,
@@ -195,7 +195,8 @@ class UserService
                     'files' => $item->documents ? DocumentResource::collection($item->documents) : null,
                     'created_at' => $item->created_at,
                 ];
-            });
+            })->sortByDesc('created_at')->values();
+            dd($result);
         } catch (\Exception $exception) {
             throw $exception;
         }
