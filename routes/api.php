@@ -18,7 +18,7 @@ Route::controller(AuthController::class)->group(function () {
 
 });
 
-
+Route::post('check-eimzo', [AuthController::class, 'checkEimzoDetached']);
 Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(UserController::class)->prefix('user')->group(function () {
@@ -76,8 +76,6 @@ Route::group(['middleware' => ['basic']], function () {
         Route::post('/apartment-update', 'apartmentUpdate');
         Route::get('/apartment-statictic/{id}', 'apartmentStatistic');
     });
-
-    Route::post('check-eimzo', [AuthController::class, 'checkEimzoDetached']);
 });
 
 
