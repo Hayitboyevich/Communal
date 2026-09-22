@@ -20,7 +20,7 @@ class Notification extends Model
 
     protected static function booted()
     {
-        static::addGlobalScope(new NotificationUserScope());
+        static::addGlobalScope(new NotificationUserScope);
     }
 
     public function user()
