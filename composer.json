@@ -15,7 +15,8 @@
         "milon/barcode": "^12.1",
         "sentry/sentry-laravel": "^4.20",
         "simplesoftwareio/simple-qrcode": "^4.2",
-        "tymon/jwt-auth": "^2.2"
+        "tymon/jwt-auth": "^2.2",
+        "plesk/ext-laravel-integration": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
