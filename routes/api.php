@@ -68,6 +68,8 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
 });
 
+Route::get('egov-info', [InformationController::class, 'egov']);
+
 Route::group(['middleware' => ['basic']], function () {
     Route::controller(InformationController::class)->prefix('info')->group(function () {
         Route::get('/types', 'types');

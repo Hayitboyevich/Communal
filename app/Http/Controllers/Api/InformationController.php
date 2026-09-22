@@ -13,6 +13,7 @@ use App\Http\Resources\RegionResource;
 use App\Models\District;
 use App\Models\Region;
 use App\Models\User;
+use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Modules\Apartment\Const\LetterStatus;
@@ -280,5 +281,19 @@ class InformationController extends BaseController
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
+    }
+
+    public function egov()
+    {
+        $client = new Client();
+        $response = $client->request('POST', 'https://iskm.egov.uz:9444/oauth2/token?grant_type=password&username=qv-user&password=8F5zl2w68GU1itlyGF0w', [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => "application/json",
+                'Authorization' => 'Basic SXVnQ2h4XzFabkxsQWhkMEp4OWVtTjZqV3AwYToxUzlrWGxLQzBhWnd3bHNzb28xSzJmM1NRN3dh'
+            ]
+        ])->getBody()->getContents();
+        $response = json_decode($response, true);
+        return $response;
     }
 }
