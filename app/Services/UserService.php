@@ -135,8 +135,7 @@ class UserService
                 'changed_user_role' => $userHistory->content->role ? Role::query()->find($userHistory->content->role, ['name', 'description']) : null,
                 'comment' => $comment,
             ];
-            CreateNotification::dispatch($data, $this->userId)->onQueue('notify')->afterCommit();
-//            $this->notificationService->createNotification($data, $this->userId);
+            CreateNotification::dispatch($data, $this->userId);
 
             DB::commit();
             return $user;

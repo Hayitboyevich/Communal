@@ -55,4 +55,16 @@ return [
         'telegram_channel_id' => env('TURAR_JOY_SYNC_TELEGRAM_CHANNEL_ID'),
     ],
 
+    'egov' => [
+        'get_token' => [
+            'url' => env('EGOV_GET_TOKEN_URL'),
+            'user_name' => env('EGOV_USERNAME'),
+            'password' => env('EGOV_PASSWORD'),
+            'token' => env('EGOV_TOKEN'),
+        ],
+        'get_user_info' => [
+            'current_work_place_user_url' => env('EGOV_CURRENT_WORK_URL'),
+            'history_work_place_user_url' => env('EGOV_HISTORY_WORK_URL')
+        ]
+    ]
 ];

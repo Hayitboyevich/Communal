@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Exceptions;
+
+use Exception;
+use Illuminate\Http\JsonResponse;
+
+class ServerException extends Exception
+{
+    public function render(): JsonResponse
+    {
+        return new JsonResponse([
+            'success' => false,
+            'message' => $this->getMessage(),
+            'code'=> 500,
+        ], 500);
+    }
+}

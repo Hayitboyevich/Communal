@@ -2,6 +2,7 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    \Modules\Water\Providers\WaterServiceProvider::class,
-    \Modules\Apartment\Providers\ApartmentServiceProvider::class,
+    App\Providers\EmploymentIntegrationServiceProvider::class,
+    Modules\Apartment\Providers\ApartmentServiceProvider::class,
+    Modules\Water\Providers\WaterServiceProvider::class,
 ];
