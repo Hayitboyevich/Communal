@@ -18,10 +18,10 @@ class Notification extends Model
 
     protected $hidden = ['user_id'];
 
-    protected static function booted()
-    {
-        static::addGlobalScope(new NotificationUserScope);
-    }
+//    protected static function booted()
+//    {
+//        static::addGlobalScope(new NotificationUserScope);
+//    }
 
     public function user()
     {

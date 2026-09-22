@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 
-class CreateNotifiacation implements ShouldQueue
+class CreateNotification implements ShouldQueue
 {
     use Queueable;
 

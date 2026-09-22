@@ -9,7 +9,7 @@ use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\DocumentResource;
 use App\Http\Resources\RoleResource;
-use App\Jobs\CreateNotifiacation;
+use App\Jobs\CreateNotification;
 use App\Models\Role;
 use App\Models\User;
 use GuzzleHttp\Client;
@@ -135,8 +135,8 @@ class UserService
                 'changed_user_role' => $userHistory->content->role ? Role::query()->find($userHistory->content->role, ['name', 'description']) : null,
                 'comment' => $comment,
             ];
-//            CreateNotifiacation::dispatch($data, $this->userId)->afterCommit();
-            $this->notificationService->createNotification($data, $this->userId);
+            CreateNotification::dispatch($data, $this->userId)->onQueue('notify')->afterCommit();
+//            $this->notificationService->createNotification($data, $this->userId);
 
             DB::commit();
             return $user;
