@@ -28,7 +28,7 @@ class NotificationService
 
     public function listNotification()
     {
-        return $this->notification->where('user_id', 485)->with('user')->get();
+        return $this->notification->where('user_id', 485)->with('user')->orderBy('created_at', 'desc')->get();
     }
 
     /**
