@@ -18,11 +18,6 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('check-user', 'checkUser');
 
 });
-
-Route::post('check-eimzo', [AuthController::class, 'checkEimzoDetached']);
-Route::get('users/history/{id}', [UserController::class, 'actionHistory']);
-Route::post('users/create', [UserController::class, 'create']);
-
 Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(UserController::class)->prefix('user')->group(function () {
@@ -67,8 +62,6 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
     });
 
 });
-
-Route::get('egov-info', [InformationController::class, 'egov']);
 
 Route::group(['middleware' => ['basic']], function () {
     Route::controller(InformationController::class)->prefix('info')->group(function () {

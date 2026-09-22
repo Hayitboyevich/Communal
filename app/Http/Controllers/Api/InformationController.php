@@ -283,15 +283,4 @@ class InformationController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
-
-    public function egov()
-    {
-        $result = Http::withHeaders([
-            'Authorization' => 'Basic SXVnQ2h4XzFabkxsQWhkMEp4OWVtTjZqV3AwYToxUzlrWGxLQzBhWnd3bHNzb28xSzJmM1NRN3dh'
-        ])
-            ->post("https://iskm.egov.uz:9444/oauth2/token?grant_type=password&username=qv-user&password=8F5zl2w68GU1itlyGF0w");
-
-        $res = json_decode($result->body());
-        return response()->json($res);
-    }
 }
