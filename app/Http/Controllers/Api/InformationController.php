@@ -16,6 +16,7 @@ use App\Models\User;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Modules\Apartment\Const\LetterStatus;
 use Modules\Apartment\Http\Resources\MonitoringResource;
 use Modules\Apartment\Http\Resources\MonitoringTypeResource;
@@ -285,15 +286,13 @@ class InformationController extends BaseController
 
     public function egov()
     {
-        $client = new Client();
-        $response = $client->request('POST', 'https://iskm.egov.uz:9444/oauth2/token?grant_type=password&username=qv-user&password=8F5zl2w68GU1itlyGF0w', [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept' => "application/json",
-                'Authorization' => 'Basic SXVnQ2h4XzFabkxsQWhkMEp4OWVtTjZqV3AwYToxUzlrWGxLQzBhWnd3bHNzb28xSzJmM1NRN3dh'
-            ]
-        ])->getBody()->getContents();
-        $response = json_decode($response, true);
-        return $response;
+        $result = Http::withHeaders([
+            'Authorization' => 'Basic SXVnQ2h4XzFabkxsQWhkMEp4OWVtTjZqV3AwYToxUzlrWGxLQzBhWnd3bHNzb28xSzJmM1NRN3dh'
+        ])
+            ->timeout(15)
+            ->post("https://iskm.egov.uz:9444/oauth2/token?grant_type=password&username=qv-user&password=8F5zl2w68GU1itlyGF0w");
+
+        $res = json_decode($result->body());
+        return response()->json($res);
     }
 }
