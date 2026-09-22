@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\NotificationUserScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use function Termwind\renderUsing;
@@ -16,6 +17,11 @@ class Notification extends Model
     ];
 
     protected $hidden = ['user_id'];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new NotificationUserScope());
+    }
 
     public function user()
     {
