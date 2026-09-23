@@ -35,6 +35,12 @@ return [
         ],
     ],
 
+    'api_shaffof_credentials' =>[
+        "login" => env('BANK_USERNAME', 'dev@gasn'),
+        "password" => env('BANK_PASSWORD', 'EkN`9?@{3v0j'),
+        "token" => 'Basic '. env('BANK_USERNAME', 'dev@gasn').':'.env('BANK_PASSWORD', 'EkN`9?@{3v0j'),
+    ],
+
     'oneId' => [
         'id' => env('ONE_ID_CLIENT_ID'),
         'secret' => env('ONE_ID_CLIENT_SECRET'),

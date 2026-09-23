@@ -10,9 +10,9 @@ class EmploymentIntegrationService
     {
     }
 
-    public function getToken()
+    public function currentWorkPlaceOne($pinfl)
     {
-//        return
+        return $this->provider->currentWorkPlaceOne($pinfl);
     }
 
 }

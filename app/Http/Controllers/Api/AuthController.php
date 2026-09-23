@@ -11,6 +11,7 @@ use App\Http\Resources\RoleResource;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\EimzoService;
+use App\Services\EmploymentIntegrationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,7 +22,8 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends BaseController
 {
-    public function __construct(private EimzoService $eimzoService)
+    public function __construct(private EimzoService $eimzoService,
+                                private readonly EmploymentIntegrationService $employmentIntegrationService)
     {
         parent::__construct();
     }
@@ -62,7 +64,7 @@ class AuthController extends BaseController
                 'full_name' => $user->full_name,
             ];
             return $this->sendSuccess($meta, 'User find.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -84,11 +86,11 @@ class AuthController extends BaseController
             $success['pin'] = $user->pin;
             $success['role'] = new RoleResource($role);
             $success['region'] = $user->region_id ? new RegionResource($user->region) : null;
-            $success['district'] = $user->district_id ?  new DistrictResource($user->district) : null;
-            $success['image'] = $user->image ?  Storage::disk('public')->url($user->image): null;
+            $success['district'] = $user->district_id ? new DistrictResource($user->district) : null;
+            $success['image'] = $user->image ? Storage::disk('public')->url($user->image) : null;
 
             return $this->sendSuccess($success, 'User logged in successfully.');
-        }else{
+        } else {
             return response()->json(['error' => 'Unauthorized', "message" => 'Invalid credentials'], 401);
         }
     }
@@ -102,7 +104,7 @@ class AuthController extends BaseController
         $user = User::query()->where('pin', $pin)->first();
         if ($user->user_status_id != UserStatusEnum::ACTIVE->value)
             return $this->sendError(error: 'Access denied!User is not active.', code: 422);
-        if ($user){
+        if ($user) {
             Auth::login($user);
             $user = Auth::user();
             $roleId = request('role_id');
@@ -116,10 +118,10 @@ class AuthController extends BaseController
             $success['pin'] = $user->pin;
             $success['role'] = new RoleResource($role);
             $success['region'] = $user->region_id ? new RegionResource($user->region) : null;
-            $success['district'] = $user->district_id ?  new DistrictResource($user->district) : null;
-            $success['image'] = $user->image ?  Storage::disk('public')->url($user->image): null;
+            $success['district'] = $user->district_id ? new DistrictResource($user->district) : null;
+            $success['image'] = $user->image ? Storage::disk('public')->url($user->image) : null;
             return $this->sendSuccess($success, 'User logged in successfully.');
-        }else{
+        } else {
             return $this->sendError('Kirish huquqi mavjud emas', code: 401);
         }
     }
@@ -129,5 +131,10 @@ class AuthController extends BaseController
         $pkcs7 = request('pkcs7');
         $signTimestamp = $this->eimzoService->signTimestamp($pkcs7);
         return $this->sendSuccess($this->eimzoService->attached($signTimestamp['pkcs7b64']), 'Eimzo detached successfully.');
+    }
+
+    public function infoEmployment($pinfl)
+    {
+        return $this->sendSuccess($this->employmentIntegrationService->currentWorkPlaceOne($pinfl), 'Employment Information Get Successfully');
     }
 }
