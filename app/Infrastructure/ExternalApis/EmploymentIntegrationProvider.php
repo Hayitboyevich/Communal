@@ -30,9 +30,12 @@ class EmploymentIntegrationProvider
      */
     private function sendingRequest(int $method_type, string $method, $url, array $headers_with_body = [], array $pool_options = [])
     {
+        if ($method_type === $this->current_pool) {
+            return $this->poolRequest($method, $url, $pool_options);
+        }
+
         $res = match ($method_type) {
             $this->current => $this->safeCall(fn() => $this->client->request($method, $url, $headers_with_body)->getBody()->getContents()),
-            $this->current_pool => $this->poolRequest($method, $url, $pool_options)
         };
         return json_decode($res);
     }
@@ -118,7 +121,7 @@ class EmploymentIntegrationProvider
      * @throws NotFoundException
      * @throws ServerException
      */
-    public function currentPoolRequest(array $pinfls , int $concurrency, Closure $acquire)
+    public function currentPoolRequest(array $pinfls, int $concurrency, ?Closure $acquire = null): array
     {
         $url = config('services.egov.get_user_info.current_work_place_user_url');
 

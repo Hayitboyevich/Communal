@@ -109,4 +109,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Notification::class, 'user_id');
     }
+
+    public function organizations(): BelongsToMany
+    {
+        // belongsToMany pivot'dagi soft delete'ni o'zi hisobga olmaydi
+        return $this->belongsToMany(Organization::class, 'user_organizations')
+            ->using(UserOrganization::class)
+            ->withPivot(['id', 'position', 'begin_date', 'dismissed_at'])
+            ->wherePivotNull('deleted_at')
+            ->withTimestamps();
+    }
 }

@@ -36,4 +36,5 @@ return Application::configure(basePath: dirname(__DIR__))
         })->everyMinute();
 
         $schedule->command('app:turar-joy-sync')->everyMinute()->withoutOverlapping();
+        $schedule->command('app:check-employment-command')->everyMinute()->withoutOverlapping();
     })->create();

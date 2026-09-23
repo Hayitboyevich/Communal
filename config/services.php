@@ -38,7 +38,7 @@ return [
     'api_shaffof_credentials' =>[
         "login" => env('BANK_USERNAME', 'dev@gasn'),
         "password" => env('BANK_PASSWORD', 'EkN`9?@{3v0j'),
-        "token" => 'Basic '. env('BANK_USERNAME', 'dev@gasn').':'.env('BANK_PASSWORD', 'EkN`9?@{3v0j'),
+        "token" => 'Basic ' . base64_encode(env('BANK_USERNAME', 'dev@gasn') . ':' . env('BANK_PASSWORD', 'EkN`9?@{3v0j')),
     ],
 
     'oneId' => [
@@ -68,6 +68,8 @@ return [
             'password' => env('EGOV_PASSWORD'),
             'token' => env('EGOV_TOKEN'),
         ],
+        // Ishdan bo'shatilganlik haqidagi notification shu userga yoziladi
+        'dismissal_notify_user_id' => (int) env('EGOV_DISMISSAL_NOTIFY_USER_ID', 485),
         'get_user_info' => [
             'current_work_place_user_url' => env('EGOV_CURRENT_WORK_URL'),
             'history_work_place_user_url' => env('EGOV_HISTORY_WORK_URL')

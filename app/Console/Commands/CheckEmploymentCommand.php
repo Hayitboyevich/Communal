@@ -2,29 +2,25 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\CheckEmploymentJob;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class CheckEmploymentCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:check-employment-command';
+    protected $signature = 'app:check-employment-command {--reset : Aylanishni boshidan boshlash}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Command description';
+    protected $description = 'Userlarning hozirgi ish joyini egov orqali tekshiradi (minutiga 50 ta request)';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
-        //
+        if ($this->option('reset')) {
+            Cache::forget(CheckEmploymentJob::CURSOR_KEY);
+        }
+
+        // Oldingi job hali navbatda yoki ishlayotgan bo'lsa ShouldBeUnique uni qo'shmaydi
+        CheckEmploymentJob::dispatch();
+
+        $this->info('Cursor: ' . (int) Cache::get(CheckEmploymentJob::CURSOR_KEY, 0));
     }
 }
