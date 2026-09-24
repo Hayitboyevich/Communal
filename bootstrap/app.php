@@ -36,7 +36,6 @@ return Application::configure(basePath: dirname(__DIR__))
         })->everyMinute();
 
         $schedule->command('app:turar-joy-sync')->everyMinute()->withoutOverlapping();
-        // Kuniga bir marta, tunda. Lock 5 soatdan keyin bo'shaydi (command yiqilib qolsa ham)
         $schedule->command('app:check-employment-command')
             ->dailyAt('01:00')
             ->withoutOverlapping(300)
