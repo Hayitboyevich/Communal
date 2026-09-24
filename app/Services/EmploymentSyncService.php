@@ -8,9 +8,10 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 /**
- * API'dan kelgan hozirgi ish joylarini qo'lda to'ldirilgan user_organizations bilan solishtiradi.
- * Bizda faol bog'langan tashkilot API javobida yo'q bo'lsa, user bo'shatilgan
- * hisoblanadi va notification yaratiladi.
+ * organizations va user_organizations qo'lda to'ldiriladi, command ularni o'zgartirmaydi
+ * (faqat dismissed_at qo'yadi). Har bir ishga tushishda userning faol bog'langan
+ * tashkilotlari INN bo'yicha API'dagi hozirgi ish joylari bilan solishtiriladi.
+ * Bazadagi INN API javobida bo'lmasa, user bo'shatilgan hisoblanadi va notification yuboriladi.
  */
 class EmploymentSyncService
 {
@@ -21,21 +22,22 @@ class EmploymentSyncService
             return;
         }
 
-        $positions = collect($response->result->positions ?? [])
-            ->filter(fn ($position) => !empty($position->org_tin))
-            ->keyBy(fn ($position) => (string) $position->org_tin);
+        $apiInns = collect($response->result->positions ?? [])
+            ->pluck('org_tin')
+            ->filter()
+            ->map(fn ($inn) => trim((string) $inn))
+            ->flip();
 
-        DB::transaction(function () use ($user, $response, $positions) {
+        DB::transaction(function () use ($user, $response, $apiInns) {
             $user->update([
                 'current_work_place'    => json_encode($response, JSON_UNESCAPED_UNICODE),
                 'employment_checked_at' => now(),
             ]);
 
-            // user_organizations qo'lda to'ldiriladi; bog'lanishi yo'q user uchun solishtiradigan narsa yo'q
             $user->organizations()
                 ->wherePivotNull('dismissed_at')
                 ->get()
-                ->reject(fn (Organization $organization) => $positions->has($organization->inn))
+                ->reject(fn (Organization $organization) => $apiInns->has(trim((string) $organization->inn)))
                 ->each(fn (Organization $organization) => $this->dismiss($user, $organization));
         });
     }
@@ -44,15 +46,17 @@ class EmploymentSyncService
     {
         $user->organizations()->updateExistingPivot($organization->id, ['dismissed_at' => now()]);
 
+        $fio = trim($user->full_name);
+
         CreateNotification::dispatch([
             'type'     => 'employee_dismissed',
             'user_id'  => $user->id,
             'pinfl'    => $user->pin,
-            'fio'      => trim($user->full_name),
+            'fio'      => $fio,
             'org_inn'  => $organization->inn,
             'org_name' => $organization->name,
             'position' => $organization->pivot->position,
-            'comment'  => sprintf('%s ishchi (%s) bo\'shatildi', trim($user->full_name), $organization->name),
+            'comment'  => sprintf('%s (%s) ishdan bo\'shatildi', $fio, $organization->name),
         ], config('services.egov.dismissal_notify_user_id'));
     }
 }
