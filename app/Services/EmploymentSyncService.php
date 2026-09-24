@@ -5,21 +5,23 @@ namespace App\Services;
 use App\Jobs\CreateNotification;
 use App\Models\Organization;
 use App\Models\User;
+use App\Models\UserOrganization;
 use App\Models\UserWorkPlaceSnapshot;
 use Illuminate\Support\Facades\DB;
 
 /**
- * organizations va user_organizations qo'lda to'ldiriladi, command ularni o'zgartirmaydi
+ * organizations va user_organizations qo'lda yoki bir marta app:import-employment bilan to'ldiriladi, sync ularni o'zgartirmaydi
  * (faqat dismissed_at qo'yadi). Har bir ishga tushishda userning faol bog'langan
  * tashkilotlari INN bo'yicha API'dagi hozirgi ish joylari bilan solishtiriladi.
- * Bazadagi INN API javobida bo'lmasa, user bo'shatilgan hisoblanadi va notification yuboriladi.
+ * Bazadagi INN API javobida bo'lmasa, user bo'shatilgan hisoblanadi; tashkilotda
+ * notification_send = true bo'lsa, notification yuboriladi.
  */
 class EmploymentSyncService
 {
     public function sync(User $user, object $response): void
     {
         // Xato yoki muvaffaqiyatsiz javobda solishtirmaymiz: aks holda hamma "bo'shatilgan" bo'lib qoladi
-        if (($response->error ?? null) !== null || (int) ($response->result->result_code ?? 0) !== 1) {
+        if (! $this->isSuccessful($response)) {
             return;
         }
 
@@ -40,6 +42,54 @@ class EmploymentSyncService
                 ->reject(fn (Organization $organization) => $apiInns->has(trim((string) $organization->inn)))
                 ->each(fn (Organization $organization) => $this->dismiss($user, $organization, $snapshot));
         });
+    }
+
+    /**
+     * Bir martalik boshlang'ich to'ldirish: API'dagi har bir ish joyi uchun tashkilot (INN bo'yicha)
+     * va bog'lanish yaratiladi. Faqat qo'shadi, hech kimni bo'shatmaydi; mavjudlariga tegmaydi.
+     *
+     * @return array{organizations: int, links: int}|null  muvaffaqiyatsiz javobda null
+     */
+    public function import(User $user, object $response): ?array
+    {
+        if (! $this->isSuccessful($response)) {
+            return null;
+        }
+
+        return DB::transaction(function () use ($user, $response) {
+            $this->storeSnapshot($user, $response);
+
+            $user->update(['employment_checked_at' => now()]);
+
+            $created = ['organizations' => 0, 'links' => 0];
+
+            foreach ($response->result->positions ?? [] as $position) {
+                $inn = trim((string) ($position->org_tin ?? ''));
+                if ($inn === '') {
+                    continue;
+                }
+
+                $organization = Organization::firstOrCreate(
+                    ['inn' => $inn],
+                    ['name' => trim((string) ($position->org ?? $inn))]
+                );
+                $created['organizations'] += (int) $organization->wasRecentlyCreated;
+
+                // Bitta tashkilotda bir nechta lavozim bo'lsa, birinchisi saqlanadi
+                $link = UserOrganization::firstOrCreate(
+                    ['user_id' => $user->id, 'organization_id' => $organization->id],
+                    ['position' => $position->position ?? null, 'begin_date' => $position->begin_date ?? null]
+                );
+                $created['links'] += (int) $link->wasRecentlyCreated;
+            }
+
+            return $created;
+        });
+    }
+
+    private function isSuccessful(object $response): bool
+    {
+        return ($response->error ?? null) === null && (int) ($response->result->result_code ?? 0) === 1;
     }
 
     /**
@@ -68,6 +118,11 @@ class EmploymentSyncService
     private function dismiss(User $user, Organization $organization, UserWorkPlaceSnapshot $snapshot): void
     {
         $user->organizations()->updateExistingPivot($organization->id, ['dismissed_at' => now()]);
+
+        // Bo'shatish hamma tashkilot uchun belgilanadi, notification esa faqat kuzatiladiganlari uchun
+        if (! $organization->notification_send) {
+            return;
+        }
 
         $fio = trim($user->full_name);
 

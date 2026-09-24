@@ -13,6 +13,10 @@ class Organization extends Model
 
     protected $guarded = false;
 
+    protected $casts = [
+        'notification_send' => 'boolean',
+    ];
+
     public function users(): BelongsToMany
     {
         // belongsToMany pivot'dagi soft delete'ni o'zi hisobga olmaydi
