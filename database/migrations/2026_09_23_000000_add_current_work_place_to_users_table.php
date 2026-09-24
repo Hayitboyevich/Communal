@@ -9,7 +9,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->json('current_work_place')->nullable();
             $table->timestamp('employment_checked_at')->nullable();
         });
     }
@@ -17,7 +16,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['current_work_place', 'employment_checked_at']);
+            $table->dropColumn('employment_checked_at');
         });
     }
 };

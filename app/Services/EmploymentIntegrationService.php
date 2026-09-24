@@ -10,9 +10,9 @@ class EmploymentIntegrationService
     {
     }
 
-    public function currentWorkPlaceOne($pinfl)
+    public function currentWorkPlaceOne($pinfl, bool $retryOn429 = false)
     {
-        return $this->provider->currentWorkPlaceOne($pinfl);
+        return $this->provider->currentWorkPlaceOne($pinfl, $retryOn429);
     }
 
     public function currentWorkPlacePool(array $pinfls, int $concurrency, ?\Closure $acquire = null): array

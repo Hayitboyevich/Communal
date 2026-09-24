@@ -109,11 +109,12 @@ class EmploymentIntegrationProvider
         return $this->sendingRequest(method_type: $this->get_token, method: 'POST', url: $url, headers_with_body: $headers_with_body);
     }
 
-    public function currentWorkPlaceOne(string $pinfl)
+    public function currentWorkPlaceOne(string $pinfl, bool $retryOn429 = false)
     {
         $url = config('services.egov.get_user_info.current_work_place_user_url');
         $token = config('services.api_shaffof_credentials.token');
         $headers_with_body = $this->postHeaders(token: $token, pinfl: $pinfl);
+        $headers_with_body['retry_on_429'] = $retryOn429;
         return $this->sendingRequest(method_type: $this->current, method: 'POST', url: $url, headers_with_body: $headers_with_body);
     }
 

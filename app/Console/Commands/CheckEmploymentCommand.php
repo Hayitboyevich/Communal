@@ -117,7 +117,8 @@ class CheckEmploymentCommand extends Command
     {
         // Bitta userdagi xato butun aylanishni to'xtatmasin
         try {
-            $response = $service->currentWorkPlaceOne($user->pin);
+            // Fonda ishlaydi: 429'da API limiti bo'shashini kutib qayta yuboramiz
+            $response = $service->currentWorkPlaceOne($user->pin, retryOn429: true);
 
             if ($response !== null) {
                 $sync->sync($user, $response);

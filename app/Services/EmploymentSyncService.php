@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Jobs\CreateNotification;
 use App\Models\Organization;
 use App\Models\User;
+use App\Models\UserWorkPlaceSnapshot;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -29,20 +30,42 @@ class EmploymentSyncService
             ->flip();
 
         DB::transaction(function () use ($user, $response, $apiInns) {
-            $user->update([
-                'current_work_place'    => json_encode($response, JSON_UNESCAPED_UNICODE),
-                'employment_checked_at' => now(),
-            ]);
+            $snapshot = $this->storeSnapshot($user, $response);
+
+            $user->update(['employment_checked_at' => now()]);
 
             $user->organizations()
                 ->wherePivotNull('dismissed_at')
                 ->get()
                 ->reject(fn (Organization $organization) => $apiInns->has(trim((string) $organization->inn)))
-                ->each(fn (Organization $organization) => $this->dismiss($user, $organization));
+                ->each(fn (Organization $organization) => $this->dismiss($user, $organization, $snapshot));
         });
     }
 
-    private function dismiss(User $user, Organization $organization): void
+    /**
+     * positions o'zgarmagan bo'lsa oxirgi snapshot'ning faqat last_seen_at'i yangilanadi,
+     * o'zgargan bo'lsa yangi snapshot yoziladi.
+     */
+    private function storeSnapshot(User $user, object $response): UserWorkPlaceSnapshot
+    {
+        $hash   = UserWorkPlaceSnapshot::hashPositions($response->result->positions ?? []);
+        $latest = $user->workPlaceSnapshots()->latest('id')->first();
+
+        if ($latest?->hash === $hash) {
+            $latest->update(['last_seen_at' => now()]);
+
+            return $latest;
+        }
+
+        return $user->workPlaceSnapshots()->create([
+            'response'      => $response,
+            'hash'          => $hash,
+            'first_seen_at' => now(),
+            'last_seen_at'  => now(),
+        ]);
+    }
+
+    private function dismiss(User $user, Organization $organization, UserWorkPlaceSnapshot $snapshot): void
     {
         $user->organizations()->updateExistingPivot($organization->id, ['dismissed_at' => now()]);
 
@@ -56,6 +79,7 @@ class EmploymentSyncService
             'org_inn'  => $organization->inn,
             'org_name' => $organization->name,
             'position' => $organization->pivot->position,
+            'snapshot_id' => $snapshot->id,
             'comment'  => sprintf('%s (%s) ishdan bo\'shatildi', $fio, $organization->name),
         ], config('services.egov.dismissal_notify_user_id'));
     }
