@@ -74,5 +74,10 @@ return [
             'current_work_place_user_url' => env('EGOV_CURRENT_WORK_URL'),
             'history_work_place_user_url' => env('EGOV_HISTORY_WORK_URL')
         ]
-    ]
+    ],
+    'shaffof_id' => [
+        'main_url' => env('SHAFFOF_ID_MAIN_URL'),
+        'client_id' => env('SHAFFOF_ID_CLIENT_ID'),
+        'client_secret' => env('SHAFFOF_ID_CLIENT_SECRET'),
+    ],
 ];
