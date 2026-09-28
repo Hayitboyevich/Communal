@@ -79,5 +79,6 @@ return [
         'main_url' => env('SHAFFOF_ID_MAIN_URL'),
         'client_id' => env('SHAFFOF_ID_CLIENT_ID'),
         'client_secret' => env('SHAFFOF_ID_CLIENT_SECRET'),
+        'redirect_uri' => env('SHAFFOF_ID_REDIRECT_URI'),
     ],
 ];
