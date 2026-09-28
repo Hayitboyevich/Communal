@@ -138,6 +138,11 @@ class UserRepository implements UserRepositoryInterface
             ->value('token');
     }
 
+    public function getUserIdTokens(int $userId)
+    {
+        return ShaffofIdUserIdToken::where('user_id', $userId)->get();
+    }
+
     public function deleteIdToken(int $userId,string $idToken): true
     {
         ShaffofIdUserIdToken::where('user_id',$userId)->where('token',$idToken)->delete();

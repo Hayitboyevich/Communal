@@ -18,6 +18,8 @@ interface UserRepositoryInterface
 
     public function saveIdToken(int $userId,string $idToken);
     public function getIdToken(int $userId);
+
+    public function getUserIdTokens(int $userId);
     public function deleteIdToken(int $userId,string $idToken);
 
 
