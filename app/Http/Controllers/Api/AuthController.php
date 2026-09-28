@@ -179,7 +179,6 @@ class AuthController extends BaseController
     public function refreshSession()
     {
         $idToken = request('id_token');
-        dd($idToken);
         return $this->shaffofIdIntegrationService->refreshSession($idToken);
     }
 }
