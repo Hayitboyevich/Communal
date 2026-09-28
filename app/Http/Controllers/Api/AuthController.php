@@ -15,7 +15,9 @@ use App\Models\Role;
 use App\Models\User;
 use App\Services\EimzoService;
 use App\Services\EmploymentIntegrationService;
+use App\Services\OneTimeTokenService;
 use App\Services\ShaffofIdIntegrationService;
+use App\Services\UserService;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -29,7 +31,8 @@ class AuthController extends BaseController
 {
     public function __construct(private EimzoService                          $eimzoService,
                                 private readonly EmploymentIntegrationService $employmentIntegrationService,
-                                private readonly ShaffofIdIntegrationService  $shaffofIdIntegrationService
+                                private readonly ShaffofIdIntegrationService  $shaffofIdIntegrationService,
+                                private readonly OneTimeTokenService          $oneTimeTokenService
     )
     {
         parent::__construct();
@@ -145,15 +148,6 @@ class AuthController extends BaseController
         return $this->sendSuccess($this->employmentIntegrationService->currentWorkPlaceOne($pinfl), 'Employment Information Get Successfully');
     }
 
-    private function base64url_decode(string $data): string
-    {
-        $data = strtr($data, '-_', '+/');
-        $pad = strlen($data) % 4;
-        if ($pad) {
-            $data .= str_repeat('=', 4 - $pad);
-        }
-        return base64_decode($data, true);
-    }
     /**
      * @throws GuzzleException
      * @throws NotFoundException
@@ -163,8 +157,8 @@ class AuthController extends BaseController
     {
         $validated = $request->validated();
         $result = $this->shaffofIdIntegrationService->getAccessToken($validated['code'], $validated['redirect_uri'], $validated['code_verifier']);
-        return json_decode($this->base64url_decode($result[1]), true);
+//        $pinfl = $result['pinfl'];
+//        $token = $this->oneTimeTokenService->issue('auth', $pinfl);
+        return $this->sendSuccess($result, 'Token Get Successfully');
     }
-
-
 }

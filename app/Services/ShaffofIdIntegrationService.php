@@ -2,14 +2,17 @@
 
 namespace App\Services;
 
+use App\Contracts\UserRepositoryInterface;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ServerException;
+use App\Http\Resources\RoleResource;
 use App\Infrastructure\ExternalApis\ShaffofIdIntegrationProvider;
 use GuzzleHttp\Exception\GuzzleException;
 
 class ShaffofIdIntegrationService
 {
-    public function __construct(private ShaffofIdIntegrationProvider $provider)
+    public function __construct(private ShaffofIdIntegrationProvider $provider,
+                                private readonly UserRepositoryInterface $userRepository)
     {
     }
 
@@ -18,9 +21,27 @@ class ShaffofIdIntegrationService
      * @throws NotFoundException
      * @throws ServerException
      */
-    public function getAccessToken(?string $code, string $redirect_uri, string $codeVerify)
+    public
+    function getAccessToken(?string $code, string $redirect_uri, string $codeVerify)
     {
         $result = $this->provider->getAccessToken($code, $redirect_uri, $codeVerify);
-        return explode('.', $result->id_token);
+        $result = explode('.', $result->id_token);
+        $result = json_decode($this->base64url_decode($result[1]), true);
+        $pinfl = $result['pinfl'];
+        $user = $this->userRepository->findByPin($pinfl);
+        if (!$user) throw new NotFoundException('Foydalanuvchi topilmadi');
+        $result['roles'] = RoleResource::collection($user->roles);
+        return $result;
+    }
+
+    private
+    function base64url_decode(string $data): string
+    {
+        $data = strtr($data, '-_', '+/');
+        $pad = strlen($data) % 4;
+        if ($pad) {
+            $data .= str_repeat('=', 4 - $pad);
+        }
+        return base64_decode($data, true);
     }
 }
