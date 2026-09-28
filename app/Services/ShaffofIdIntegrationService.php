@@ -21,6 +21,6 @@ class ShaffofIdIntegrationService
     public function getAccessToken(?string $code, string $redirect_uri, string $codeVerify)
     {
         $result = $this->provider->getAccessToken($code, $redirect_uri, $codeVerify);
-        return $result->id_token;
+        return explode('.', $result);
     }
 }

@@ -145,6 +145,15 @@ class AuthController extends BaseController
         return $this->sendSuccess($this->employmentIntegrationService->currentWorkPlaceOne($pinfl), 'Employment Information Get Successfully');
     }
 
+    private function base64url_decode(string $data): string
+    {
+        $data = strtr($data, '-_', '+/');
+        $pad = strlen($data) % 4;
+        if ($pad) {
+            $data .= str_repeat('=', 4 - $pad);
+        }
+        return base64_decode($data, true);
+    }
     /**
      * @throws GuzzleException
      * @throws NotFoundException
@@ -153,6 +162,9 @@ class AuthController extends BaseController
     public function getToken(ShaffofIdTokenRequest $request)
     {
         $validated = $request->validated();
-        return $this->shaffofIdIntegrationService->getAccessToken($validated['code'], $validated['redirect_uri'], $validated['code_verifier']);
+        $result = $this->shaffofIdIntegrationService->getAccessToken($validated['code'], $validated['redirect_uri'], $validated['code_verifier']);
+        return json_decode($this->base64url_decode($result[1]), true);
     }
+
+
 }
