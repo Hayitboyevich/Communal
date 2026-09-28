@@ -11,11 +11,15 @@ use GuzzleHttp\Exception\GuzzleException;
 class ShaffofIdIntegrationProvider
 {
     use HandlesExceptions;
+
     private string $accessTokenUrl = 'oauth/token'; //token_id base64 decode qilsak user ma'lumotlari bo'ladi $userInfoUrl'ga request jo'natishga xojat qolmaydi
     private string $userInfoUrl = 'oauth/userinfo';
+    private string $refreshSessionUrl = 'oauth/logout';
 
 
-    public function __construct(private readonly Client $client){}
+    public function __construct(private readonly Client $client)
+    {
+    }
 
 
     /**
@@ -28,7 +32,9 @@ class ShaffofIdIntegrationProvider
         $res = match ($url) {
             $this->accessTokenUrl => $this->safeCall(fn() => $this->client->request('POST',
                 config('services.shaffof_id.main_url') . $url, $headers_with_body)->getBody()->getContents()),
-            $this->userInfoUrl => $this->safeCall(fn() => $this->client->request('GET', config('services.shaffof_id.main_url') . $url)->getBody()->getContents()),
+            $this->userInfoUrl,
+            $this->refreshSessionUrl =>
+            $this->safeCall(fn() => $this->client->request('GET', config('services.shaffof_id.main_url') . $url)->getBody()->getContents()),
         };
         return json_decode($res);
     }
@@ -40,10 +46,10 @@ class ShaffofIdIntegrationProvider
      */
     public function getAccessToken(?string $code, string $redirect_uri, string $codeVerify)
     {
-        $payload['headers'] = [
+        $headers['headers'] = [
             'Accept' => 'application/json'
         ];
-        $payload['form_params'] = [
+        $headers['form_params'] = [
             'grant_type' => 'authorization_code',
             'client_id' => config('services.shaffof_id.client_id'),
             'client_secret' => config('services.shaffof_id.client_secret'),
@@ -52,9 +58,9 @@ class ShaffofIdIntegrationProvider
         ];
 
         if ($codeVerify) {
-            $payload['form_params']['code_verifier'] = $codeVerify;
+            $headers['form_params']['code_verifier'] = $codeVerify;
         }
-        return $this->sendRequest(url: $this->accessTokenUrl, headers_with_body: $payload);
+        return $this->sendRequest(url: $this->accessTokenUrl, headers_with_body: $headers);
     }
 
     /**
@@ -72,8 +78,21 @@ class ShaffofIdIntegrationProvider
         return $this->sendRequest(url: $this->userInfoUrl, headers_with_body: $headers);
     }
 
-    public function refreshSession($tokeId)
+    /**
+     * @throws GuzzleException
+     * @throws NotFoundException
+     * @throws ServerException
+     */
+    public function refreshSession($idToken)
     {
-
+        $headers = [
+            'headers' => [
+                'Accept' => 'application/json'
+            ]
+        ];
+        $clientId = config('services.shaffof_id.client_id');
+        $redirectUri = config('services.shaffof_id.redirect_uri');
+        $url = $this->refreshSessionUrl . "?client_id=$clientId&id_token_hint=$idToken&post_logout_redirect_uri=$redirectUri";
+        return $this->sendRequest(url: $url, headers_with_body: $headers);
     }
 }

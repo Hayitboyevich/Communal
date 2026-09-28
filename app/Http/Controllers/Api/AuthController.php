@@ -168,4 +168,15 @@ class AuthController extends BaseController
         ],
             'Token Get Successfully');
     }
+
+    public function logout(): JsonResponse
+    {
+        JWTAuth::invalidate(JWTAuth::getToken());
+        return $this->sendSuccess(null, 'Logged out successfully.');
+    }
+
+    public function refreshSession($idToken)
+    {
+        return $this->shaffofIdIntegrationService->refreshSession($idToken);
+    }
 }
