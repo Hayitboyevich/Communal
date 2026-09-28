@@ -125,7 +125,7 @@ class UserRepository implements UserRepositoryInterface
     public function saveIdToken(int $userId,string $idToken): true
     {
         ShaffofIdUserIdToken::create([
-            'id_token' => $idToken,
+            'token' => $idToken,
             'user_id' => $userId,
         ]);
         return true;
@@ -135,12 +135,12 @@ class UserRepository implements UserRepositoryInterface
     {
         return ShaffofIdUserIdToken::where('user_id', $userId)
             ->latest('id')
-            ->value('id_token');
+            ->value('token');
     }
 
     public function deleteIdToken(int $userId,string $idToken): true
     {
-        ShaffofIdUserIdToken::where('user_id',$userId)->where('id_token',$idToken)->delete();
+        ShaffofIdUserIdToken::where('user_id',$userId)->where('token',$idToken)->delete();
         return true;
     }
 
