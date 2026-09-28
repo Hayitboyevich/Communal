@@ -45,8 +45,8 @@ class ShaffofIdIntegrationProvider
         ];
         $payload['form_params'] = [
             'grant_type' => 'authorization_code',
-            'client_id' => config('services.shaffofId.id'),
-            'client_secret' => config('services.shaffofId.secret'),
+            'client_id' => config('services.shaffof_id.client_id'),
+            'client_secret' => config('services.shaffof_id.client_secret'),
             'redirect_uri' => $redirect_uri,
             'code' => $code
         ];
