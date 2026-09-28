@@ -165,6 +165,7 @@ class AuthController extends BaseController
             'roles' => $result['roles'],
             'access_token' => $token,
             'full_name' => $result['name'],
+            'id_token' => $result['id_token'],
         ],
             'Token Get Successfully');
     }

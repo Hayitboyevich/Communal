@@ -25,13 +25,15 @@ class ShaffofIdIntegrationService
     function getAccessToken(?string $code, string $redirect_uri, string $codeVerify)
     {
         $result = $this->provider->getAccessToken($code, $redirect_uri, $codeVerify);
-        $result = explode('.', $result->id_token);
+        $idToken = $result->id_token;
+        $result = explode('.', $idToken);
         $result = json_decode($this->base64url_decode($result[1]), true);
         $pinfl = $result['pinfl'];
         $user = $this->userRepository->findByPin($pinfl);
         if (!$user) throw new NotFoundException('Foydalanuvchi topilmadi');
         $this->userRepository->saveIdToken((int)$user->id, $result['id_token']);
         $result['roles'] = RoleResource::collection($user->roles);
+        $result['id_token'] = $idToken;
         return $result;
     }
 
