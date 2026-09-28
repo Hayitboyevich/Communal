@@ -18,7 +18,11 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('check-user', 'checkUser');
     Route::post('shaffof-id-token', 'getToken');
     Route::get('info-employment/{pinfl}', 'infoEmployment');
+    Route::get('logout', 'logout')->middleware(['middleware' => ['auth:api', 'check-role']]);
 });
+
+Route::get('refresh/{idToken}', [AuthController::class, 'refreshSession']);
+
 Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
     Route::controller(UserController::class)->prefix('user')->group(function () {
