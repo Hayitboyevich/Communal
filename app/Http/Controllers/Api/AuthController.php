@@ -181,6 +181,6 @@ class AuthController extends BaseController
     public function refreshSession()
     {
         $idToken = request('id_token');
-        return $this->shaffofIdIntegrationService->refreshSessionCheck($idToken);
+        return $this->sendSuccess($this->shaffofIdIntegrationService->refreshSessionCheck($idToken), 'Session refreshed successfully.');
     }
 }
