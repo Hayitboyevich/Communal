@@ -21,7 +21,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('logout', 'logout')->middleware(['auth:api', 'check-role']);
 });
 
-Route::post('refresh', [AuthController::class, 'refreshSession']);
+Route::post('refresh-id-token', [AuthController::class, 'refreshSession']);
 
 Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
