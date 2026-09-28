@@ -153,6 +153,6 @@ class AuthController extends BaseController
     public function getToken(ShaffofIdTokenRequest $request)
     {
         $validated = $request->validated();
-        return $this->sendSuccess($this->shaffofIdIntegrationService->getAccessToken($validated['code'], $validated['redirect_uri'], $validated['code_verifier']), 'Token Get Successfully');
+        return $this->shaffofIdIntegrationService->getAccessToken($validated['code'], $validated['redirect_uri'], $validated['code_verifier']);
     }
 }
