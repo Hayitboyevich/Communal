@@ -176,8 +176,9 @@ class AuthController extends BaseController
         return $this->sendSuccess(null, 'Logged out successfully.');
     }
 
-    public function refreshSession($idToken)
+    public function refreshSession()
     {
+        $idToken = request('id_token');
         return $this->shaffofIdIntegrationService->refreshSession($idToken);
     }
 }
