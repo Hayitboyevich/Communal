@@ -25,7 +25,7 @@ class ShaffofIdIntegrationProvider
      */
     private function sendRequest($url, $headers_with_body = null)
     {
-        $res = match ('POST') {
+        $res = match ($url) {
             $this->accessTokenUrl => $this->safeCall(fn() => $this->client->request('POST',
                 config('services.shaffof_id.main_url') . $url, $headers_with_body)->getBody()->getContents()),
             $this->userInfoUrl => $this->safeCall(fn() => $this->client->request('GET', config('services.shaffof_id.main_url') . $url)->getBody()->getContents()),
@@ -40,7 +40,10 @@ class ShaffofIdIntegrationProvider
      */
     public function getAccessToken(?string $code, string $redirect_uri, string $codeVerify)
     {
-        $payload = [
+        $payload['headers'] = [
+            'Accept' => 'application/json'
+        ];
+        $payload['form_params'] = [
             'grant_type' => 'authorization_code',
             'client_id' => config('services.shaffofId.id'),
             'client_secret' => config('services.shaffofId.secret'),
@@ -49,7 +52,7 @@ class ShaffofIdIntegrationProvider
         ];
 
         if ($codeVerify) {
-            $payload['code_verifier'] = $codeVerify;
+            $payload['form_params']['code_verifier'] = $codeVerify;
         }
         return $this->sendRequest(url: $this->accessTokenUrl, headers_with_body: $payload);
     }

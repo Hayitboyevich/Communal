@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Constants\ErrorMessage;
 use App\Enums\UserStatusEnum;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\ServerException;
 use App\Http\Controllers\BaseController;
+use App\Http\Requests\ShaffofIdTokenRequest;
 use App\Http\Resources\DistrictResource;
 use App\Http\Resources\RegionResource;
 use App\Http\Resources\RoleResource;
@@ -12,6 +15,8 @@ use App\Models\Role;
 use App\Models\User;
 use App\Services\EimzoService;
 use App\Services\EmploymentIntegrationService;
+use App\Services\ShaffofIdIntegrationService;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,8 +27,10 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends BaseController
 {
-    public function __construct(private EimzoService $eimzoService,
-                                private readonly EmploymentIntegrationService $employmentIntegrationService)
+    public function __construct(private EimzoService                          $eimzoService,
+                                private readonly EmploymentIntegrationService $employmentIntegrationService,
+                                private readonly ShaffofIdIntegrationService  $shaffofIdIntegrationService
+    )
     {
         parent::__construct();
     }
@@ -136,5 +143,16 @@ class AuthController extends BaseController
     public function infoEmployment($pinfl)
     {
         return $this->sendSuccess($this->employmentIntegrationService->currentWorkPlaceOne($pinfl), 'Employment Information Get Successfully');
+    }
+
+    /**
+     * @throws GuzzleException
+     * @throws NotFoundException
+     * @throws ServerException
+     */
+    public function getToken(ShaffofIdTokenRequest $request)
+    {
+        $validated = $request->validated();
+        return $this->sendSuccess($this->shaffofIdIntegrationService->getAccessToken($validated['code'], $validated['redirect_uri'], $validated['code_verifier']), 'Token Get Successfully');
     }
 }
