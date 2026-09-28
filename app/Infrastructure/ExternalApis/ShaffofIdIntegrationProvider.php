@@ -32,9 +32,8 @@ class ShaffofIdIntegrationProvider
         $res = match ($url) {
             $this->accessTokenUrl => $this->safeCall(fn() => $this->client->request('POST',
                 config('services.shaffof_id.main_url') . $url, $headers_with_body)->getBody()->getContents()),
-            $this->userInfoUrl,
-            $this->refreshSessionUrl =>
-            $this->safeCall(fn() => $this->client->request('GET', config('services.shaffof_id.main_url') . $url)->getBody()->getContents()),
+            $this->userInfoUrl => $this->safeCall(fn() => $this->client->request('GET', config('services.shaffof_id.main_url') . $url)->getBody()->getContents()),
+            $this->refreshSessionUrl => $this->safeCall(fn() => $this->client->request('GET', config('services.shaffof_id.main_url') . $url.$params)->getBody()->getContents()),
         };
         return json_decode($res);
     }
