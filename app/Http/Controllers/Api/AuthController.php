@@ -107,9 +107,12 @@ class AuthController extends BaseController
 
     public function auth(): JsonResponse
     {
-        $encodedData = request('token');
-        $decodedData = base64_decode($encodedData);
-        list($pin, $accessToken) = explode(':', $decodedData);
+        $fromCache = $this->oneTimeTokenService->consume(purpose: 'auth', token: request('token'));
+        if (!$fromCache){
+            $encodedData = request('token');
+            $decodedData = base64_decode($encodedData);
+            list($pin, $accessToken) = explode(':', $decodedData);
+        } else $pin = $fromCache['pinfl'];
 
         $user = User::query()->where('pin', $pin)->first();
         if ($user->user_status_id != UserStatusEnum::ACTIVE->value)
