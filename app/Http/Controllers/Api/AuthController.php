@@ -17,7 +17,6 @@ use App\Services\EimzoService;
 use App\Services\EmploymentIntegrationService;
 use App\Services\OneTimeTokenService;
 use App\Services\ShaffofIdIntegrationService;
-use App\Services\UserService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
