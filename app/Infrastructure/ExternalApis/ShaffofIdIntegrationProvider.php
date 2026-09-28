@@ -85,9 +85,14 @@ class ShaffofIdIntegrationProvider
      */
     public function refreshSession($idToken)
     {
+        $headers = [
+            'headers' => [
+                'Accept' => 'application/json'
+            ]
+        ];
         $clientId = config('services.shaffof_id.client_id');
         $redirectUri = config('services.shaffof_id.redirect_uri');
         $params = "?client_id=$clientId&id_token_hint=$idToken&post_logout_redirect_uri=$redirectUri";
-        return $this->sendRequest(url: $this->refreshSessionUrl , params: $params);
+        return $this->sendRequest(url: $this->refreshSessionUrl , params: $params, headers_with_body: $headers);
     }
 }

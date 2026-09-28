@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Contracts\UserRepositoryInterface;
 use App\Enums\UserRoleEnum;
 use App\Enums\UserStatusEnum;
+use App\Models\ShaffofIdUserIdToken;
 use App\Models\User;
 
 class UserRepository implements UserRepositoryInterface
@@ -120,4 +121,28 @@ class UserRepository implements UserRepositoryInterface
     {
 
     }
+
+    public function saveIdToken(int $userId,string $idToken): true
+    {
+        ShaffofIdUserIdToken::create([
+            'id_token' => $idToken,
+            'user_id' => $userId,
+        ]);
+        return true;
+    }
+
+    public function getIdToken(int $userId)
+    {
+        return ShaffofIdUserIdToken::where('user_id', $userId)
+            ->latest('id')
+            ->value('id_token');
+    }
+
+    public function deleteIdToken(int $userId,string $idToken): true
+    {
+        ShaffofIdUserIdToken::where('user_id',$userId)->where('id_token',$idToken)->delete();
+        return true;
+    }
+
+
 }

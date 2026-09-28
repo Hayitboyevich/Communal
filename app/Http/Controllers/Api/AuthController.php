@@ -172,6 +172,8 @@ class AuthController extends BaseController
 
     public function logout(): JsonResponse
     {
+        $user = $this->user;
+        $this->shaffofIdIntegrationService->refreshSession($user->id);
         JWTAuth::invalidate(JWTAuth::getToken());
         return $this->sendSuccess(null, 'Logged out successfully.');
     }
@@ -179,6 +181,6 @@ class AuthController extends BaseController
     public function refreshSession()
     {
         $idToken = request('id_token');
-        return $this->shaffofIdIntegrationService->refreshSession($idToken);
+        return $this->shaffofIdIntegrationService->refreshSessionCheck($idToken);
     }
 }

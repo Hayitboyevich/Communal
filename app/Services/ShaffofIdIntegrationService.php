@@ -31,7 +31,7 @@ class ShaffofIdIntegrationService
         $pinfl = $result['pinfl'];
         $user = $this->userRepository->findByPin($pinfl);
         if (!$user) throw new NotFoundException('Foydalanuvchi topilmadi');
-//        $this->userRepository->saveIdToken((int)$user->id, $result['id_token']);
+        $this->userRepository->saveIdToken((int)$user->id, $result['id_token']);
         $result['roles'] = RoleResource::collection($user->roles);
         $result['id_token'] = $idToken;
         return $result;
@@ -48,15 +48,21 @@ class ShaffofIdIntegrationService
         return base64_decode($data, true);
     }
 
-//    public function refreshSession(int $userId)
-//    {
-//        $idToken = $this->userRepository->getIdToken($userId);
-//        return $this->provider->refreshSession($idToken);
-//    }
-
-    public function refreshSession($idToken)
+    /**
+     * @throws GuzzleException
+     * @throws NotFoundException
+     * @throws ServerException
+     */
+    public function refreshSession(int $userId)
     {
-//        $idToken = $this->userRepository->getIdToken($userId);
+        $idToken = $this->userRepository->getIdToken($userId);
+        if (!$idToken) throw new NotFoundException('Foydalanuvchi topilmadi');
+        $this->userRepository->deleteIdToken($userId, $idToken);
+        return $this->provider->refreshSession($idToken);
+    }
+
+    public function refreshSessionCheck($idToken)
+    {
         return $this->provider->refreshSession($idToken);
     }
 }

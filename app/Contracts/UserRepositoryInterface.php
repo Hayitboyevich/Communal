@@ -16,5 +16,9 @@ interface UserRepositoryInterface
 
     public function search($query, $filters);
 
+    public function saveIdToken(int $userId,string $idToken);
+    public function getIdToken(int $userId);
+    public function deleteIdToken(int $userId,string $idToken);
+
 
 }
