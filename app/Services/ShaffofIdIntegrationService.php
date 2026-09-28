@@ -11,7 +11,7 @@ use GuzzleHttp\Exception\GuzzleException;
 
 class ShaffofIdIntegrationService
 {
-    public function __construct(private ShaffofIdIntegrationProvider $provider,
+    public function __construct(private ShaffofIdIntegrationProvider     $provider,
                                 private readonly UserRepositoryInterface $userRepository)
     {
     }
@@ -34,12 +34,10 @@ class ShaffofIdIntegrationService
         $this->userRepository->deleteUserAllIdTokens((int)$user->id);
         $this->userRepository->saveIdToken((int)$user->id, $idToken);
         $result['roles'] = RoleResource::collection($user->roles);
-        $result['id_token'] = $idToken;
         return $result;
     }
 
-    private
-    function base64url_decode(string $data): string
+    private function base64url_decode(string $data): string
     {
         $data = strtr($data, '-_', '+/');
         $pad = strlen($data) % 4;
@@ -59,11 +57,6 @@ class ShaffofIdIntegrationService
         $idToken = $this->userRepository->getIdToken($userId);
         if (!$idToken) throw new NotFoundException('Foydalanuvchi topilmadi');
         $this->userRepository->deleteIdToken($userId, $idToken);
-        return $this->provider->refreshSession($idToken);
-    }
-
-    public function refreshSessionCheck($idToken)
-    {
         return $this->provider->refreshSession($idToken);
     }
 }

@@ -164,8 +164,7 @@ class AuthController extends BaseController
         return $this->sendSuccess([
             'roles' => $result['roles'],
             'access_token' => $token,
-            'full_name' => $result['name'],
-            'id_token' => $result['id_token'],
+            'full_name' => $result['name']
         ],
             'Token Get Successfully');
     }
