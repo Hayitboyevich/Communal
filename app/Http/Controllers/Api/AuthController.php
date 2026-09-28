@@ -18,6 +18,7 @@ use App\Services\EmploymentIntegrationService;
 use App\Services\OneTimeTokenService;
 use App\Services\ShaffofIdIntegrationService;
 use App\Services\UserService;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -178,10 +179,14 @@ class AuthController extends BaseController
         return $this->sendSuccess(null, 'Logged out successfully.');
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function refreshSession()
     {
         $idToken = request('id_token');
-        $req = Http::get("https://id.shaffofqurilish.uz/oauth/logout?client_id=01a0cdac-95ae-736e-861b-85403355dfaf&id_token_hint=$idToken&post_logout_redirect_uri=https://ujk-nazorat.mc.uz/login");
+        $client = new Client();
+        $req = $client->get("https://id.shaffofqurilish.uz/oauth/logout?client_id=01a0cdac-95ae-736e-861b-85403355dfaf&id_token_hint=$idToken&post_logout_redirect_uri=https://ujk-nazorat.mc.uz/login");
         $req = $req->getBody()->getContents();
         return $this->sendSuccess($req, 'Session refreshed successfully.');
     }
