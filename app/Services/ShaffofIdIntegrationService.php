@@ -31,7 +31,7 @@ class ShaffofIdIntegrationService
         $pinfl = $result['pinfl'];
         $user = $this->userRepository->findByPin($pinfl);
         if (!$user) throw new NotFoundException('Foydalanuvchi topilmadi');
-        $this->userRepository->saveIdToken((int)$user->id, $result['id_token']);
+        $this->userRepository->saveIdToken((int)$user->id, $idToken);
         $result['roles'] = RoleResource::collection($user->roles);
         $result['id_token'] = $idToken;
         return $result;
