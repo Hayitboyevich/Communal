@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\VersionController;
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'login');
+    Route::post('refresh-id-token', 'refreshSession');
     Route::post('auth', 'auth');
     Route::post('check-user', 'checkUser');
     Route::post('shaffof-id-token', 'getToken');
@@ -21,7 +22,6 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('logout', 'logout')->middleware(['auth:api', 'check-role']);
 });
 
-Route::post('refresh-id-token', [AuthController::class, 'refreshSession']);
 
 Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
