@@ -29,14 +29,11 @@ class ShaffofIdIntegrationProvider
      */
     private function sendRequest($url, $params = null, $headers_with_body = null)
     {
-        if ($this->refreshSessionUrl === $url) {
-            dd(config('services.shaffof_id.main_url') . $url.$params);
-        }
         $res = match ($url) {
             $this->accessTokenUrl => $this->safeCall(fn() => $this->client->request('POST',
                 config('services.shaffof_id.main_url') . $url, $headers_with_body)->getBody()->getContents()),
             $this->userInfoUrl => $this->safeCall(fn() => $this->client->request('GET', config('services.shaffof_id.main_url') . $url)->getBody()->getContents()),
-            $this->refreshSessionUrl => $this->safeCall(fn() => $this->client->request('GET', )->getBody()->getContents()),
+            $this->refreshSessionUrl => $this->safeCall(fn() => $this->client->request('GET', config('services.shaffof_id.main_url') . $url . $params)->getBody()->getContents()),
         };
         return json_decode($res);
     }
@@ -95,6 +92,6 @@ class ShaffofIdIntegrationProvider
         $clientId = config('services.shaffof_id.client_id');
         $redirectUri = config('services.shaffof_id.redirect_uri');
         $params = "?client_id=$clientId&id_token_hint=$idToken&post_logout_redirect_uri=$redirectUri";
-        return $this->sendRequest(url: $this->refreshSessionUrl , params: $params, headers_with_body: $headers);
+        return $this->sendRequest(url: $this->refreshSessionUrl, params: $params, headers_with_body: $headers);
     }
 }
