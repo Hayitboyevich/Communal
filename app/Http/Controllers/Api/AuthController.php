@@ -157,12 +157,12 @@ class AuthController extends BaseController
     {
         $validated = $request->validated();
         $result = $this->shaffofIdIntegrationService->getAccessToken($validated['code'], $validated['redirect_uri'], $validated['code_verifier']);
-        $pinfl = $result->pinfl;
+        $pinfl = $result['pinfl'];
         $token = $this->oneTimeTokenService->issue('auth', $pinfl);
         return $this->sendSuccess([
-            'roles' => $result->roles,
+            'roles' => $result['roles'],
             'access_token' => $token,
-            'full_name' => $result->name,
+            'full_name' => $result['name'],
         ],
             'Token Get Successfully');
     }
