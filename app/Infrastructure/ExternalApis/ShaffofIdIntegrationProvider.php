@@ -7,6 +7,7 @@ use App\Exceptions\ServerException;
 use App\Traits\HandlesExceptions;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use http\Exception\InvalidArgumentException;
 
 class ShaffofIdIntegrationProvider
 {
@@ -21,20 +22,19 @@ class ShaffofIdIntegrationProvider
     {
     }
 
-
     /**
      * @throws GuzzleException
      * @throws NotFoundException
      * @throws ServerException
      */
-    private function sendRequest($url, $params = null, $headers_with_body = null)
+    private function sendRequest($url, $headers_with_body = null)
     {
-        $res = match ($url) {
-            $this->accessTokenUrl => $this->safeCall(fn() => $this->client->request('POST',
-                config('services.shaffof_id.main_url') . $url, $headers_with_body)->getBody()->getContents()),
-            $this->userInfoUrl => $this->safeCall(fn() => $this->client->request('GET', config('services.shaffof_id.main_url') . $url)->getBody()->getContents()),
-            $this->refreshSessionUrl => $this->safeCall(fn() => $this->client->request('GET', config('services.shaffof_id.main_url') . $url . $params)->getBody()->getContents()),
+        $method = match ($url) {
+            $this->accessTokenUrl => 'POST',
+            $this->userInfoUrl, $this->refreshSessionUrl => 'GET',
+            default => throw new InvalidArgumentException("Noma'lum URL: {$url}")
         };
+        $res = $this->client->request($method, $url, $headers_with_body)->getBody()->getContents();
         return json_decode($res);
     }
 
@@ -86,12 +86,14 @@ class ShaffofIdIntegrationProvider
     {
         $headers = [
             'headers' => [
-                'Accept' => 'application/json'
-            ]
+                'Accept' => 'application/json',
+            ],
+            'query' => [
+                'client_id'                => config('services.shaffof_id.client_id'),
+                'id_token_hint'            => $idToken,
+                'post_logout_redirect_uri' => config('services.shaffof_id.redirect_uri'),
+            ],
         ];
-        $clientId = config('services.shaffof_id.client_id');
-        $redirectUri = config('services.shaffof_id.redirect_uri');
-        $params = "?client_id=$clientId&id_token_hint=$idToken&post_logout_redirect_uri=$redirectUri";
-        return $this->sendRequest(url: $this->refreshSessionUrl, params: $params, headers_with_body: $headers);
+        return $this->sendRequest(url: $this->refreshSessionUrl, headers_with_body: $headers);
     }
 }
