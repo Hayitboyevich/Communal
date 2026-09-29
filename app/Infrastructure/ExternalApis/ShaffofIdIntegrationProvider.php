@@ -7,7 +7,6 @@ use App\Exceptions\ServerException;
 use App\Traits\HandlesExceptions;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use http\Exception\InvalidArgumentException;
 
 class ShaffofIdIntegrationProvider
 {
@@ -32,7 +31,7 @@ class ShaffofIdIntegrationProvider
         $method = match ($url) {
             $this->accessTokenUrl => 'POST',
             $this->userInfoUrl, $this->refreshSessionUrl => 'GET',
-            default => throw new InvalidArgumentException("Noma'lum URL: {$url}")
+            default => throw new NotFoundException("Noma'lum URL: {$url}")
         };
         $res = $this->client->request($method, $url, $headers_with_body)->getBody()->getContents();
         return json_decode($res);
