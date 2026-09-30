@@ -98,6 +98,9 @@ class ProtocolRepository implements ProtocolRepositoryInterface
 
             ->when(isset($filters['is_administrative']), function ($q) use ($filters) {
                 $q->where('is_administrative', $filters['is_administrative']);
+            })
+            ->when(isset($filters['group_type']), function ($q) use ($filters) {
+                $q->where('group_type', $filters['group_type']);
             });
     }
 

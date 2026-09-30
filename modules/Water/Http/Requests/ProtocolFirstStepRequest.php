@@ -33,6 +33,7 @@ class ProtocolFirstStepRequest extends FormRequest
             'type' => 'required|integer',
             'user_id' => 'required|integer',
             'role_id' => 'sometimes',
+            'group_type' => 'sometimes|string|in:I,II,III',
         ];
     }
 
