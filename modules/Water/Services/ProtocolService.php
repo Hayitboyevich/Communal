@@ -289,7 +289,7 @@ class ProtocolService
     {
         if (!empty($files)) {
             $paths = array_map(fn($file) => $this->fileService->uploadFile($file, 'protocol/protocol-files'), $files);
-            $protocol->$column = json_encode(array_map(fn($path) => ['url' => $path], $paths));
+            $protocol->$column = array_map(fn($path) => ['url' => $path], $paths);
             $protocol->save();
         }
     }
