@@ -73,6 +73,7 @@ class ProtocolResource extends JsonResource
                     'url' => url('storage/' . $file['url']),
                 ];
             }),
+            'protocol_files' => $this->protocol_files,
             'created_at' => $this->created_at,
             'step' => $this->step,
             'type' => $this->type,
