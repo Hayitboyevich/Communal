@@ -76,6 +76,7 @@ class ProtocolResource extends JsonResource
             'protocol_files' => $this->protocol_files,
             'created_at' => $this->created_at,
             'step' => $this->step,
+            'group_type' => $this->group_type,
             'type' => $this->type,
             'fine' => $this->fine ? FineResource::make($this->fine) : null,
             'history' => $this->histories ? $this->histories->map(function ($history) {

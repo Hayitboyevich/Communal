@@ -69,6 +69,7 @@ class ProtocolListResource extends JsonResource
             }),
             'created_at' => $this->created_at,
             'step' => $this->step,
+            'group_type' => $this->group_type,
             'type' => $this->type
         ];
     }
