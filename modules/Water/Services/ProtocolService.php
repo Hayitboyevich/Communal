@@ -285,6 +285,15 @@ class ProtocolService
         }
     }
 
+    public function uploadProtocolFiles(Protocol $protocol, string $column, ?array $files)
+    {
+        if (!empty($files)) {
+            $paths = array_map(fn($file) => $this->fileService->uploadFile($file, 'protocol/protocol-files'), $files);
+            $protocol->$column = json_encode(array_map(fn($path) => ['url' => $path], $paths));
+            $protocol->save();
+        }
+    }
+
     public function change(ProtocolSuperAdminRequest $request)
     {
         try {

@@ -119,6 +119,7 @@ class ProtocolController extends BaseController
             $this->service->saveVideo($protocol, $request['videos']);
             $this->service->saveImages($protocol, $request['images']);
             $this->service->uploadFiles($protocol, 'additional_files', $request['additional_files']);
+            $this->service->uploadProtocolFiles($protocol, 'protocol_files', $request['protocol_files']);
             DB::commit();
             return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol created successfully.');
         } catch (\Exception $exception) {

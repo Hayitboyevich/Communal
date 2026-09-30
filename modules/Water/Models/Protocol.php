@@ -23,6 +23,7 @@ class Protocol extends Model
 
     protected $casts = [
         'protocol_status_id' => ProtocolStatusEnum::class,
+        'protocol_files' => 'array',
     ];
 
     public function documents(): MorphMany

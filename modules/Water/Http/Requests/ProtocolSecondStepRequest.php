@@ -32,6 +32,7 @@ class ProtocolSecondStepRequest extends FormRequest
             'protocol_status_id' => 'sometimes',
             'step' => 'required|integer',
             'additional_files' => 'sometimes',
+            'protocol_files' => 'sometimes|array',
             'additional_comment' => 'sometimes',
             'is_finished' => 'sometimes',
             'defect_id' => 'sometimes',
