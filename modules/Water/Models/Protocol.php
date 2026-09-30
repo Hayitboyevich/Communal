@@ -10,11 +10,13 @@ use App\Models\Region;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Video;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\Storage;
 use Modules\Water\Enums\ProtocolStatusEnum;
 
 class Protocol extends Model
@@ -26,6 +28,17 @@ class Protocol extends Model
         'protocol_files' => 'array',
     ];
 
+
+    protected function protocolFiles(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => collect(json_decode($value ?? '[]', true))
+                ->map(fn ($file) => [
+                    'url' => Storage::disk('public')->url($file['url']),
+                ])
+                ->all(),
+        );
+    }
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');
