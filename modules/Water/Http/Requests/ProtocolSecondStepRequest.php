@@ -3,6 +3,7 @@
 namespace Modules\Water\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Modules\Water\Enums\ProtocolStatusEnum;
 
 class ProtocolSecondStepRequest extends FormRequest
@@ -32,7 +33,7 @@ class ProtocolSecondStepRequest extends FormRequest
             'protocol_status_id' => 'sometimes',
             'step' => 'required|integer',
             'additional_files' => 'sometimes',
-            'protocol_files' => 'sometimes|array',
+            'protocol_files' => [Rule::requiredIf(fn() => $this->protocol_status_id === 2), 'array'],
             'additional_comment' => 'sometimes',
             'is_finished' => 'sometimes',
             'defect_id' => 'sometimes',
