@@ -5,12 +5,17 @@ namespace Modules\Apartment\Models;
 use App\Models\District;
 use App\Models\Region;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Apartment\Enums\ApartmentsTypeEnum;
 
 class Apartment extends Model
 {
     protected $fillable = [
         'turar_joy_sync_sources',
         'turar_joy_sync_ready_at',
+    ];
+
+    protected $casts = [
+        'apartment_type' => ApartmentsTypeEnum::class,
     ];
     protected $guarded = false;
 
