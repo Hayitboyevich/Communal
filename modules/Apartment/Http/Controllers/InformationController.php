@@ -89,22 +89,18 @@ class InformationController extends BaseController
         $validated = $request->validated();
         try {
             $apartments = Apartment::query()
-                ->when(!empty($validated['region_id']), function ($query) use ($validated) {
-                    $query->whereHas('company', function ($query) use ($validated) {
-                        $query->where('region_id', $validated['region_id']);
-                    });
-                })
-                ->when(!empty($validated['district_id']), function ($query) use ($validated) {
-                    $query->whereHas('company', function ($query) use ($validated) {
-                        $query->where('district_id', $validated['district_id']);
-                    });
-                })
-                ->when(!empty($validated['apartment_type']), function ($query) use ($validated) {
-                    $query->where('apartment_type', $validated['apartment_type']);
-                })
-                ->when(!empty($validated['company_id']), function ($query) use ($validated) {
-                    $query->where('company_id', $validated['company_id']);
-                })
+                ->when(
+                    !empty($validated['region_id']) || !empty($validated['district_id']),
+                    function ($query) use ($validated) {
+                        $query->whereHas('company', function ($query) use ($validated) {
+                            $query
+                                ->when($validated['region_id'] ?? null, fn($q, $regionId) => $q->where('region_id', $regionId))
+                                ->when($validated['district_id'] ?? null, fn($q, $districtId) => $q->where('district_id', $districtId));
+                        });
+                    }
+                )
+                ->when($validated['apartment_type'] ?? null, fn($q, $type) => $q->where('apartment_type', $type))
+                ->when($validated['company_id'] ?? null, fn($q, $companyId) => $q->where('company_id', $companyId))
                 ->get();
             return $this->sendSuccess(ApartmentResource::collection($apartments), 'Apartment list');
         } catch (\Exception $exception) {
@@ -151,9 +147,9 @@ class InformationController extends BaseController
             $per_page = $validated['per_page'] ?? 10;
             $page = $validated['page'] ?? 1;
             $place_id = $validated['place_id'] ?? null;
-            if (!is_null($place_id) && in_array(10, $place_id)){
-                $place_id = [8,9];
-            } elseif (!is_null($place_id) && in_array(8, $place_id) && in_array(9, $place_id)){
+            if (!is_null($place_id) && in_array(10, $place_id)) {
+                $place_id = [8, 9];
+            } elseif (!is_null($place_id) && in_array(8, $place_id) && in_array(9, $place_id)) {
                 $place_id = [10];
             }
             if ($role_id == UserRoleEnum::APARTMENT_MANAGER->value or $role_id == UserRoleEnum::APARTMENT_VIEWER->value) {
@@ -223,21 +219,21 @@ class InformationController extends BaseController
             } elseif ($role_id == UserRoleEnum::APARTMENT_INSPECTOR->value) {
                 $apartments = Apartment::query()->where('home_integration', 1)
                     ->whereHas('apartmentHiddenEconomy', function ($query) use ($place_id, $user) {
-                    $query->where('user_id', $user->id);
-                    if (is_null($place_id)) {
-                        $query->where('monitoring_type_id', 1);
-                    } elseif (in_array(8, $place_id) && in_array(9, $place_id)) {
-                        $query->where([
-                            'monitoring_type_id' => 2,
-                            'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value,
-                        ]);
-                    } elseif (in_array(10, $place_id)) {
-                        $query->where([
-                            'monitoring_type_id' => 2,
-                            'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value,
-                        ]);
-                    }
-                })
+                        $query->where('user_id', $user->id);
+                        if (is_null($place_id)) {
+                            $query->where('monitoring_type_id', 1);
+                        } elseif (in_array(8, $place_id) && in_array(9, $place_id)) {
+                            $query->where([
+                                'monitoring_type_id' => 2,
+                                'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::TOM->value,
+                            ]);
+                        } elseif (in_array(10, $place_id)) {
+                            $query->where([
+                                'monitoring_type_id' => 2,
+                                'hidden_economy_type' => ApartmentHiddenEconomyTypeEnum::FASAD->value,
+                            ]);
+                        }
+                    })
                     ->when(!empty($validated['type']), fn($q) => $q->whereHas('apartmentHiddenEconomy.monitoring',
                         fn($q) => $q->where('type', $validated['type'])))
                     ->when(!empty($validated['is_administrative']), fn($q) => $q->whereHas('apartmentHiddenEconomy.monitoring',
