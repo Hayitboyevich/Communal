@@ -8,6 +8,7 @@ use App\Http\Controllers\BaseController;
 use App\Models\Place;
 use Illuminate\Http\JsonResponse;
 use Modules\Apartment\Http\Enums\ApartmentHiddenEconomyTypeEnum;
+use Modules\Apartment\Http\Requests\ApartmentFilterRequest;
 use Modules\Apartment\Http\Requests\ApartmentHiddenEconomyRequest;
 use Modules\Apartment\Http\Resources\ApartmentResource;
 use Modules\Apartment\Http\Resources\CompanyResource;
@@ -83,10 +84,28 @@ class InformationController extends BaseController
         }
     }
 
-    public function apartment($id = null): JsonResponse
+    public function apartment(ApartmentFilterRequest $request, $id = null): JsonResponse
     {
+        $validated = $request->validated();
         try {
-            $apartments = Apartment::query()->where('company_id', request('company_id'))->get();
+            $apartments = Apartment::query()
+                ->when(!empty($validated['region_id']), function ($query) use ($validated) {
+                    $query->whereHas('company', function ($query) use ($validated) {
+                        $query->where('region_id', $validated['region_id']);
+                    });
+                })
+                ->when(!empty($validated['district_id']), function ($query) use ($validated) {
+                    $query->whereHas('company', function ($query) use ($validated) {
+                        $query->where('district_id', $validated['district_id']);
+                    });
+                })
+                ->when(!empty($validated['apartment_type']), function ($query) use ($validated) {
+                    $query->where('apartment_type', $validated['apartment_type']);
+                })
+                ->when(!empty($validated['company_id']), function ($query) use ($validated) {
+                    $query->where('company_id', $validated['company_id']);
+                })
+                ->get();
             return $this->sendSuccess(ApartmentResource::collection($apartments), 'Apartment list');
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
