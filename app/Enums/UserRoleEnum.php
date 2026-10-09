@@ -21,6 +21,6 @@ enum UserRoleEnum: int
     case CADASTR_REGION_VIEWER = 15;
     case SUPER_ADMIN = 16;
     case REG_VIEWER = 18;
-
+    case MONITORING_VIEWER = 19;
     case OGOH = 101;
 }

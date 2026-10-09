@@ -65,6 +65,15 @@ class MonitoringController extends BaseController
         }
     }
 
+    public function attachHomeId($id)
+    {
+        $filter = request()->only('home_id');
+        $monitoring = Monitoring::query()->findOrFail($id);
+        $monitoring->apartment_id = $filter['home_id'];
+        $monitoring->save();
+        return $this->sendSuccess(MonitoringResource::make($monitoring), 'Home ID attached successfully.');
+    }
+
     public function getMonth(): JsonResponse
     {
         try {
