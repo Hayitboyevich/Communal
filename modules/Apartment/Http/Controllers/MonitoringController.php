@@ -67,7 +67,7 @@ class MonitoringController extends BaseController
 
     public function attachHomeId($id)
     {
-        $filter = request()->only('home_id');
+        $filter = request()->only(['home_id']);
         $monitoring = Monitoring::query()->findOrFail($id);
         if ($monitoring->apartment_id != null) return $this->sendError(ErrorMessage::ERROR_1, 'Home ID already attached.');
         $monitoring->apartment_id = $filter['home_id'];
