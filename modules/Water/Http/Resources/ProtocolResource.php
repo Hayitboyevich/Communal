@@ -92,7 +92,8 @@ class ProtocolResource extends JsonResource
                     'is_change' => $history->type ? ProtocolHistoryType::getLabel($history->type) : null,
                     'created_at' => $history->created_at,
                 ];
-            })->sortByDesc('created_at')->values() :null
+            })->sortByDesc('created_at')->values() :null,
+            'editable' => $this->editable,
         ];
     }
 }
