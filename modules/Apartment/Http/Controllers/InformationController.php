@@ -88,7 +88,7 @@ class InformationController extends BaseController
     {
         $validated = $request->validated();
         try {
-            $apartments = Apartment::query()
+            $query = Apartment::query()
                 ->when(
                     !empty($validated['region_id']) || !empty($validated['district_id']),
                     function ($query) use ($validated) {
@@ -101,8 +101,20 @@ class InformationController extends BaseController
                 )
                 ->when($validated['apartment_type'] ?? null, fn($q, $type) => $q->where('apartment_type', $type))
                 ->when($validated['company_id'] ?? null, fn($q, $companyId) => $q->where('company_id', $companyId))
-                ->get();
-            return $this->sendSuccess(ApartmentResource::collection($apartments), 'Apartment list');
+                ->orderBy('id', 'desc');
+            if ($request->filled('per_page')) {
+                $apartments = $query->paginate($validated['per_page'])->withQueryString();
+                return $this->sendSuccess([
+                    'items' => ApartmentResource::collection($apartments),
+                    'pagination' => [
+                        'current_page' => $apartments->currentPage(),
+                        'per_page'     => $apartments->perPage(),
+                        'total'        => $apartments->total(),
+                        'last_page'    => $apartments->lastPage(),
+                    ],
+                ], 'Apartment list');
+            }
+            return $this->sendSuccess(ApartmentResource::collection($query->get()), 'Apartment list');
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }

@@ -32,6 +32,8 @@ class ApartmentFilterRequest extends FormRequest
             'region_id' => ['bail', Rule::requiredIf(fn() => $this->filled('apartment_type')),'integer', 'exists:regions,id'],
             'district_id' => ['bail', Rule::requiredIf(fn() => $this->filled('apartment_type') && $this->filled('region_id')),'integer',
                 Rule::exists('districts', 'id')->where('region_id', $this->input('region_id'))],
+            'page' => 'sometimes|integer',
+            'per_page' => 'sometimes|integer',
         ];
     }
 }
