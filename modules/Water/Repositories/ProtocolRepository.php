@@ -224,7 +224,7 @@ class ProtocolRepository implements ProtocolRepositoryInterface
     {
         try {
             $protocol = $this->findById($id);
-            $protocol->update(['protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT, 'step' => Step::ONE]);
+            $protocol->update(['protocol_status_id' => ProtocolStatusEnum::ENTER_RESULT, 'step' => Step::ONE, 'editable' => true]);
             return $protocol;
         } catch (\Exception $exception) {
             throw $exception;
