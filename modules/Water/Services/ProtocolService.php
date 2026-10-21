@@ -84,7 +84,7 @@ class ProtocolService
             }
             $protocol->images()->delete();
         }
-
+        $data['editable'] = false;
         $protocol = $this->repository->update($id, $data);
         $this->createHistory($protocol, ProtocolHistoryType::UPDATE, '', $additionalInfo ?: null);
         $this->saveImages($protocol, $images);
