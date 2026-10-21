@@ -246,6 +246,7 @@ class ProtocolService
                 'files' => $history->documents ? DocumentResource::collection($history->documents): null,
                 'images' =>$history->images ? ImageResource::collection($history->images): null,
                 'is_change' => $history->type ? ProtocolHistoryType::getLabel($history->type) : null,
+                'additional_info' => $history->formattedAdditionalInfo(),
                 'created_at' => $history->created_at,
             ];
         })->sortByDesc('created_at')->values();
