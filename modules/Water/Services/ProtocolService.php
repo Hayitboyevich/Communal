@@ -121,15 +121,6 @@ class ProtocolService
 
         return $old ?: null;
     }
-
-    /**
-     * Requestda yangi fayl kelgan ustunlarning eski qiymati (faqat fayllar).
-     */
-    public function oldFiles(int $id, array $columns, array $request): ?array
-    {
-        return $this->oldValues($this->repository->findById($id), [], $columns, $request);
-    }
-
     protected function decodeJson($raw)
     {
         if ($raw === null || $raw === '') {

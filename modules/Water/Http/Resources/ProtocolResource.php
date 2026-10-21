@@ -90,10 +90,32 @@ class ProtocolResource extends JsonResource
                     'files' => $history->documents ? DocumentResource::collection($history->documents): null,
                     'images' =>$history->images ? ImageResource::collection($history->images): null,
                     'is_change' => $history->type ? ProtocolHistoryType::getLabel($history->type) : null,
+                    'additional_info' => $this->formatAdditionalInfo($history->content->additionalInfo ?? null),
                     'created_at' => $history->created_at,
                 ];
             })->sortByDesc('created_at')->values() :null,
             'editable' => $this->editable,
         ];
+    }
+    private function formatAdditionalInfo($info): ?array
+    {
+        if (empty($info)) {
+            return null;
+        }
+
+        $info = json_decode(json_encode($info), true);
+        if (!is_array($info)) {
+            return null;
+        }
+
+        foreach (['images', 'additional_files', 'protocol_files', 'image_files'] as $key) {
+            if (!empty($info[$key]) && is_array($info[$key])) {
+                $info[$key] = array_values(array_map(fn($file) => [
+                    'url' => Storage::disk('public')->url(is_array($file) ? ($file['url'] ?? '') : $file),
+                ], $info[$key]));
+            }
+        }
+
+        return $info;
     }
 }

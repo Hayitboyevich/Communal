@@ -126,7 +126,6 @@ class ProtocolController extends BaseController
         try {
             $data = $request->except('files', 'additional_files', 'protocol_files', 'images', 'videos');
 
-            // o'zgarayotgan maydonlar + almashtiriladigan fayllarning eski holati history additionalInfo ga
             $additionalInfo = $this->service->oldValues(
                 $this->service->findById($id),
                 $data,
