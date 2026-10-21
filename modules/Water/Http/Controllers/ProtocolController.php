@@ -99,7 +99,17 @@ class ProtocolController extends BaseController
     {
         DB::beginTransaction();
         try {
-            $protocol = $this->service->create($request->except('images'));
+            if ($request->isEditMode()) {
+                $protocol = $this->service->updateFirst(
+                    (int) $request->input('protocol_id'),
+                    $request->except('images', 'protocol_id'),
+                    $request['images']
+                );
+                DB::commit();
+                return $this->sendSuccess(ProtocolResource::make($protocol), 'Protocol updated successfully.');
+            }
+
+            $protocol = $this->service->create($request->except('images', 'protocol_id'));
             $this->service->saveImages($protocol, $request['images']);
 
             DB::commit();
@@ -114,7 +124,17 @@ class ProtocolController extends BaseController
     {
         DB::beginTransaction();
         try {
-            $protocol = $this->service->update($this->user, $this->roleId, $id, $request->except('files', 'additional_files', 'images', 'videos'), ProtocolHistoryType::CREATE_SECOND);
+            $data = $request->except('files', 'additional_files', 'protocol_files', 'images', 'videos');
+
+            // o'zgarayotgan maydonlar + almashtiriladigan fayllarning eski holati history additionalInfo ga
+            $additionalInfo = $this->service->oldValues(
+                $this->service->findById($id),
+                $data,
+                ['additional_files', 'protocol_files'],
+                $request->all()
+            );
+
+            $protocol = $this->service->update($this->user, $this->roleId, $id, $data, ProtocolHistoryType::CREATE_SECOND, $additionalInfo);
             $this->service->saveFiles($protocol, $request['files']);
             $this->service->saveVideo($protocol, $request['videos']);
             $this->service->saveImages($protocol, $request['images']);

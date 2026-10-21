@@ -49,7 +49,7 @@ class ProtocolService
         return $protocol;
     }
 
-    public function update($user, $roleId, ?int $id, ?array $data, $type)
+    public function update($user, $roleId, ?int $id, ?array $data, $type, $additionalInfo = null)
     {
         if ($roleId == UserRoleEnum::INSPECTOR->value && $data['protocol_status_id'] == ProtocolStatusEnum::NOT_DEFECT->value) {
             $type = ProtocolHistoryType::CONFIRM_NOT_DEFECT;
@@ -63,8 +63,83 @@ class ProtocolService
 
 
         $protocol = $this->repository->update($id, $data);
-        $this->createHistory($protocol, $type);
+        $this->createHistory($protocol, $type, '', $additionalInfo);
         return $protocol;
+    }
+
+    public function updateFirst(int $id, array $data, ?array $images)
+    {
+        $protocol = $this->repository->findById($id);
+
+        if (!$protocol->editable) {
+            throw new \Exception('Protocol is not editable.');
+        }
+
+        $additionalInfo = $this->oldValues($protocol, $data) ?? [];
+
+        if (!empty($images)) {
+            $oldImages = $protocol->images()->get(['url'])->map(fn($image) => ['url' => $image->url])->all();
+            if (!empty($oldImages)) {
+                $additionalInfo['images'] = $oldImages;
+            }
+            $protocol->images()->delete();
+        }
+
+        $protocol = $this->repository->update($id, $data);
+        $this->createHistory($protocol, ProtocolHistoryType::UPDATE, '', $additionalInfo ?: null);
+        $this->saveImages($protocol, $images);
+
+        return $protocol;
+    }
+
+    public function oldValues(Protocol $protocol, array $data, array $fileColumns = [], array $request = []): ?array
+    {
+        $old = [];
+        $attributes = $protocol->getAttributes();
+
+        foreach ($data as $key => $value) {
+            if (!array_key_exists($key, $attributes) || in_array($key, $fileColumns, true)) {
+                continue;
+            }
+            $oldRaw = $protocol->getRawOriginal($key);
+            $newRaw = $value instanceof \BackedEnum ? $value->value : (is_array($value) ? json_encode($value) : $value);
+
+            if ((string) $oldRaw !== (string) $newRaw) {
+                $old[$key] = $oldRaw;
+            }
+        }
+
+        foreach ($fileColumns as $column) {
+            if (empty($request[$column])) {
+                continue;
+            }
+            $decoded = $this->decodeJson($protocol->getRawOriginal($column));
+            if (!empty($decoded)) {
+                $old[$column] = $decoded;
+            }
+        }
+
+        return $old ?: null;
+    }
+
+    /**
+     * Requestda yangi fayl kelgan ustunlarning eski qiymati (faqat fayllar).
+     */
+    public function oldFiles(int $id, array $columns, array $request): ?array
+    {
+        return $this->oldValues($this->repository->findById($id), [], $columns, $request);
+    }
+
+    protected function decodeJson($raw)
+    {
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+        $decoded = is_string($raw) ? json_decode($raw, true) : $raw;
+        if (is_string($decoded)) {
+            $decoded = json_decode($decoded, true);
+        }
+        return $decoded;
     }
 
     public function statusChange($id, ProtocolChangeRequest $request)

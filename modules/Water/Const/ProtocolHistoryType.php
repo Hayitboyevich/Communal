@@ -19,6 +19,7 @@ class ProtocolHistoryType
     const CONFIRMED = 13;
     const FINE = 14;
     const CHANGE = 15;
+    const UPDATE = 16;
 
     public static function getLabel($type): string
     {
@@ -51,6 +52,8 @@ class ProtocolHistoryType
                 return 'Kamchilik aniqlanmadi';
             case self::CHANGE:
                 return 'Admin tomonidan ba\'zi o\'zgarishlar qilindi';
+            case self::UPDATE:
+                return 'Protokol tahrirlandi';
             case self::FINE:
                 return 'Mamuriy qilindi';
             default:
