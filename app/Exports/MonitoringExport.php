@@ -3,15 +3,18 @@
 namespace App\Exports;
 
 use Carbon\Carbon;
+use Maatwebsite\Excel\Concerns\FromGenerator;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Modules\Apartment\Models\Monitoring;
 
-class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChunkReading
+class MonitoringExport implements WithHeadings, FromGenerator, WithMapping
 {
 
+    private const HIDDEN_ECONOMY_PLACES = [1, 2, 8, 9, 10];
+    private const CHUNK = 1000;
     public function __construct(
         protected ?int   $regionId,
         protected ?array $filters = []
@@ -19,12 +22,12 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
     {
     }
 
-    public function query()
+    public function generator(): \Generator
     {
         $dateFrom = $this->filters['date_from'] ?? null;
         $dateTo = $this->filters['date_to'] ?? null;
 
-        return Monitoring::query()
+        yield from Monitoring::query()
             ->with([
                 'confirmRegulationHistory',
                 'user',
@@ -49,68 +52,65 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
                     Carbon::parse($dateFrom)->startOfDay(),
                     Carbon::parse($dateTo)->endOfDay()
                 ]);
-            });
+            })
+            ->lazyById(self::CHUNK);
     }
 
-    public function map($monitoring): array
+    public function map($m): array
     {
-        $check_array = [1, 2, 8, 9, 10];
-        $hidden_economy = function () use ($monitoring, $check_array) {
-            if ($monitoring->apartmentHiddenEconomy) {
-                return 'true';
-            } elseif ($monitoring->regulation) {
-                if (in_array($monitoring->regulation->place_id, $check_array)) {
-                    return 'true';
-                }
-                return 'false';
-            } else return 'false';
-        };
+        $fine = $m->fine;
+
         return [
-            $monitoring->id,
-            $monitoring?->apartment?->home_id ?? '',
-            $monitoring?->region?->name_uz ?? '',
-            $monitoring?->district?->name_uz ?? '',
-            $monitoring?->status?->name ?? '',
-            $monitoring?->user?->full_name ?? '',
-            $monitoring?->monitoringType?->name ?? '',
-            $monitoring?->regulation?->place?->name ?? '',
-            $monitoring?->regulation?->violationType?->name ?? '',
-            optional($monitoring->created_at)->format('Y-m-d'),
-            $monitoring?->base?->name ?? '',
-            $monitoring?->company?->company_name ?? '',
-            $monitoring->address ?? ($monitoring?->apartment?->street_name . ' ' . $monitoring?->apartment?->home_name),
-            $monitoring->address_commit ?? '',
-            $monitoring->additional_comment ?? '',
-            $monitoring?->regulation?->fish ?? $monitoring?->regulation?->organization_name ?? '',
-            $monitoring?->violation?->deadline ?? '',
-            $monitoring->fine ? $monitoring->fine->series . $monitoring->fine->number : '',
-            $monitoring->fine ? $monitoring->fine->decision_series . $monitoring->fine->decision_number : '',
-            $monitoring->fine ? $monitoring->fine->status_name : '',
-            $monitoring->fine ? $monitoring->fine->main_punishment_amount : '',
-            $monitoring->fine ? $monitoring->fine->paid_amount : '',
-            $monitoring->fine ? $monitoring->fine->created_time : '',
-            $monitoring->fine ? $monitoring->fine->updated_time : '',
-            $monitoring->fine ? $monitoring->fine->execution_date : '',
-            $monitoring->my_home_integration ? 'true' : 'false',
-            $monitoring->long_term ? 'Uzoq muddatli' : '',
-            $monitoring->long_term_type == 1
-                ? 'Vafot etgan'
-                : ($monitoring->long_term_type == 2
-                ? 'Chet elda'
-                : ($monitoring->long_term_type == 3
-                    ? 'Boshqa holat'
-                    : '')),
-            $monitoring->send_court ? 'Sudga yuborilgan' : '',
-            $monitoring->treatment_number ?? '',
-            $monitoring->treatment_date ?? '',
-            $hidden_economy(),
-            optional($monitoring->confirmRegulationHistory)->created_at,
+            $m->id,
+            $m->apartment?->home_id ?? '',
+            $m->region?->name_uz ?? '',
+            $m->district?->name_uz ?? '',
+            $m->status?->name ?? '',
+            $m->user?->full_name ?? '',
+            $m->monitoringType?->name ?? '',
+            $m->regulation?->place?->name ?? '',
+            $m->regulation?->violationType?->name ?? '',
+            $m->created_at?->format('Y-m-d'),
+            $m->base?->name ?? '',
+            $m->company?->company_name ?? '',
+            $m->address ?? trim(($m->apartment?->street_name ?? '') . ' ' . ($m->apartment?->home_name ?? '')),
+            $m->address_commit ?? '',
+            $m->additional_comment ?? '',
+            $m->regulation?->fish ?? $m->regulation?->organization_name ?? '',
+            $m->violation?->deadline ?? '',
+            $fine ? $fine->series . $fine->number : '',
+            $fine ? $fine->decision_series . $fine->decision_number : '',
+            $fine?->status_name ?? '',
+            $fine?->main_punishment_amount ?? '',
+            $fine?->paid_amount ?? '',
+            $fine?->created_time ?? '',
+            $fine?->updated_time ?? '',
+            $fine?->execution_date ?? '',
+            $m->my_home_integration ? 'true' : 'false',
+            $m->long_term ? 'Uzoq muddatli' : '',
+            match ((int) $m->long_term_type) {
+                1 => 'Vafot etgan',
+                2 => 'Chet elda',
+                3 => 'Boshqa holat',
+                default => '',
+            },
+            $m->send_court ? 'Sudga yuborilgan' : '',
+            $m->treatment_number ?? '',
+            $m->treatment_date ?? '',
+            $this->isHiddenEconomy($m) ? 'true' : 'false',
+            $m->confirmRegulationHistory?->created_at?->format('Y-m-d H:i'),
         ];
+    }
+
+    private function isHiddenEconomy(Monitoring $m): bool
+    {
+        return $m->apartmentHiddenEconomy !== null
+            || in_array($m->regulation?->place_id, self::HIDDEN_ECONOMY_PLACES, true);
     }
 
     public function chunkSize(): int
     {
-        return 500;
+        return 1000;
     }
 
     public function headings(): array
