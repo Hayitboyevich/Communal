@@ -22,7 +22,7 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
     public function query()
     {
         $dateFrom = $this->filters['date_from'] ?? null;
-        $dateTo   = $this->filters['date_to'] ?? null;
+        $dateTo = $this->filters['date_to'] ?? null;
 
         return Monitoring::query()
             ->with([
@@ -41,7 +41,9 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
                 'fine',
                 'apartmentHiddenEconomy'
             ])
-            ->where('region_id', $this->regionId)
+            ->when(!empty($this->regionId), function ($query) {
+                $query->where('region_id', $this->regionId);
+            })
             ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
                 $query->whereBetween('created_at', [
                     Carbon::parse($dateFrom)->startOfDay(),
@@ -52,11 +54,11 @@ class MonitoringExport implements WithHeadings, FromQuery, WithMapping, WithChun
 
     public function map($monitoring): array
     {
-        $check_array = [1,2,8,9,10];
-        $hidden_economy = function () use ($monitoring,$check_array) {
+        $check_array = [1, 2, 8, 9, 10];
+        $hidden_economy = function () use ($monitoring, $check_array) {
             if ($monitoring->apartmentHiddenEconomy) {
                 return 'true';
-            } elseif ($monitoring->regulation){
+            } elseif ($monitoring->regulation) {
                 if (in_array($monitoring->regulation->place_id, $check_array)) {
                     return 'true';
                 }

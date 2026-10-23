@@ -295,7 +295,7 @@ class MonitoringController extends BaseController
     }
 
 
-    public function excel($id)
+    public function excel($id=null)
     {
         try {
             ini_set('memory_limit', '-1');
