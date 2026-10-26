@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth:api' => \Illuminate\Auth\Middleware\Authenticate::class,
             'basic' => \App\Http\Middleware\BasicAuthMiddleware::class,
             'check-role' => \App\Http\Middleware\CheckRoleMiddleware::class,
+            'letter.type' => \App\Http\Middleware\LetterTypeMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

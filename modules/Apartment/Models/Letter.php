@@ -2,15 +2,30 @@
 
 namespace Modules\Apartment\Models;
 
+use App\Enums\LetterType;
 use App\Models\District;
 use App\Models\Region;
+use App\Models\Scopes\LetterTypeScope;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[ScopedBy([LetterTypeScope::class])]
 class Letter extends Model
 {
     protected $guarded = false;
+
+    protected $casts = ['letter_type' => LetterType::class];
+
+
+    protected static function booted(): void
+    {
+        static::creating(function (Letter $letter) {
+            $letter->letter_type ??= LetterType::current()
+                ?? throw new \LogicException('Letter type aniqlanmadi');
+        });
+    }
 
     public function inspector(): BelongsTo
     {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\LetterType;
 use Illuminate\Support\Facades\Route;
 use Modules\Apartment\Http\Controllers\ApartmentHiddenEconomyController;
 use Modules\Apartment\Http\Controllers\MonitoringController;
@@ -38,7 +39,10 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::post('attach-home-id/{id}', 'attachHomeId');
     });
 
-    Route::controller(LetterController::class)->prefix('letter')->group(function () {
+    Route::controller(LetterController::class)
+        ->prefix('letter')
+        ->middleware('letter.type:' . LetterType::APARTMENT->value)
+        ->group(function () {
         Route::post('/create', 'create');
         Route::post('/send/hybrid/{id}', 'sendHybrid');
         Route::get('/get/hybrid/{id}', 'getHybrid');

@@ -2,7 +2,9 @@
 
 namespace Modules\Apartment\Repositories;
 
+use App\Enums\LetterType;
 use App\Enums\UserRoleEnum;
+use App\Models\Scopes\LetterTypeScope;
 use App\Services\EimzoService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
@@ -21,19 +23,46 @@ class LetterRepository implements LetterInterface
     public function all($user, $roleId)
     {
         try {
-            switch ($roleId) {
-                case UserRoleEnum::APARTMENT_MANAGER->value:
-                case UserRoleEnum::REG_VIEWER->value:
-                    return $this->letter->query()->where('region_id', $user->region_id);
-                case UserRoleEnum::APARTMENT_VIEWER->value:
-                    return $this->letter->query();
-                default:
-                    return $this->letter->query()->whereRaw('1 = 0');
-            }
+            $query = $this->letter->query();
+            return match (LetterType::current()) {
+                LetterType::APARTMENT => $this->apartmentScope($query, $user, $roleId),
+                LetterType::WATER     => $this->waterScope($query, $user, $roleId),
+                default               => $query->whereRaw('1 = 0'),
+            };
+//            switch ($roleId) {
+//                case UserRoleEnum::APARTMENT_MANAGER->value:
+//                case UserRoleEnum::REG_VIEWER->value:
+//                    return $this->letter->query()->where('region_id', $user->region_id);
+//                case UserRoleEnum::APARTMENT_VIEWER->value:
+//                    return $this->letter->query();
+//                default:
+//                    return $this->letter->query()->whereRaw('1 = 0');
+//            }
         } catch (\Exception $exception) {
             throw $exception;
         }
     }
+
+    private function apartmentScope($query, $user, $roleId)
+    {
+        return match ((int) $roleId) {
+            UserRoleEnum::APARTMENT_VIEWER->value => $query,
+            UserRoleEnum::APARTMENT_MANAGER->value,
+            UserRoleEnum::REG_VIEWER->value       => $query->where('region_id', $user->region_id),
+            default                               => $query->whereRaw('1 = 0'),
+        };
+    }
+
+    private function waterScope($query, $user, $roleId)
+    {
+        return match ((int) $roleId) {
+            UserRoleEnum::RES_VIEWER->value      => $query,
+            UserRoleEnum::MANAGER->value         => $query->where('region_id', $user->region_id),
+            default                              => $query->whereRaw('1 = 0'),
+        };
+    }
+
+
 
     public function findById($id)
     {

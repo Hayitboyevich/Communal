@@ -1,6 +1,8 @@
 <?php
 
+use App\Enums\LetterType;
 use Illuminate\Support\Facades\Route;
+use Modules\Apartment\Http\Controllers\LetterController;
 use Modules\Water\Http\Controllers\DetailController;
 use Modules\Water\Http\Controllers\ProtocolController;
 use Modules\Water\Http\Controllers\ProtocolStatusController;
@@ -64,5 +66,17 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::post('/create', 'create');
         Route::post('/change', 'change');
     });
+
+    Route::controller(LetterController::class)
+        ->prefix('water/letter')
+        ->middleware('letter.type:' . LetterType::WATER->value)
+        ->group(function () {
+            Route::post('/create', 'create');
+            Route::post('/send/hybrid/{id}', 'sendHybrid');
+            Route::get('/get/hybrid/{id}', 'getHybrid');
+            Route::get('/get/receipt/{id}', 'getReceipt');
+            Route::get('/count', 'count');
+            Route::get('/{id?}', 'index');
+        });
 
 });
