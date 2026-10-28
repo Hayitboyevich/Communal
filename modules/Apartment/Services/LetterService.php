@@ -47,7 +47,10 @@ class LetterService
                 'body' => [
                     'fish' => $letter->fish,
                     'monitoring_id' => $letter->monitoring_id,
-                    'letter_type' => $type,
+                    'letter_type' => [
+                        'name' => $type->name,
+                        'id' => $type->value,
+                    ],
                 ],
                 "methods" => ["eimzo"],
                 "signer_pinfl" => $user->pinfl,
