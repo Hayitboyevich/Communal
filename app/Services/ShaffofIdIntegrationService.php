@@ -92,7 +92,6 @@ class ShaffofIdIntegrationService
         if ($token = cache()->get($key)) {
             return $token;
         }
-        dd($key);
         return Cache::lock("$key:lock", 10)->block(5, function () use ($purpose, $grantType, $key) {
             if ($token = cache()->get($key)) {
                 return $token;
