@@ -2,6 +2,7 @@
 
 namespace Modules\Apartment\Http\Resources;
 
+use App\Enums\LetterType;
 use App\Http\Resources\DistrictResource;
 use App\Http\Resources\RegionResource;
 use App\Http\Resources\UserResource;
@@ -13,7 +14,7 @@ class LetterResource extends JsonResource
 
     public function toArray(Request $request): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'monitoring_id' => $this->monitoring_id,
             'regulation_id' => $this->regulation_id,
@@ -31,5 +32,9 @@ class LetterResource extends JsonResource
             'region' => $this->region ? RegionResource::make($this->region) : null,
             'district' => $this->district ? DistrictResource::make($this->district) : null,
         ];
+
+        if (LetterType::current() == LetterType::WATER->value) $data['protocol_id'] = $this->protocol_id;
+
+        return $data;
     }
 }

@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Water\Models\Protocol;
 
 #[ScopedBy([LetterTypeScope::class])]
 class Letter extends Model
@@ -50,5 +51,10 @@ class Letter extends Model
     public function monitoring(): BelongsTo
     {
         return $this->belongsTo(Monitoring::class, 'monitoring_id');
+    }
+
+    public function protocol(): BelongsTo
+    {
+        return $this->belongsTo(Protocol::class, 'protocol_id');
     }
 }

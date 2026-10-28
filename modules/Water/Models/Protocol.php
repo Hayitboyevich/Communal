@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Storage;
+use Modules\Apartment\Models\Letter;
 use Modules\Water\Enums\ProtocolStatusEnum;
 
 class Protocol extends Model
@@ -102,5 +103,10 @@ class Protocol extends Model
     public function defect(): BelongsTo
     {
         return $this->belongsTo(Defect::class, 'defect_id');
+    }
+
+    public function letter()
+    {
+        return $this->hasOne(Letter::class, 'protocol_id');
     }
 }
