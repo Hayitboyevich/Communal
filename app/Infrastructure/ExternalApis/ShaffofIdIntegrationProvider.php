@@ -118,7 +118,7 @@ class ShaffofIdIntegrationProvider
                 'title' => $title,
                 'body' => $body,
                 "methods" => ["eimzo"],
-                "signer_pinfl" => $user->pinfl,
+                "signer_pinfl" => $user->pin,
                 'external_id' => $uuid,
                 "callback_url" => "https://test.uz/testable/testback",
                 "return_url" => $returnUrl,

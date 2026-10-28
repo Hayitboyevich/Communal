@@ -43,7 +43,7 @@ class LetterService
             $internalUuid = uuid_create();
             $letter = Letter::findOrFail($id);
             $data = [
-                'title' => $letter->address,
+                'title' => $letter->address . ' ' . $letter->fish,
                 'body' => [
                     'fish' => $letter->fish,
                     'monitoring_id' => $letter->monitoring_id,
