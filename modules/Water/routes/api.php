@@ -77,6 +77,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
             Route::get('/get/receipt/{id}', 'getReceipt');
             Route::get('/count', 'count');
             Route::get('/{id?}', 'index');
+            Route::get('check', 'checkSigning');
         });
 
 });

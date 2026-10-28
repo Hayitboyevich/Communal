@@ -105,4 +105,29 @@ class LetterController extends BaseController
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
+
+    public function checkSigning()
+    {
+        $token = cache()->get("ott:documents:" . hash('sha256', 'client_credentials'));
+        $headers = [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type' => 'client_credentials',
+            ],
+            'json' => [
+                'title' => "sdfsdfsdf",
+                'body' => [],
+                "methods" => ["eimzo"],
+                "signer_pinfl" => '1234567890',
+                'external_id' => '1234567890',
+                "callback_url" => "https://test.uz/testable/testback",
+                "return_url" => "https://test.uz/testable/testback",
+                "ttl" => 86400
+            ]
+        ];
+        $client = new \GuzzleHttp\Client();
+        $response = $client->post('http://id.shaffofqurilish.uz/api/documents', $headers);
+        dd($response->getBody()->getContents());
+
+    }
 }
