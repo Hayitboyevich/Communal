@@ -125,6 +125,7 @@ class ShaffofIdIntegrationProvider
                 "ttl" => 86400
             ]
         ];
+        dd($headers);
         return $this->sendRequest(url: $this->sendDocumentUrl, method: 'POST', headers_with_body: $headers);
     }
 
