@@ -107,7 +107,7 @@ class ShaffofIdIntegrationProvider
      * @throws NotFoundException
      * @throws ServerException
      */
-    public function sendSigningDocument(User $user,string $accessToken, ?string $returnUrl,string $title, array $body, string $uuid, ?string $contentType = null)
+    public function sendSigningDocument(User $user, string $accessToken, ?string $returnUrl, string $title, array $body, string $uuid, ?string $contentType = null)
     {
         $headers = [
             'headers' => [
@@ -125,7 +125,6 @@ class ShaffofIdIntegrationProvider
                 "ttl" => 86400
             ]
         ];
-        dd($headers);
         return $this->sendRequest(url: $this->sendDocumentUrl, method: 'POST', headers_with_body: $headers);
     }
 
