@@ -48,7 +48,7 @@ class LetterController extends BaseController
                 $id ? 'Letter retrieved successfully.' : 'Letters retrieved successfully.',
                 $id ? null : pagination($data)
             );
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -58,7 +58,7 @@ class LetterController extends BaseController
         try {
             $data = $this->service->create($request);
             return $this->sendSuccess(LetterResource::make($data), 'Letter created successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -68,9 +68,9 @@ class LetterController extends BaseController
         try {
             $data = request()->only(['signature']);
             $type = LetterType::current();
-            $letter = $this->service->change($this->user, $id, $data, $type);
+            $letter = $this->service->change(user: $this->user, id: $id, request: $data, type: $type);
             return $this->sendSuccess(LetterResource::make($letter), 'Letter send successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -80,7 +80,7 @@ class LetterController extends BaseController
         try {
             $data = $this->service->getHybrid($id);
             return $this->sendSuccess($data, 'Letter retrieved successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -90,7 +90,7 @@ class LetterController extends BaseController
         try {
             $data = $this->service->receipt($id);
             return $this->sendSuccess($data, 'Receipt retrieved successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -101,7 +101,7 @@ class LetterController extends BaseController
             $filters = request()->only(['region_id', 'district_id', 'inspector']);
             $data = $this->service->count($this->user, $this->roleId, $filters);
             return $this->sendSuccess($data, 'Count retrieved successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }

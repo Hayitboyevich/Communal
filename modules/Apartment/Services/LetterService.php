@@ -36,7 +36,7 @@ class LetterService
         return $this->repository->create($request->validated());
     }
 
-    public function change($user, $id, $request, int $type = null)
+    public function change($user, $id, $request = null, int $type = null)
     {
         try {
             $internalUuid = uuid_create();
@@ -61,7 +61,7 @@ class LetterService
             $letter->sign_url = $signingProcess->sign_url;
             $letter->body_hash = $signingProcess->body_hash;
             $letter->save();
-
+            return $letter;
 //            $data = $this->imzoService->signTimestamp($request['signature']);
             if (empty($data)) throw new \Exception('E-imzo malumot olishda xatolik yuz berdi');
 
