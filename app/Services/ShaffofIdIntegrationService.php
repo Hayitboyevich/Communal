@@ -72,7 +72,7 @@ class ShaffofIdIntegrationService
     {
         $token = $this->checkCache('documents');
         return $this->provider->sendSigningDocument(user: $user, accessToken: $token, returnUrl: $data['return_url'], title: $data['title'],
-        body: $data['body'], uuid: $data['internal_uuid'], contentType: 'application/pdf');
+        body: $data['body'], uuid: $data['internal_uuid'], contentType: 'application/json');
     }
 
     /**

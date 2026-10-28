@@ -71,7 +71,6 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         ->prefix('water/letter')
         ->middleware('letter.type:' . LetterType::WATER->value)
         ->group(function () {
-            Route::get('/check-shaffof', 'checkSigning');
             Route::post('/create', 'create');
             Route::post('/send/hybrid/{id}', 'sendHybrid');
             Route::get('/get/hybrid/{id}', 'getHybrid');
