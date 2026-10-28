@@ -70,7 +70,7 @@ class ShaffofIdIntegrationService
      */
     public function signDocument(array $data, User $user)
     {
-        $token = $this->checkCache('document');
+        $token = $this->checkCache('documents');
         return $this->provider->sendSigningDocument(user: $user, accessToken: $token, returnUrl: $data['returnUrl'],title: $data['title'],
         body: $data['body'], uuid: $data['internal_uuid'], contentType: 'application/pdf');
     }
@@ -84,7 +84,7 @@ class ShaffofIdIntegrationService
     private function checkCache(string $purpose)
     {
         $grantType = match ($purpose) {
-            'document' => 'client_credentials',
+            'documents' => 'client_credentials',
             'auth' => 'authorization_code',
             default => throw new ServerException('Unknown grant type'),
         };
