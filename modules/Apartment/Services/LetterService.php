@@ -2,6 +2,7 @@
 
 namespace Modules\Apartment\Services;
 
+use App\Enums\LetterType;
 use App\Services\EimzoService;
 use App\Services\InvoiceService;
 use App\Services\ShaffofIdIntegrationService;
@@ -36,7 +37,7 @@ class LetterService
         return $this->repository->create($request->validated());
     }
 
-    public function change($user, $id, $request = null, array $type = [])
+    public function change($user, $id, $request = null, LetterType $type )
     {
         try {
             $internalUuid = uuid_create();
