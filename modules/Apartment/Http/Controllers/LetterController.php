@@ -3,6 +3,7 @@
 namespace Modules\Apartment\Http\Controllers;
 
 use App\Constants\ErrorMessage;
+use App\Enums\LetterType;
 use App\Http\Controllers\BaseController;
 use App\Http\Resources\DistrictResource;
 use App\Http\Resources\RegionResource;
@@ -66,7 +67,8 @@ class LetterController extends BaseController
     {
         try {
             $data = request()->only(['signature']);
-            $letter = $this->service->change($this->user, $id, $data);
+            $type = LetterType::current();
+            $letter = $this->service->change($this->user, $id, $data, $type);
             return $this->sendSuccess(LetterResource::make($letter), 'Letter send successfully.');
         }catch (\Exception $exception){
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());

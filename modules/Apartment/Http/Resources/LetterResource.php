@@ -31,6 +31,8 @@ class LetterResource extends JsonResource
             ] : null,
             'region' => $this->region ? RegionResource::make($this->region) : null,
             'district' => $this->district ? DistrictResource::make($this->district) : null,
+            'sign_url' => $this->sign_url ?? null,
+            'shaffof_id_uuid' => $this->shaffof_id_uuid ?? null,
         ];
 
         if (LetterType::current() == LetterType::WATER->value) $data['protocol_id'] = $this->protocol_id;

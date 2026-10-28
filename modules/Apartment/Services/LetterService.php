@@ -4,22 +4,25 @@ namespace Modules\Apartment\Services;
 
 use App\Services\EimzoService;
 use App\Services\InvoiceService;
+use App\Services\ShaffofIdIntegrationService;
 use Modules\Apartment\Const\LetterStatus;
 use Modules\Apartment\Contracts\LetterInterface;
 use Modules\Apartment\Http\Requests\LetterRequest;
+use Modules\Apartment\Models\Letter;
 
 class LetterService
 {
     public function __construct(
-        protected LetterInterface $repository,
-        protected EimzoService    $imzoService,
-        protected InvoiceService  $invoiceService)
+        protected LetterInterface             $repository,
+        protected EimzoService                $imzoService,
+        protected InvoiceService              $invoiceService,
+        protected ShaffofIdIntegrationService $shaffofIdIntegrationService)
     {
     }
 
     public function getAll($user, $roleId, $filters)
     {
-        $query =  $this->repository->all($user, $roleId);
+        $query = $this->repository->all($user, $roleId);
         return $this->repository->search($query, $filters);
     }
 
@@ -33,10 +36,33 @@ class LetterService
         return $this->repository->create($request->validated());
     }
 
-    public function change($user, $id, $request)
+    public function change($user, $id, $request, int $type = null)
     {
         try {
-            $data = $this->imzoService->signTimestamp($request['signature']);
+            $internalUuid = uuid_create();
+            $letter = Letter::findOrFail($id);
+            $data = [
+                'title' => $letter->address,
+                'body' => [
+                    'fish' => $letter->fish,
+                    'monitoring_id' => $letter->monitoring_id,
+                    'letter_type' => $type,
+                ],
+                "methods" => ["eimzo"],
+                "signer_pinfl" => $user->pinfl,
+                'internal_uuid' => $internalUuid,
+                "callback_url" => "https://test.uz/testable/testback",
+                "return_url" => 'https://ujk-nazorat.mc.uz/dashboard/mail',
+                "ttl" => 86400
+            ];
+            $signingProcess = $this->shaffofIdIntegrationService->signDocument(data: $data, user: $user);
+            $letter->internal_uuid = $internalUuid;
+            $letter->shaffof_id_uuid = $signingProcess->uuid;
+            $letter->sign_url = $signingProcess->sign_url;
+            $letter->body_hash = $signingProcess->body_hash;
+            $letter->save();
+
+//            $data = $this->imzoService->signTimestamp($request['signature']);
             if (empty($data)) throw new \Exception('E-imzo malumot olishda xatolik yuz berdi');
 
             $director = $this->checkDirector($data, false);

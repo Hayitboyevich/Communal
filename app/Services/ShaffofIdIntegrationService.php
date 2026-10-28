@@ -7,7 +7,12 @@ use App\Exceptions\NotFoundException;
 use App\Exceptions\ServerException;
 use App\Http\Resources\RoleResource;
 use App\Infrastructure\ExternalApis\ShaffofIdIntegrationProvider;
+use App\Models\User;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Facades\Cache;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class ShaffofIdIntegrationService
 {
@@ -58,5 +63,50 @@ class ShaffofIdIntegrationService
         if (!$idToken) throw new NotFoundException('Foydalanuvchi topilmadi');
         $this->userRepository->deleteIdToken($userId, $idToken);
         return $this->provider->refreshSession($idToken);
+    }
+
+    /**
+     * @throws NotFoundException
+     */
+    public function signDocument(array $data, User $user)
+    {
+        $token = $this->checkCache('document');
+        return $this->provider->sendSigningDocument(user: $user, accessToken: $token, returnUrl: $data['returnUrl'],title: $data['title'],
+        body: $data['body'], uuid: $data['internal_uuid'], contentType: 'application/pdf');
+    }
+
+    /**
+     * @throws LockTimeoutException
+     * @throws NotFoundExceptionInterface
+     * @throws ServerException
+     * @throws ContainerExceptionInterface
+     */
+    private function checkCache(string $purpose)
+    {
+        $grantType = match ($purpose) {
+            'document' => 'client_credentials',
+            'auth' => 'authorization_code',
+            default => throw new ServerException('Unknown grant type'),
+        };
+        $key = self::key($purpose, $grantType);
+        if ($token = cache()->get($key)) {
+            return $token;
+        }
+        return Cache::lock("$key:lock", 10)->block(5, function () use ($purpose, $grantType, $key) {
+            if ($token = cache()->get($key)) {
+                return $token;
+            }
+            $result = $this->provider->getAccessToken(grantType: $grantType, accept: 'application/x-www-form-urlencoded',
+                scope: $purpose);
+            $token = $result->access_token;
+            $expiresIn = (int) ($result->expires_in ?? 3600);
+            cache()->put($key, $token, max($expiresIn - 60, 60));
+            return $token;
+        });
+    }
+
+    private static function key(string $purpose, string $token): string
+    {
+        return "ott:$purpose:" . hash('sha256', $token);
     }
 }
