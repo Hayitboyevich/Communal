@@ -9,6 +9,7 @@ use App\Http\Resources\DistrictResource;
 use App\Http\Resources\RegionResource;
 use App\Models\District;
 use App\Models\Region;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
 use Modules\Apartment\Contracts\ChecklistRepositoryInterface;
@@ -22,6 +23,8 @@ use Modules\Apartment\Http\Resources\LetterResource;
 use Modules\Apartment\Services\ChecklistService;
 use Modules\Apartment\Services\ClaimService;
 use Modules\Apartment\Services\LetterService;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class LetterController extends BaseController
 {
@@ -106,6 +109,11 @@ class LetterController extends BaseController
         }
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws GuzzleException
+     * @throws NotFoundExceptionInterface
+     */
     public function checkSigning()
     {
         $token = cache()->get("ott:documents:" . hash('sha256', 'client_credentials'));
