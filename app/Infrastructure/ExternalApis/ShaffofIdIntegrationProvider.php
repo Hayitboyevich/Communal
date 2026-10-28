@@ -115,7 +115,7 @@ class ShaffofIdIntegrationProvider
                 'Content-Type' => $contentType,
             ],
             'json' => [
-                'title' => $title,
+                'title' => "sdfsdfsdf",
                 'body' => $body,
                 "methods" => ["eimzo"],
                 "signer_pinfl" => $user->pin,
