@@ -36,7 +36,7 @@ class LetterService
         return $this->repository->create($request->validated());
     }
 
-    public function change($user, $id, $request = null, int $type = null)
+    public function change($user, $id, $request = null, array $type = [])
     {
         try {
             $internalUuid = uuid_create();
