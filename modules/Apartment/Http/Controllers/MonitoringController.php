@@ -484,7 +484,7 @@ class MonitoringController extends BaseController
                 $regulation->violation_type_id = $validated['violation_type_id'];
                 $regulation->edited_violation_type = true;
                 $monitoring = Monitoring::findOrFail($regulation->monitoring_id);
-                $this->historyService->createHistory($monitoring, $monitoring->monitoring_status_id, 22, $old);
+                $this->historyService->createHistory($monitoring->id, $monitoring->monitoring_status_id->value, 22, $old);
                 $regulation->save();
                 return $monitoring;
             });
