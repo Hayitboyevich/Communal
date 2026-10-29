@@ -26,7 +26,7 @@ class RegulationViolationTypeRequest extends FormRequest
         return [
             'regulation_id' => ['required', 'integer', Rule::exists('regulations', 'id')
                 ->where('editable_violation_type', true)
-                ->where('edited_violation_type', false)],
+                ->where('edited_violation_type', 'false')],
             'violation_type_id' => 'required|integer|exists:violation_types,id',
         ];
     }
