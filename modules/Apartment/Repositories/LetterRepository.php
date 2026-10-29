@@ -183,7 +183,7 @@ class LetterRepository implements LetterInterface
             ])->withBody(http_build_query($data), 'application/x-www-form-urlencoded')
                 ->post($url);
 
-            dd($response);
+            dd($response->getBody());
             return $response->json() ?? null;
 
         } catch (\Exception $exception) {
