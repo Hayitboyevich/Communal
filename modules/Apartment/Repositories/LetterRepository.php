@@ -161,7 +161,6 @@ class LetterRepository implements LetterInterface
 
     private function sendPost($letter, $token)
     {
-        dd($token);
         try {
             $url = config('apartment.hybrid.url') . '/api/gasn/mail/';
             $data = [
