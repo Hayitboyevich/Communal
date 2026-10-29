@@ -46,7 +46,6 @@ class LetterService
             if ($letter->sign_url and $letter->status == LetterStatus::New) {
                 $check = $this->shaffofIdIntegrationService->checkSigningStatus($letter->shaffof_id_uuid);
                 if ($check->status == 'signed') {
-                    dd($check);
                     return $this->repository->change($id, $check->body_hash);
                 } elseif ($letter->isExpired()) {
                     $this->getNewSigningUrl($letter, $user, $type);
