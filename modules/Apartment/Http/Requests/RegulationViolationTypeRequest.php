@@ -13,7 +13,7 @@ class RegulationViolationTypeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return (int) auth()->user()->getRoleFromToken() === UserRoleEnum::VIOLATION_TYPE_VIEWER->value;
+        return (int)auth()->user()->getRoleFromToken() === UserRoleEnum::VIOLATION_TYPE_VIEWER->value;
     }
 
     /**
@@ -24,7 +24,9 @@ class RegulationViolationTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'regulation_id' => ['required', 'integer', Rule::exists('regulations', 'id')->where('editable_violation_type', true)],
+            'regulation_id' => ['required', 'integer', Rule::exists('regulations', 'id')
+                ->where('editable_violation_type', true)
+                ->where('edited_violation_type', false)],
             'violation_type_id' => 'required|integer|exists:violation_types,id',
         ];
     }

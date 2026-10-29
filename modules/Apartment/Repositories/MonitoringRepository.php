@@ -34,9 +34,10 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                     return Monitoring::query()->where('user_id', $user->id)->where('region_id', $user->region_id);
                 case UserRoleEnum::APARTMENT_VIEWER->value:
                 case UserRoleEnum::SUPER_ADMIN->value:
+                case UserRoleEnum::VIOLATION_TYPE_VIEWER->value:
                     return Monitoring::query();
-                    case UserRoleEnum::MONITORING_VIEWER->value:
-                        return Monitoring::query()->where('home_id_attached', false)->where('monitoring_status_id', '!=', MonitoringStatusEnum::NOT_DEFECT->value);
+                case UserRoleEnum::MONITORING_VIEWER->value:
+                    return Monitoring::query()->where('home_id_attached', false)->where('monitoring_status_id', '!=', MonitoringStatusEnum::NOT_DEFECT->value);
                 case UserRoleEnum::APARTMENT_MANAGER->value:
                 case UserRoleEnum::REG_VIEWER->value:
                     return Monitoring::query()->where('region_id', $user->region_id);
@@ -63,7 +64,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                 })
                 ->when(isset($filters['month']), function ($query) use ($filters) {
                     $startDate = Carbon::createFromFormat('Y-m', $filters['month'])->startOfMonth();
-                    $endDate   = Carbon::createFromFormat('Y-m', $filters['month'])->endOfMonth();
+                    $endDate = Carbon::createFromFormat('Y-m', $filters['month'])->endOfMonth();
 
                     $query->whereHas('violation', function ($q) use ($startDate, $endDate) {
                         $q->whereBetween('deadline', [$startDate, $endDate]);
@@ -136,7 +137,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                     'additional_comment' => $data['additional_comment'] ?? null,
                     'step' => $data['step'],
                     'data_type' => $data['data_type'] ?? null,
-                    'send_my_home' =>null,
+                    'send_my_home' => null,
                 ]);
 
                 $this->createHistory($originalMonitoring, MonitoringHistoryType::VIOLATION_NOT_DETECTED);
@@ -152,7 +153,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                             'monitoring_status_id' => $data['monitoring_status_id'],
                             'additional_comment' => $data['additional_comment'] ?? null,
                             'step' => $data['step'],
-                            'send_my_home' =>null
+                            'send_my_home' => null
                         ]);
 
                         $regulation = Regulation::create([
@@ -250,7 +251,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $monitoring = $this->findById($id);
             $monitoring->update([
                 'monitoring_status_id' => MonitoringStatusEnum::NOT_DEFECT->value,
-                'send_my_home' =>null
+                'send_my_home' => null
             ]);
             return $monitoring;
         } catch (\Exception $exception) {
@@ -265,7 +266,7 @@ class MonitoringRepository implements MonitoringRepositoryInterface
             $monitoring->update([
                 'monitoring_status_id' => MonitoringStatusEnum::ENTER_RESULT->value,
                 'step' => Step::ONE,
-                'send_my_home' =>null
+                'send_my_home' => null
             ]);
 
             //history yoziladi
