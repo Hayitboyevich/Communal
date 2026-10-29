@@ -31,6 +31,7 @@ class RegulationResource extends JsonResource
             'address' => $this->address,
             'letter' => $this->letter ? $this->letter->letter_id : null,
             'editable_violation_type' => $this->editable_violation_type,
+            'edited_violation_type' => $this->edited_violation_type,
         ];
     }
 }
