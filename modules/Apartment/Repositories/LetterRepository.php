@@ -184,7 +184,11 @@ class LetterRepository implements LetterInterface
                 ->post($url);
 
 
-            return $response->json() ?? null;
+            $res = null;
+            if ($response->status() == 200) {
+                $res= 'success';
+            }
+            return $res;
 
         } catch (\Exception $exception) {
             throw $exception;
