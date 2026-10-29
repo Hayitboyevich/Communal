@@ -34,13 +34,17 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                     return Monitoring::query()->where('user_id', $user->id)->where('region_id', $user->region_id);
                 case UserRoleEnum::APARTMENT_VIEWER->value:
                 case UserRoleEnum::SUPER_ADMIN->value:
-                case UserRoleEnum::VIOLATION_TYPE_VIEWER->value:
                     return Monitoring::query();
                 case UserRoleEnum::MONITORING_VIEWER->value:
                     return Monitoring::query()->where('home_id_attached', false)->where('monitoring_status_id', '!=', MonitoringStatusEnum::NOT_DEFECT->value);
                 case UserRoleEnum::APARTMENT_MANAGER->value:
                 case UserRoleEnum::REG_VIEWER->value:
                     return Monitoring::query()->where('region_id', $user->region_id);
+                case UserRoleEnum::VIOLATION_TYPE_VIEWER->value:
+                    return Monitoring::query()->whereHas('regulation', function ($q) use ($user) {
+                        $q->where('place_id', 3);
+                        $q->whereIn('violation_type_id', [30 ,31]);
+                    });
                 default:
                     return Monitoring::query()->whereRaw('1 = 0');
             }
