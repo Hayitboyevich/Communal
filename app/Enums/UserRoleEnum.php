@@ -22,5 +22,6 @@ enum UserRoleEnum: int
     case SUPER_ADMIN = 16;
     case REG_VIEWER = 18;
     case MONITORING_VIEWER = 19;
+    case VIOLATION_TYPE_VIEWER = 20;
     case OGOH = 101;
 }
