@@ -19,7 +19,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('check-user', 'checkUser');
     Route::post('shaffof-id-token', 'getToken');
     Route::get('info-employment/{pinfl}', 'infoEmployment');
-    Route::get('logout', 'logout')->middleware(['auth:api', 'check-role']);
+    Route::post('logout', 'logout')->middleware(['auth:api', 'check-role']);
 });
 
 
