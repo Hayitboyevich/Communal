@@ -29,8 +29,8 @@ class ShaffofIdIntegrationService
     public
     function getAccessToken(?string $code, string $redirect_uri, string $codeVerify)
     {
-        $result = $this->provider->getAccessToken($code, $redirect_uri, $codeVerify);
-        return $result;
+        $result = $this->provider->getAccessToken(grantType: 'authorization_code', accept: 'application/x-www-form-urlencoded',
+            codeVerify: $codeVerify, code: $code, redirect_uri: $redirect_uri);
         $idToken = $result->id_token;
         $result = explode('.', $idToken);
         $result = json_decode($this->base64url_decode($result[1]), true);
