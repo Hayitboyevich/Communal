@@ -41,9 +41,8 @@ class MonitoringRepository implements MonitoringRepositoryInterface
                 case UserRoleEnum::REG_VIEWER->value:
                     return Monitoring::query()->where('region_id', $user->region_id);
                 case UserRoleEnum::VIOLATION_TYPE_VIEWER->value:
-                    return Monitoring::query()->whereHas('regulation', function ($q) use ($user) {
-                        $q->where('place_id', 3);
-                        $q->whereIn('violation_type_id', [30 ,31]);
+                    return Monitoring::query()->whereHas('regulation', function ($q) {
+                        $q->where('editable_violation_type', true);
                     });
                 default:
                     return Monitoring::query()->whereRaw('1 = 0');
