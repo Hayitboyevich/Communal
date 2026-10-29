@@ -30,7 +30,6 @@ use Modules\Apartment\Models\Regulation;
 use Modules\Apartment\Services\TurarJoySyncService;
 use Modules\Apartment\Services\MonitoringService;
 use Illuminate\Http\Request;
-use Modules\Water\Const\Step;
 use Modules\Water\Http\Resources\FineResource;
 use Modules\Water\Services\HistoryService;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -477,14 +476,21 @@ class MonitoringController extends BaseController
     public function editRegulationViolationType(RegulationViolationTypeRequest $request)
     {
         $validated = $request->validated();
-        if ($this->roleId != UserRoleEnum::VIOLATION_TYPE_VIEWER->value) return $this->sendError(error: 'Permission denied', errorMessages: 'You are not authorized to perform this action.', code: 403);
-        $regulation = Regulation::find($validated['regulation_id']);
+        $regulation = Regulation::findOrFail($validated['regulation_id']);
         $old = $regulation->violation_type_id;
-        $regulation->violation_type_id = $validated['violation_type_id'];
-        $monitoring = Monitoring::find($regulation->monitoring_id);
-        $this->historyService->createHistory($monitoring, $monitoring->monitoring_status_id, 22, $old);
-        $regulation->save();
-        return $this->sendSuccess(MonitoringResource::make(), 'Monitoring confirmed successfully.');
+        try {
+            $result = DB::transaction(function () use ($validated, $regulation, $old) {
+                $regulation->violation_type_id = $validated['violation_type_id'];
+                $regulation->edited_violation_type = true;
+                $monitoring = Monitoring::findOrFail($regulation->monitoring_id);
+                $this->historyService->createHistory($monitoring, $monitoring->monitoring_status_id, 22, $old);
+                $regulation->save();
+                return $monitoring;
+            });
+        } catch (\Exception $exception) {
+            return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
+        }
+        return $this->sendSuccess(MonitoringResource::make($result), 'Monitoring confirmed successfully.');
     }
 
 }

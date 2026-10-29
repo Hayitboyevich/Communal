@@ -2,6 +2,7 @@
 
 namespace Modules\Apartment\Http\Requests;
 
+use App\Enums\UserRoleEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -12,7 +13,7 @@ class RegulationViolationTypeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return (int) auth()->user()->getRoleFromToken() === UserRoleEnum::VIOLATION_TYPE_VIEWER->value;
     }
 
     /**
