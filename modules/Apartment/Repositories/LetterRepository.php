@@ -88,10 +88,10 @@ class LetterRepository implements LetterInterface
         DB::beginTransaction();
         try {
             $token = $this->authPost();
-            dd($token);
             $letter = $this->findById($id);
             $pkcs7b64 = $signature;
             $responseData  = $this->sendPost($letter, $token);
+            dd($responseData);
 
             if (empty($responseData)) {
                 throw new \Exception('Pochtaga yuborishda muammo yuzaga keldi.');
