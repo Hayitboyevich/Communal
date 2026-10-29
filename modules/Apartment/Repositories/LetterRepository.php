@@ -161,6 +161,7 @@ class LetterRepository implements LetterInterface
 
     private function sendPost($letter, $token)
     {
+        dd($token);
         try {
             $url = config('apartment.hybrid.url') . '/api/gasn/mail/';
             $data = [
@@ -176,7 +177,7 @@ class LetterRepository implements LetterInterface
 //                'SaotoAreaId' => $letter->district->soato,
 //                'Document64' => $this->generatePdf($letter),
             ];
-dd($data);
+
             $response = Http::withHeaders([
                 'Content-Type' => 'application/x-www-form-urlencoded',
                 'Authorization' => 'Bearer ' . $token,
