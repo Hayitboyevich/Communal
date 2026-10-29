@@ -176,14 +176,14 @@ class LetterRepository implements LetterInterface
 //                'SaotoAreaId' => $letter->district->soato,
 //                'Document64' => $this->generatePdf($letter),
             ];
-
+dd($data);
             $response = Http::withHeaders([
                 'Content-Type' => 'application/x-www-form-urlencoded',
                 'Authorization' => 'Bearer ' . $token,
             ])->withBody(http_build_query($data), 'application/x-www-form-urlencoded')
                 ->post($url);
 
-            dd($response->json());
+
             return $response->json() ?? null;
 
         } catch (\Exception $exception) {
