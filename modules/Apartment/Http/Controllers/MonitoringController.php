@@ -22,21 +22,26 @@ use Modules\Apartment\Http\Requests\ChangeInspectorRequest;
 use Modules\Apartment\Http\Requests\MonitoringAdminRequest;
 use Modules\Apartment\Http\Requests\MonitoringChangeStatusRequest;
 use Modules\Apartment\Http\Requests\MonitoringCreateRequest;
+use Modules\Apartment\Http\Requests\RegulationViolationTypeRequest;
 use Modules\Apartment\Http\Requests\ViolationRequest;
 use Modules\Apartment\Http\Resources\MonitoringResource;
 use Modules\Apartment\Models\Monitoring;
+use Modules\Apartment\Models\Regulation;
 use Modules\Apartment\Services\TurarJoySyncService;
 use Modules\Apartment\Services\MonitoringService;
 use Illuminate\Http\Request;
 use Modules\Water\Const\Step;
 use Modules\Water\Http\Resources\FineResource;
+use Modules\Water\Services\HistoryService;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MonitoringController extends BaseController
 {
+    private HistoryService $historyService;
+
     public function __construct(
-        protected MonitoringService    $service,
-        protected TurarJoySyncService  $turarJoySyncService
+        protected MonitoringService   $service,
+        protected TurarJoySyncService $turarJoySyncService
     )
     {
         parent::__construct();
@@ -45,7 +50,7 @@ class MonitoringController extends BaseController
     public function index($id = null): JsonResponse
     {
         try {
-            $filters = request()->only(['status', 'type', 'category', 'is_administrative', 'region_id', 'inspector_id',  'district_id', 'month', 'id', 'monitoring_type']);
+            $filters = request()->only(['status', 'type', 'category', 'is_administrative', 'region_id', 'inspector_id', 'district_id', 'month', 'id', 'monitoring_type']);
             $monitorings = $id
                 ? $this->service->findById($id)
                 : $this->service->getAll($this->user, $this->roleId, $filters)->orderBy('created_at', 'desc')->paginate(request('per_page', 15));
@@ -81,7 +86,7 @@ class MonitoringController extends BaseController
             $filters = request(['month', 'region_id', 'status']);
             $data = $this->service->getMonth($this->user, $this->roleId, $filters);
             return $this->sendSuccess($data, 'Success');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -114,7 +119,7 @@ class MonitoringController extends BaseController
         try {
             $this->service->changeInspector($this->user, $this->roleId, $request);
             return $this->sendSuccess(true, 'Monitoring changed successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -124,7 +129,7 @@ class MonitoringController extends BaseController
         try {
             $data = $this->service->update($request);
             return $this->sendSuccess(MonitoringResource::make($data), 'Monitoring changed successfully.');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -141,11 +146,11 @@ class MonitoringController extends BaseController
 
         if ($startDate && $endDate) {
             $startDate = Carbon::parse($startDate)->startOfDay();
-            $endDate   = Carbon::parse($endDate)->endOfDay();
+            $endDate = Carbon::parse($endDate)->endOfDay();
             $query->whereBetween('monitorings.created_at', [$startDate, $endDate]);
         }
 
-         return $query
+        return $query
             ->leftJoinSub($violationsSub, 'vio', function ($join) {
                 $join->on('vio.monitoring_id', '=', 'monitorings.id');
             })
@@ -295,7 +300,7 @@ class MonitoringController extends BaseController
     }
 
 
-    public function excel($id=null)
+    public function excel($id = null)
     {
         try {
             ini_set('memory_limit', '-1');
@@ -310,7 +315,7 @@ class MonitoringController extends BaseController
     public function location()
     {
         try {
-            $filters = request()->only(['status', 'type', 'category', 'is_administrative', 'region_id', 'inspector_id',  'district_id', 'month', 'id', 'monitoring_type']);
+            $filters = request()->only(['status', 'type', 'category', 'is_administrative', 'region_id', 'inspector_id', 'district_id', 'month', 'id', 'monitoring_type']);
 
             $all = $this->service->getAll($this->user, $this->roleId, $filters)->select(['id', 'lat', 'long', 'monitoring_status_id'])
                 ->with([
@@ -319,7 +324,7 @@ class MonitoringController extends BaseController
                 ->get();;
             return $this->sendSuccess($all, 'Data retrieved successfully');
 
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
         }
     }
@@ -469,5 +474,17 @@ class MonitoringController extends BaseController
         }
     }
 
+    public function editRegulationViolationType(RegulationViolationTypeRequest $request)
+    {
+        $validated = $request->validated();
+        if ($this->roleId != UserRoleEnum::VIOLATION_TYPE_VIEWER->value) return $this->sendError(error: 'Permission denied', errorMessages: 'You are not authorized to perform this action.', code: 403);
+        $regulation = Regulation::find($validated['regulation_id']);
+        $old = $regulation->violation_type_id;
+        $regulation->violation_type_id = $validated['violation_type_id'];
+        $monitoring = Monitoring::find($regulation->monitoring_id);
+        $this->historyService->createHistory($monitoring, $monitoring->monitoring_status_id, 22, $old);
+        $regulation->save();
+        return $this->sendSuccess(MonitoringResource::make(), 'Monitoring confirmed successfully.');
+    }
 
 }

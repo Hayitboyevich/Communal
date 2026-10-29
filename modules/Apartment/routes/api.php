@@ -37,6 +37,7 @@ Route::group(['middleware' => ['auth:api', 'check-role']], function () {
         Route::post('/change', 'change');
         Route::get('/{id?}', 'index');
         Route::post('attach-home-id/{id}', 'attachHomeId');
+        Route::post('change-violation-type', 'editRegulationViolationType');
     });
 
     Route::controller(LetterController::class)
