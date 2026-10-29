@@ -18,7 +18,9 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class LetterRepository implements LetterInterface
 {
-    public function __construct(public Letter $letter, protected EimzoService $imzoService){}
+    public function __construct(public Letter $letter, protected EimzoService $imzoService)
+    {
+    }
 
     public function all($user, $roleId)
     {
@@ -26,8 +28,8 @@ class LetterRepository implements LetterInterface
             $query = $this->letter->query();
             return match (LetterType::current()) {
                 LetterType::APARTMENT => $this->apartmentScope($query, $user, $roleId),
-                LetterType::WATER     => $this->waterScope($query, $user, $roleId),
-                default               => $query->whereRaw('1 = 0'),
+                LetterType::WATER => $this->waterScope($query, $user, $roleId),
+                default => $query->whereRaw('1 = 0'),
             };
 //            switch ($roleId) {
 //                case UserRoleEnum::APARTMENT_MANAGER->value:
@@ -45,28 +47,27 @@ class LetterRepository implements LetterInterface
 
     private function apartmentScope($query, $user, $roleId)
     {
-        return match ((int) $roleId) {
+        return match ((int)$roleId) {
             UserRoleEnum::APARTMENT_VIEWER->value => $query,
             UserRoleEnum::APARTMENT_MANAGER->value,
-            UserRoleEnum::REG_VIEWER->value       => $query->where('region_id', $user->region_id),
-            default                               => $query->whereRaw('1 = 0'),
+            UserRoleEnum::REG_VIEWER->value => $query->where('region_id', $user->region_id),
+            default => $query->whereRaw('1 = 0'),
         };
     }
 
     private function waterScope($query, $user, $roleId)
     {
-        return match ((int) $roleId) {
-            UserRoleEnum::RES_VIEWER->value      => $query,
-            UserRoleEnum::MANAGER->value         => $query->where('region_id', $user->region_id),
-            default                              => $query->whereRaw('1 = 0'),
+        return match ((int)$roleId) {
+            UserRoleEnum::RES_VIEWER->value => $query,
+            UserRoleEnum::MANAGER->value => $query->where('region_id', $user->region_id),
+            default => $query->whereRaw('1 = 0'),
         };
     }
 
 
-
     public function findById($id)
     {
-        return  $this->letter->query()->find($id);
+        return $this->letter->query()->find($id);
     }
 
     public function create($data)
@@ -90,8 +91,7 @@ class LetterRepository implements LetterInterface
             $token = $this->authPost();
             $letter = $this->findById($id);
             $pkcs7b64 = $signature;
-            $responseData  = $this->sendPost($letter, $token);
-            dd($responseData);
+            $responseData = $this->sendPost($letter, $token);
 
             if (empty($responseData)) {
                 throw new \Exception('Pochtaga yuborishda muammo yuzaga keldi.');
@@ -101,7 +101,7 @@ class LetterRepository implements LetterInterface
 
             DB::commit();
             return $letter;
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             DB::rollBack();
             throw $exception;
         }
@@ -111,7 +111,7 @@ class LetterRepository implements LetterInterface
     public function getLetter($id)
     {
         $token = $this->authPost();
-        $url = config('apartment.hybrid.url').'/api/gasn/mail?id='.$id;
+        $url = config('apartment.hybrid.url') . '/api/gasn/mail?id=' . $id;
 
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token,
@@ -123,15 +123,15 @@ class LetterRepository implements LetterInterface
     private function getHashCode($letter, $token)
     {
         try {
-            $url = config('apartment.hybrid.url').'/api/SendMail/'.$letter->letter_id;
+            $url = config('apartment.hybrid.url') . '/api/SendMail/' . $letter->letter_id;
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
             ])->get($url);
             if ($response->successful()) {
                 return $response->json();
             }
-            return  null;
-        }catch (\Exception $exception){
+            return null;
+        } catch (\Exception $exception) {
             return null;
         }
     }
@@ -140,7 +140,7 @@ class LetterRepository implements LetterInterface
     {
         try {
             $token = $this->authPost();
-            $url = config('apartment.hybrid.url').'/api/SendMail/'.$letter->letter_id;
+            $url = config('apartment.hybrid.url') . '/api/SendMail/' . $letter->letter_id;
             $data = [
                 'signature' => $signature
             ];
@@ -153,7 +153,7 @@ class LetterRepository implements LetterInterface
             if ($response->failed()) throw new \Exception('Hybrid potchada xatolik');
 
             return $response->json() ?? null;
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             throw $exception;
         }
 
@@ -162,7 +162,7 @@ class LetterRepository implements LetterInterface
     private function sendPost($letter, $token)
     {
         try {
-            $url = config('apartment.hybrid.url').'/api/gasn/mail/';
+            $url = config('apartment.hybrid.url') . '/api/gasn/mail/';
             $data = [
                 'Id' => $letter->id,
                 'SaotoAreaId' => $letter->district->soato,
@@ -183,10 +183,10 @@ class LetterRepository implements LetterInterface
             ])->withBody(http_build_query($data), 'application/x-www-form-urlencoded')
                 ->post($url);
 
-
+            dd($response);
             return $response->json() ?? null;
 
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             throw $exception;
         }
     }
@@ -198,26 +198,25 @@ class LetterRepository implements LetterInterface
         $domain = URL::to('/monitoring-pdf') . '/' . $monitoring->id;
         $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
 
-        $barcode = DNS1D::getBarcodePNG('GASN'.$monitoring->letter->id, 'C39', 2, 40);
+        $barcode = DNS1D::getBarcodePNG('GASN' . $monitoring->letter->id, 'C39', 2, 40);
 
         $pdf = PDF::loadView('pdf.letter', compact('monitoring', 'qrImage', 'barcode'));
 
         $pdfOutput = $pdf->output();
 
-        return  base64_encode($pdfOutput);
+        return base64_encode($pdfOutput);
     }
-
 
 
     private function authPost()
     {
         $token = null;
-        $url = config('apartment.hybrid.url').'/token';
+        $url = config('apartment.hybrid.url') . '/token';
 
         $data = [
             'grant_type' => config('apartment.hybrid.grant_type'),
-            'client_id'   => config('apartment.hybrid.client_id'),
-            'client_secret'   => config('apartment.hybrid.client_secret'),
+            'client_id' => config('apartment.hybrid.client_id'),
+            'client_secret' => config('apartment.hybrid.client_secret'),
         ];
 
         $response = Http::withHeaders([
@@ -236,13 +235,13 @@ class LetterRepository implements LetterInterface
     {
         try {
             $token = $this->authPost();
-            $url = config('apartment.hybrid.url').'/api/gasn/receipt/get?id='.$id;
+            $url = config('apartment.hybrid.url') . '/api/gasn/receipt/get?id=' . $id;
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
             ])->get($url);
-             return $response->successful() ? base64_encode($response->body()) : null;
-        }catch (\Exception $exception){
+            return $response->successful() ? base64_encode($response->body()) : null;
+        } catch (\Exception $exception) {
             throw $exception;
         }
     }
