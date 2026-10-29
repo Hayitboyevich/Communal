@@ -30,6 +30,7 @@ class RegulationResource extends JsonResource
             'videos' => $this->videos ? VideoResource::collection($this->videos) : null,
             'address' => $this->address,
             'letter' => $this->letter ? $this->letter->letter_id : null,
+            'editable_violation_type' => $this->editable_violation_type,
         ];
     }
 }
