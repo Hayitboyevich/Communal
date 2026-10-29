@@ -89,14 +89,14 @@ class LetterRepository implements LetterInterface
         try {
             $token = $this->authPost();
             $letter = $this->findById($id);
-            $pkcs7b64 = $this->imzoService->signTimestamp($signature);
+            $pkcs7b64 = $signature;
             $responseData  = $this->sendPost($letter, $token);
 
             if (empty($responseData)) {
                 throw new \Exception('Pochtaga yuborishda muammo yuzaga keldi.');
             }
 
-            $letter->update(['status' => 2, 'pkcs7' => $pkcs7b64['pkcs7b64']]);
+            $letter->update(['status' => 2, 'pkcs7' => $pkcs7b64['pkcs7b64'], 'body_hash' => $pkcs7b64, 'is_signed_from_shi' => true]);
 
             DB::commit();
             return $letter;

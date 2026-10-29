@@ -79,6 +79,19 @@ class ShaffofIdIntegrationService
     /**
      * @throws LockTimeoutException
      * @throws NotFoundExceptionInterface
+     * @throws NotFoundException
+     * @throws ServerException
+     * @throws ContainerExceptionInterface
+     */
+    public function checkSigningStatus(string $externalUuid)
+    {
+        $accessToken = $this->checkCache('documents');
+        return $this->provider->checkSigningStatus(accessToken: $accessToken, externalUuid: $externalUuid);
+    }
+
+    /**
+     * @throws LockTimeoutException
+     * @throws NotFoundExceptionInterface
      * @throws ServerException
      * @throws ContainerExceptionInterface
      */

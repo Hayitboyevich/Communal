@@ -8,6 +8,7 @@ use App\Models\Region;
 use App\Models\Scopes\LetterTypeScope;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Water\Models\Protocol;
@@ -17,7 +18,10 @@ class Letter extends Model
 {
     protected $guarded = false;
 
-    protected $casts = ['letter_type' => LetterType::class];
+    protected $casts = [
+        'letter_type' => LetterType::class,
+        'sign_url_expires_at' => 'datetime',
+    ];
 
 
     protected static function booted(): void
@@ -26,6 +30,14 @@ class Letter extends Model
             $letter->letter_type ??= LetterType::current()
                 ?? throw new \LogicException('Letter type aniqlanmadi');
         });
+    }
+
+    public function isExpired(): attribute
+    {
+        return Attribute::get(
+            fn () => $this->expires_at === null
+                || $this->expires_at->copy()->subMinute()->isPast()
+        );
     }
 
     public function inspector(): BelongsTo

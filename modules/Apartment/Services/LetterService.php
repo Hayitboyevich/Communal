@@ -6,6 +6,8 @@ use App\Enums\LetterType;
 use App\Services\EimzoService;
 use App\Services\InvoiceService;
 use App\Services\ShaffofIdIntegrationService;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Modules\Apartment\Const\LetterStatus;
 use Modules\Apartment\Contracts\LetterInterface;
 use Modules\Apartment\Http\Requests\LetterRequest;
@@ -40,44 +42,63 @@ class LetterService
     public function change($user, $id, LetterType $type, $request = null)
     {
         try {
-            $internalUuid = uuid_create();
             $letter = Letter::findOrFail($id);
-            $data = [
-                'title' => $letter->address . ' ' . $letter->fish,
-                'body' => [
-                    'fish' => $letter->fish,
-                    'monitoring_id' => $letter->monitoring_id,
-                    'letter_type' => [
-                        'name' => $type->name,
-                        'id' => $type->value,
-                    ],
+            if (!$letter->isExpired and $letter->status == LetterStatus::New) {
+                $check = $this->shaffofIdIntegrationService->checkSigningStatus($letter->shaffof_id_uuid);
+                if ($check->status === 'signed') {
+                    return $this->repository->change($id, $check->body_hash);
+                } else {
+                    return $letter;
+                }
+            } elseif (($letter->isExpired and $letter->status == LetterStatus::New)) {
+                $letter = $this->getNewSigningUrl($letter, $user, $type);
+            }
+            return $letter;
+//            $data = $this->imzoService->signTimestamp($request['signature']);
+//            if (empty($data)) throw new \Exception('E-imzo malumot olishda xatolik yuz berdi');
+//
+//            $director = $this->checkDirector($data, false);
+//
+//            if ($director['inn'] != $user->pin) {
+//                throw new \Exception('E-imzo egasi mos kelmadi');
+//            }
+//            return $this->repository->change($id, $request['signature']);
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    private function getNewSigningUrl(Letter $letter, $user, LetterType $type)
+    {
+        $internalUuid = uuid_create();
+        $data = [
+            'title' => $letter->address . ' ' . $letter->fish,
+            'body' => [
+                'fish' => $letter->fish,
+                'monitoring_id' => $letter->monitoring_id,
+                'letter_type' => [
+                    'name' => $type->name,
+                    'id' => $type->value,
                 ],
-                "methods" => ["eimzo"],
-                "signer_pinfl" => $user->pinfl,
-                'internal_uuid' => $internalUuid,
-                "callback_url" => "https://test.uz/testable/testback",
-                "return_url" => 'https://ujk-nazorat.mc.uz/dashboard/mail',
-                "ttl" => 86400
-            ];
-            $signingProcess = $this->shaffofIdIntegrationService->signDocument(data: $data, user: $user);
+            ],
+            "methods" => ["eimzo"],
+            'internal_uuid' => $internalUuid,
+            "callback_url" => "https://test.uz/testable/testback",
+            "return_url" => 'https://ujk-nazorat.mc.uz/dashboard/mail',
+            "ttl" => 86400
+        ];
+        $signingProcess = $this->shaffofIdIntegrationService->signDocument(data: $data, user: $user);
+        return DB::transaction(function () use ($letter, $signingProcess, $internalUuid) {
             $letter->internal_uuid = $internalUuid;
             $letter->shaffof_id_uuid = $signingProcess->uuid;
             $letter->sign_url = $signingProcess->sign_url;
             $letter->body_hash = $signingProcess->body_hash;
+            $letter->sign_url_expires_at = Carbon::parse($signingProcess['expires_at'])
+                ->setTimezone(config('app.timezone'))
+                ->subMinute();
             $letter->save();
             return $letter;
-//            $data = $this->imzoService->signTimestamp($request['signature']);
-            if (empty($data)) throw new \Exception('E-imzo malumot olishda xatolik yuz berdi');
-
-            $director = $this->checkDirector($data, false);
-
-            if ($director['inn'] != $user->pin) {
-                throw new \Exception('E-imzo egasi mos kelmadi');
-            }
-            return $this->repository->change($id, $request['signature']);
-        } catch (\Exception $exception) {
-            throw $exception;
-        }
+        });
     }
 
 //    public function eimzo($pkcs7, $isYuridik)

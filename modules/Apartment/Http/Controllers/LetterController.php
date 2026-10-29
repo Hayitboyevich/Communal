@@ -71,7 +71,7 @@ class LetterController extends BaseController
         try {
             $data = request()->only(['signature']);
             $type = LetterType::current();
-            $letter = $this->service->change(user: $this->user, id: $id, request: $data, type: $type);
+            $letter = $this->service->change(user: $this->user, id: $id, type: $type, request: $data);
             return $this->sendSuccess(LetterResource::make($letter), 'Letter send successfully.');
         } catch (\Exception $exception) {
             return $this->sendError(ErrorMessage::ERROR_1, $exception->getMessage());
