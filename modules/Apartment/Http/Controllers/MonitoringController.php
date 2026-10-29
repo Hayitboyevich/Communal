@@ -43,6 +43,7 @@ class MonitoringController extends BaseController
         protected TurarJoySyncService $turarJoySyncService
     )
     {
+        $this->historyService = new HistoryService('monitoring_histories');
         parent::__construct();
     }
 
