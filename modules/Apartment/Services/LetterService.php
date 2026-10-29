@@ -93,7 +93,7 @@ class LetterService
             $letter->shaffof_id_uuid = $signingProcess->uuid;
             $letter->sign_url = $signingProcess->sign_url;
             $letter->body_hash = $signingProcess->body_hash;
-            $letter->sign_url_expires_at = Carbon::parse($signingProcess['expires_at'])
+            $letter->sign_url_expires_at = Carbon::parse($signingProcess->expires_at)
                 ->setTimezone(config('app.timezone'))
                 ->subMinute();
             $letter->save();
