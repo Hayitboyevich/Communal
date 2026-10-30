@@ -92,7 +92,7 @@ class LetterRepository implements LetterInterface
             $letter = $this->findById($id);
             $pkcs7b64 = $signature;
             $responseData = $this->sendPost($letter, $token);
-
+dd(empty($responseData));
             if (empty($responseData)) {
                 throw new \Exception('Pochtaga yuborishda muammo yuzaga keldi.');
             }
@@ -186,7 +186,7 @@ class LetterRepository implements LetterInterface
 
             $res = null;
             if ($response->status() == 200) {
-                $res = $response;
+                $res = $response->status();
             }
             return $res;
 
