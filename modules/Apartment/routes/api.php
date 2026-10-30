@@ -12,8 +12,15 @@ use Modules\Apartment\Http\Controllers\ProgramMonitoringController;
 use Modules\Apartment\Http\Controllers\ProgramObjectController;
 use Modules\Apartment\Http\Controllers\ChecklistController;
 use Modules\Apartment\Http\Controllers\LetterController;
+use Modules\Apartment\Http\Controllers\ViolationReportController;
+use Modules\Apartment\Const\ViolationReportConfig;
 
 Route::group(['middleware' => ['auth:api', 'check-role']], function () {
+
+    Route::get('/violation-report/{type}', [ViolationReportController::class, 'show'])
+        ->whereIn('type', ViolationReportConfig::TYPES);
+    Route::get('/violation-report/{type}/excel', [ViolationReportController::class, 'excel'])
+        ->whereIn('type', ViolationReportConfig::TYPES);
 
     Route::controller(MonitoringController::class)->prefix('monitoring')->group(function () {
         Route::post('/create', 'create');
