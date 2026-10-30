@@ -23,7 +23,7 @@ class PdfController extends Controller
                 ->where('letter_type', \App\Enums\LetterType::WATER->value)
                 ->findOrFail($id);
 
-            return $pdfService->make($letter)->stream('majburiy-korsatma-' . $letter->id . '.pdf');
+            return $pdfService->make($letter, withBarcode: false)->stream('majburiy-korsatma-' . $letter->id . '.pdf');
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }

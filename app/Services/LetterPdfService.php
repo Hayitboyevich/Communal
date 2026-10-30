@@ -17,10 +17,14 @@ class LetterPdfService
     /**
      * Xat turiga qarab PDF hujjatini yaratadi.
      */
-    public function make(Letter $letter): DomPdf
+    /**
+     * @param bool $withBarcode gibrid pochtaga yuborishda true (konvert uchun barcode),
+     *                          web orqali ko'rishda (QR link) false
+     */
+    public function make(Letter $letter, bool $withBarcode = true): DomPdf
     {
         return match ($letter->letter_type) {
-            LetterType::WATER => $this->water($letter),
+            LetterType::WATER => $this->water($letter, $withBarcode),
             default => $this->apartment($letter),
         };
     }
@@ -41,7 +45,7 @@ class LetterPdfService
         return Pdf::loadView('pdf.letter', compact('monitoring', 'qrImage', 'barcode'));
     }
 
-    private function water(Letter $letter): DomPdf
+    private function water(Letter $letter, bool $withBarcode): DomPdf
     {
         $protocol = Protocol::query()
             ->with(['region', 'district', 'defect', 'inspector'])
@@ -51,7 +55,9 @@ class LetterPdfService
 
         $domain = URL::to('/water-letter-pdf') . '/' . $letter->id;
         $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
-        $barcode = DNS1D::getBarcodePNG('GASN' . $letter->id, 'C39', 2, 40);
+        $barcode = $withBarcode
+            ? DNS1D::getBarcodePNG('GASN' . $letter->id, 'C39', 2, 40)
+            : null;
 
         return Pdf::loadView('pdf.water_letter', compact('letter', 'protocol', 'qrImage', 'barcode'))
             ->setPaper('a4', 'portrait');
