@@ -16,6 +16,19 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class PdfController extends Controller
 {
 
+    public function waterLetterPdf($id, \App\Services\LetterPdfService $pdfService)
+    {
+        try {
+            $letter = \Modules\Apartment\Models\Letter::query()
+                ->where('letter_type', \App\Enums\LetterType::WATER->value)
+                ->findOrFail($id);
+
+            return $pdfService->make($letter)->stream('majburiy-korsatma-' . $letter->id . '.pdf');
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+    }
+
     public function protocolPdf($id)
     {
         try {

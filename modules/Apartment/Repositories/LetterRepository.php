@@ -6,19 +6,19 @@ use App\Enums\LetterType;
 use App\Enums\UserRoleEnum;
 use App\Models\Scopes\LetterTypeScope;
 use App\Services\EimzoService;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\LetterPdfService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\URL;
-use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
 use Modules\Apartment\Contracts\LetterInterface;
 use Modules\Apartment\Models\Letter;
-use Modules\Apartment\Models\Monitoring;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class LetterRepository implements LetterInterface
 {
-    public function __construct(public Letter $letter, protected EimzoService $imzoService)
+    public function __construct(
+        public Letter              $letter,
+        protected EimzoService     $imzoService,
+        protected LetterPdfService $pdfService,
+    )
     {
     }
 
@@ -195,20 +195,12 @@ class LetterRepository implements LetterInterface
         }
     }
 
-    private function generatePdf($letter)
+    /**
+     * letter_type ga qarab: APARTMENT -> pdf.letter, WATER -> pdf.water_letter
+     */
+    private function generatePdf(Letter $letter): string
     {
-        $monitoring = Monitoring::find($letter->monitoring_id);
-
-        $domain = URL::to('/monitoring-pdf') . '/' . $monitoring->id;
-        $qrImage = base64_encode(QrCode::format('png')->size(200)->generate($domain));
-
-        $barcode = DNS1D::getBarcodePNG('GASN' . $monitoring->letter->id, 'C39', 2, 40);
-
-        $pdf = PDF::loadView('pdf.letter', compact('monitoring', 'qrImage', 'barcode'));
-
-        $pdfOutput = $pdf->output();
-
-        return base64_encode($pdfOutput);
+        return $this->pdfService->base64($letter);
     }
 
 
