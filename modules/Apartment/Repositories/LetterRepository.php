@@ -185,6 +185,7 @@ class LetterRepository implements LetterInterface
 
 
             $res = null;
+            dd($response->status());
             if ($response->status() == 200) {
                 $res= 'success';
             }
