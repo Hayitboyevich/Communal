@@ -5,7 +5,7 @@
      * @var \Modules\Apartment\Models\Letter $letter
      * @var \Modules\Water\Models\Protocol   $protocol
      * @var string $qrImage  base64 png
-     * @var string $barcode  base64 png (GASN{letter_id})
+     * @var string|null $barcode  base64 png (GASN{letter_id}), web ko'rinishda null
      */
 
     // protocols.user_type: 1 - jismoniy shaxs, 2 - yuridik shaxs
@@ -41,9 +41,7 @@
         .info td { padding: 6px 0; vertical-align: top; }
         .info .label { width: 45%; font-weight: 700; }
         .info .value { text-align: center; border-bottom: 1px solid #000; }
-        .type-box { display: inline-block; border: 1.5px solid #000; padding: 2px 6px; }
-        .type-active { background: #cfe0ff; font-weight: 700; padding: 0 3px; }
-        .type-passive { color: #555; padding: 0 3px; }
+        .type-box { display: inline-block; border: 1.5px solid #000; padding: 2px 8px; font-weight: 700; }
         .main { margin-top: 10px; }
         .main th, .main td { border: 1px solid #000; padding: 6px 4px; text-align: center; vertical-align: middle; font-size: 10px; }
         .main th { font-weight: 700; }
@@ -69,7 +67,8 @@
     <div style="width: 96%; border-top: 2px solid #687196; margin: 0 auto;"></div>
 </div>
 
-{{-- ===== Gibrid pochta: barcode + manzil (konvert oynasi) ===== --}}
+{{-- ===== Gibrid pochta: barcode + manzil (konvert oynasi) — faqat pochtaga yuborishda ===== --}}
+@if(!empty($barcode))
 <table style="margin-bottom: 12px;">
     <tr>
         <td></td>
@@ -103,6 +102,7 @@
         </td>
     </tr>
 </table>
+@endif
 
 <div class="center bold" style="font-size: 13px; line-height: 1.4;">
     Ichimlik suvi ta’minoti va oqova suvlarni chiqarib yuborish sohasida aniqlangan<br/>
@@ -122,11 +122,7 @@
     <tr>
         <td class="label">Kimga:</td>
         <td class="value">
-            <span class="type-box">
-                <span class="{{ $isYuridik ? 'type-passive' : 'type-active' }}">Jismoniy shaxs</span>
-                /
-                <span class="{{ $isYuridik ? 'type-active' : 'type-passive' }}">Yuridik shaxs</span>
-            </span>
+            <span class="type-box">{{ $isYuridik ? 'Yuridik shaxs' : 'Jismoniy shaxs' }}</span>
         </td>
     </tr>
     <tr>
