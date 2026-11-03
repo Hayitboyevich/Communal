@@ -38,7 +38,6 @@
         .info td { padding: 6px 0; vertical-align: top; }
         .info .label { width: 45%; font-weight: 700; }
         .info .value { text-align: center; border-bottom: 1px solid #000; }
-        .type-box { display: inline-block; border: 1.5px solid #000; padding: 2px 8px; font-weight: 700; }
         .main { margin-top: 10px; }
         .main th, .main td { border: 1px solid #000; padding: 6px 4px; text-align: center; vertical-align: middle; font-size: 10px; }
         .main th { font-weight: 700; }
@@ -119,7 +118,7 @@
     <tr>
         <td class="label">Kimga:</td>
         <td class="value">
-            <span class="type-box">{{ $responsibleType?->label() ?? '-' }}</span>
+            {{ $responsibleType?->label() ?? '-' }}
         </td>
     </tr>
     <tr>

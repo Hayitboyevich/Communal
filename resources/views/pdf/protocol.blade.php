@@ -163,10 +163,16 @@
             <td style="padding: 10px">
                 <div style="font-weight: 500; margin-bottom: 5px">Kimga:</div>
             </td>
-            <td style="text-align: center;">
-                <span style="display: inline-block; border: 1.5px solid #080b22; padding: 2px 8px; font-weight: 700;">
+            <td>
+                <p
+                    style="
+                border-bottom: 1px solid #bfbfbf;
+                margin-bottom: 5px;
+                text-align: center;
+              "
+                >
                     {{ $protocol->responsibleType()?->label() ?? '-' }}
-                </span>
+                </p>
             </td>
         </tr>
         @if($protocol->functionary_name)
