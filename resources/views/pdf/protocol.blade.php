@@ -163,21 +163,30 @@
             <td style="padding: 10px">
                 <div style="font-weight: 500; margin-bottom: 5px">Kimga:</div>
             </td>
-            <td>
-                <p
-                    style="
+            <td style="text-align: center;">
+                <span style="display: inline-block; border: 1.5px solid #080b22; padding: 2px 8px; font-weight: 700;">
+                    {{ $protocol->responsibleType()?->label() ?? '-' }}
+                </span>
+            </td>
+        </tr>
+        @if($protocol->functionary_name)
+            <tr>
+                <td style="padding: 10px">
+                    <div style="font-weight: 500; margin-bottom: 5px">F.I.Sh.:</div>
+                </td>
+                <td>
+                    <p
+                        style="
                 border-bottom: 1px solid #bfbfbf;
                 margin-bottom: 5px;
                 text-align: center;
               "
-                >
-                    {{ $protocol?->functionary_name  ?? $protocol?->enterprise_name}}
-                </p>
-                {{--                <div style="font-size: 12px; text-align: center">--}}
-                {{--                    (Tashkilot nomi)--}}
-                {{--                </div>--}}
-            </td>
-        </tr>
+                    >
+                        {{ $protocol->functionary_name }}
+                    </p>
+                </td>
+            </tr>
+        @endif
         @if($protocol->enterprise_name)
             <tr>
                 <td style="padding: 10px">

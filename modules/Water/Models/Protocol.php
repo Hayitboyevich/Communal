@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Storage;
 use Modules\Apartment\Models\Letter;
 use Modules\Water\Enums\ProtocolStatusEnum;
+use Modules\Water\Enums\ProtocolUserTypeEnum;
 
 class Protocol extends Model
 {
@@ -108,5 +109,27 @@ class Protocol extends Model
     public function letter()
     {
         return $this->hasOne(Letter::class, 'protocol_id');
+    }
+
+    /**
+     * Javobgar turi: Jismoniy / Yuridik shaxs.
+     * 1) user_type (2-qadamda saqlanadi)
+     * 2) user_type bo'sh bo'lsa: INN yoki korxona nomi bor -> yuridik, JSHSHIR bor -> jismoniy
+     */
+    public function responsibleType(): ?ProtocolUserTypeEnum
+    {
+        if ($type = ProtocolUserTypeEnum::tryFrom((int) $this->user_type)) {
+            return $type;
+        }
+
+        if (filled($this->inn) || filled($this->enterprise_name)) {
+            return ProtocolUserTypeEnum::LEGAL;
+        }
+
+        if (filled($this->pin)) {
+            return ProtocolUserTypeEnum::PHYSICAL;
+        }
+
+        return null;
     }
 }

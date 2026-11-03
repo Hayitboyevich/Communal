@@ -8,11 +8,8 @@
      * @var string|null $barcode  base64 png (GASN{letter_id}), web ko'rinishda null
      */
 
-    // protocols.user_type: 1 - jismoniy shaxs, 2 - yuridik shaxs
-    // user_type bo'sh bo'lsa — korxona nomi / INN bor-yo'qligiga qarab aniqlanadi
-    $isYuridik = $protocol->user_type
-        ? (int) $protocol->user_type === 2
-        : (filled($protocol->enterprise_name) || filled($protocol->inn));
+    // Jismoniy / Yuridik — Protocol::responsibleType() (user_type, bo'lsa INN/korxona/JSHSHIR bo'yicha)
+    $responsibleType = $protocol->responsibleType();
 
     $regionName = mb_strtoupper($protocol->region?->name_uz ?? '');
 
@@ -122,7 +119,7 @@
     <tr>
         <td class="label">Kimga:</td>
         <td class="value">
-            <span class="type-box">{{ $isYuridik ? 'Yuridik shaxs' : 'Jismoniy shaxs' }}</span>
+            <span class="type-box">{{ $responsibleType?->label() ?? '-' }}</span>
         </td>
     </tr>
     <tr>
