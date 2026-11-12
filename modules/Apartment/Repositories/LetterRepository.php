@@ -176,7 +176,7 @@ class LetterRepository implements LetterInterface
 //                'SaotoAreaId' => $letter->district->soato,
 //                'Document64' => $this->generatePdf($letter),
             ];
-            dd($data['Base64Content']);
+            dd($token);
 
             $response = Http::withHeaders([
                 'Content-Type' => 'application/x-www-form-urlencoded',
