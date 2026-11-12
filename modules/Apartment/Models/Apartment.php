@@ -20,6 +20,16 @@ class Apartment extends Model
     protected $guarded = false;
 
 
+    public function region()
+    {
+        return $this->belongsTo(Region::class);
+    }
+
+    public function district()
+    {
+        return $this->belongsTo(District::class);
+    }
+
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'company_id');

@@ -16,6 +16,9 @@ class ApartmentResource extends JsonResource
             'street_id' => $this->street_id,
             'home_name' => $this->home_name,
             'home_id' => $this->home_id,
+            'region_soato' => $this->region_soato,
+            'district_soato' => $this->district_soato,
+            'cadastral_number' => $this->cadastral_number,
         ];
     }
 }

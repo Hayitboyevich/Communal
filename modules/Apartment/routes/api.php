@@ -3,6 +3,7 @@
 use App\Enums\LetterType;
 use Illuminate\Support\Facades\Route;
 use Modules\Apartment\Http\Controllers\ApartmentHiddenEconomyController;
+use Modules\Apartment\Http\Controllers\ApartmentPushController;
 use Modules\Apartment\Http\Controllers\MonitoringController;
 use Modules\Apartment\Http\Controllers\MonitoringStatusController;
 use Modules\Apartment\Http\Controllers\InformationController;
@@ -14,6 +15,10 @@ use Modules\Apartment\Http\Controllers\ChecklistController;
 use Modules\Apartment\Http\Controllers\LetterController;
 use Modules\Apartment\Http\Controllers\ViolationReportController;
 use Modules\Apartment\Const\ViolationReportConfig;
+
+// Tashqi tizim uchun push API (Basic auth)
+Route::middleware(['basic', 'throttle:600,1'])
+    ->post('/integration/apartments/push', [ApartmentPushController::class, 'push']);
 
 Route::group(['middleware' => ['auth:api', 'check-role']], function () {
 
