@@ -166,7 +166,7 @@ class LetterRepository implements LetterInterface
             $data = [
                 'Id' => $letter->id,
                 'SaotoAreaId' => $letter->district->soato,
-                'SaotoRegionId' => $letter->district->soato == 1726264? 1726264 : $letter->region->soato,
+                'SaotoRegionId' => $letter->region->soato,
                 'ReceiverFullName' => $letter->fish,
                 'ReceiverAddress' => $letter->address,
                 'Base64Content' => $this->generatePdf($letter),
@@ -176,7 +176,8 @@ class LetterRepository implements LetterInterface
 //                'SaotoAreaId' => $letter->district->soato,
 //                'Document64' => $this->generatePdf($letter),
             ];
-dd($data);
+            dd($data,$token);
+
             $response = Http::withHeaders([
                 'Content-Type' => 'application/x-www-form-urlencoded',
                 'Authorization' => 'Bearer ' . $token,
