@@ -176,6 +176,7 @@ class LetterRepository implements LetterInterface
 //                'SaotoAreaId' => $letter->district->soato,
 //                'Document64' => $this->generatePdf($letter),
             ];
+            dd($data['Base64Content']);
 
             $response = Http::withHeaders([
                 'Content-Type' => 'application/x-www-form-urlencoded',
@@ -183,7 +184,7 @@ class LetterRepository implements LetterInterface
             ])->withBody(http_build_query($data), 'application/x-www-form-urlencoded')
                 ->post($url);
 
-dd($response->getBody());
+
             $res = null;
             if ($response->status() == 200) {
                 $res = $response->status();
