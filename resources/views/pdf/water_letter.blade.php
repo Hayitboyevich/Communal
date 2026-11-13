@@ -2,7 +2,7 @@
     /**
      * Suv ta'minoti — Majburiy ko'rsatma (gibrid pochta uchun)
      *
-     * @var \Modules\Apartment\Models\Letter $letter
+     * @var \Modules\Apartment\Models\Letter|null $letter  protokol PDF (pdf.protocol) da null
      * @var \Modules\Water\Models\Protocol   $protocol
      * @var string $qrImage  base64 png
      * @var string|null $barcode  base64 png (GASN{letter_id}), web ko'rinishda null
@@ -16,8 +16,10 @@
     $date = $protocol->created_at ? $protocol->created_at->format('d-m-Y') . 'y' : '';
     $deadline = $protocol->deadline ? \Illuminate\Support\Carbon::parse($protocol->deadline)->format('d-m-Y') . 'y' : '';
 
-    $fish = $protocol->functionary_name ?: $letter->fish;
-    $address = $letter->address ?: trim(($protocol->district?->name_uz ? $protocol->district->name_uz . ', ' : '') . $protocol->address);
+    $letter = $letter ?? null;
+
+    $fish = $protocol->functionary_name ?: $letter?->fish;
+    $address = $letter?->address ?: trim(($protocol->district?->name_uz ? $protocol->district->name_uz . ', ' : '') . $protocol->address);
 
     $violation = $protocol->defect_information ?: $protocol->defect?->name;
 @endphp
@@ -72,16 +74,16 @@
             <div style="border-radius: 12px; border: 1px dashed #000; padding: 7px;">
                 <div style="text-align: center; margin-bottom: 2px;">
                     <img src="data:image/png;base64,{{ $barcode }}" alt="bar code" style="height: 1cm;"/><br/>
-                    <span>GASN{{ $letter->id }}</span>
+                    <span>GASN{{ $letter?->id }}</span>
                 </div>
                 <table>
                     <tr>
                         <td style="vertical-align: top; width: 60px;"><b>Kimga:</b></td>
-                        <td>{{ $letter->fish }}</td>
+                        <td>{{ $letter?->fish }}</td>
                     </tr>
                     <tr>
                         <td style="vertical-align: top;"><b>Manzil:</b></td>
-                        <td>{{ $letter->address }}</td>
+                        <td>{{ $letter?->address }}</td>
                     </tr>
                     @if($protocol->phone)
                         <tr>
@@ -193,13 +195,13 @@
             <img src="data:image/png;base64,{{ $qrImage }}" alt="QR" style="width: 100px; height: 100px;"/>
         </td>
         <td style="width: 38%; vertical-align: middle; text-align: center;" class="bold">
-            {{ $protocol->inspector?->full_name ?? $letter->inspector?->full_name }}
+            {{ $protocol->inspector?->full_name ?? $letter?->inspector?->full_name }}
         </td>
     </tr>
 </table>
 
 <div style="margin-top: 16px; padding-left: 40px;">
-    Aloqa uchun tel.: {{ $protocol->inspector?->phone ?? $letter->inspector?->phone }}
+    Aloqa uchun tel.: {{ $protocol->inspector?->phone ?? $letter?->inspector?->phone }}
 </div>
 
 </body>
